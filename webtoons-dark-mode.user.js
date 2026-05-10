@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.76
+// @version      1.0.77
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.76';
+    const VERSION = '1.0.77';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -1490,7 +1490,36 @@
             scheduleViewerCards();
         };
     });
-    window.addEventListener('popstate', () => { scheduleViewerSync(); scheduleViewerCards(); });
+    window.addEventListener('popstate', () => { scheduleViewerSync(); scheduleViewerCards(); scheduleViewerBanners(); });
+
+    // Fix "Want more?" app-download banner and any other unknown cont_box children
+    // that keep their native gray backgrounds. CSS can't reliably target these
+    // because the class names vary and Webtoons sometimes applies inline styles.
+    function fixViewerBanners() {
+        const box = document.querySelector('#_viewerBox');
+        if (!box || box.dataset.wtBanners) return;
+        const knownClasses = ['.viewer_lst', '.aside', '.comment_area'];
+        let fixed = 0;
+        for (const child of Array.from(box.children)) {
+            if (knownClasses.some(c => child.matches(c))) continue;
+            child.style.setProperty('background-color', 'var(--wt-bg-elev)', 'important');
+            child.style.setProperty('color', 'var(--wt-text)', 'important');
+            // Make immediate children transparent so only the wrapper carries the color.
+            for (const gc of Array.from(child.children)) {
+                const gcBg = window.getComputedStyle(gc).backgroundColor;
+                if (gcBg && gcBg !== 'transparent' && gcBg !== 'rgba(0, 0, 0, 0)') {
+                    gc.style.setProperty('background-color', 'transparent', 'important');
+                }
+            }
+            fixed++;
+        }
+        if (fixed) box.dataset.wtBanners = '1';
+    }
+    function scheduleViewerBanners() {
+        [400, 1000, 2200].forEach(d => setTimeout(fixViewerBanners, d));
+    }
+    document.addEventListener('DOMContentLoaded', fixViewerBanners);
+    scheduleViewerBanners();
 
     // Inject card wrappers into the viewer sidebar. CSS selectors for inner
     // sections are unreliable (class names vary); JS groups children of
