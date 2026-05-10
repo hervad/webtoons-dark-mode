@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.83
+// @version      1.0.84
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.83';
+    const VERSION = '1.0.84';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -1413,8 +1413,10 @@
         new MutationObserver(() => {
             if (darkOn && !document.getElementById('wt-dark-style')) applyTheme(true);
             if (dimOn && !document.getElementById('wt-dim-style')) applyDim(true);
-            // Head changes during SPA stylesheet swaps — re-check viewer state
-            typeof syncViewerClass === 'function' && syncViewerClass();
+            // NOTE: do NOT call syncViewerClass() here — head mutations fire during
+            // SPA stylesheet swaps while the OLD page's #content.viewer is still in
+            // the DOM, which would re-add wt-viewer right after pushState removed it.
+            // scheduleViewerSync() on pushState handles re-adding the class when needed.
         }).observe(document.head, { childList: true });
     }
     if (document.head) watchHead();
