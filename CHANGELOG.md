@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.71] - 2026-05-10
+
+### Fixed
+- Viewer sidebar: removed bottom separator between the two section cards — `.lst_type1` border-bottom was drawing a line inside each `.ranking_wrap` card.
+
 ## [1.0.70] - 2026-05-10
 
 ### Fixed
