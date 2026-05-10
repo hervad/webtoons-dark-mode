@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.79] - 2026-05-11
+
+### Fixed
+- Episode strip (`.episode_area`) now uses `var(--wt-bg)` instead of `var(--wt-bg-elev)` so it matches all other viewer sections (no visible shade difference); removed card styling (border-radius, box-shadow).
+- Removed `.episode_area` exemption from `fixViewerBanners()` so JS also normalizes it.
+
 ## [1.0.78] - 2026-05-10
 
 ### Fixed
