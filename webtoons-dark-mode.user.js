@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.2
+// @version      1.0.3
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Persistent toggle, optional reader dim, no image inversion, no SPA observers.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -28,17 +28,19 @@
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
         :root {
-            --wt-bg:        #15171a;
-            --wt-bg-elev:   #1e2125;
-            --wt-bg-elev2:  #262a30;
-            --wt-bg-input:  #2a2e35;
-            --wt-border:    #2c3036;
-            --wt-text:      #e6e6e6;
-            --wt-text-dim:  #a0a4ab;
-            --wt-text-mute: #6b7079;
-            --wt-link:      #7cb6ff;
-            --wt-accent:    #00d564;
-            --wt-shadow:    0 1px 2px rgba(0,0,0,.6);
+            --wt-bg:              #15171a;
+            --wt-bg-elev:         #1e2125;
+            --wt-bg-elev2:        #262a30;
+            --wt-bg-hover:        #30353c;
+            --wt-bg-input:        #2a2e35;
+            --wt-border:          #363b44;
+            --wt-text:            #e6e6e6;
+            --wt-text-dim:        #a0a4ab;
+            --wt-text-mute:       #7b828d;
+            --wt-text-on-accent:  #0a0a0a;
+            --wt-link:            #7cb6ff;
+            --wt-accent:          #00d564;
+            --wt-shadow:          0 1px 2px rgba(0,0,0,.6);
         }
     `;
 
@@ -189,10 +191,10 @@
             color: var(--wt-text) !important;
             border: 1px solid var(--wt-border) !important;
         }
-        button:hover, .btn:hover { background-color: #30353c !important; }
+        button:hover, .btn:hover { background-color: var(--wt-bg-hover) !important; }
         .btn_subscribe, .btn_main, ._btnSubscribe {
             background-color: var(--wt-accent) !important;
-            color: #0a0a0a !important;
+            color: var(--wt-text-on-accent) !important;
             border-color: var(--wt-accent) !important;
         }
 
@@ -292,7 +294,7 @@
         ::-webkit-scrollbar-thumb:hover  { background: #3a4049; }
 
         /* Selection */
-        ::selection { background: var(--wt-accent); color: #0a0a0a; }
+        ::selection { background: var(--wt-accent); color: var(--wt-text-on-accent); }
 
         /* Pure-white badge chips */
         .label, .badge, .ico_new, .ico_up, .ico_hot {
@@ -345,7 +347,7 @@
         }
         ._btnLoginSns:hover, .btn_sns:hover,
         ._emailLoginButton:hover, ._btnLoginEmail:hover {
-            background: #30353c !important;
+            background: var(--wt-bg-hover) !important;
         }
         ._btnLoginLayerClose, ._backToDefaultLoginButton { color: var(--wt-text) !important; }
 
@@ -371,12 +373,14 @@
 
     function ensureStyle(id, css, on) {
         let el = document.getElementById(id);
-        if (on && !el) {
-            el = document.createElement('style');
-            el.id = id;
-            el.textContent = css;
-            (document.head || document.documentElement).appendChild(el);
-        } else if (!on && el) {
+        if (on) {
+            if (!el) {
+                el = document.createElement('style');
+                el.id = id;
+                (document.head || document.documentElement).appendChild(el);
+            }
+            if (el.textContent !== css) el.textContent = css;
+        } else if (el) {
             el.remove();
         }
     }
