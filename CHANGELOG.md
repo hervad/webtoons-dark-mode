@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-05-11
+
+### Fixed
+
+- Panel edge glow now appears at the actual panel image edges: reverted to per-image shadow on `img._images` (container approach placed shadow at wrong location because Webtoons sets explicit dimensions on the container); used spread (-25px) > blur (20px) so the shadow source starts fully inside the image — guaranteed zero top/bottom bleed, no horizontal line artifacts
+
 ## [1.1.0] - 2026-05-11
 
 ### Fixed
