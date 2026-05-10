@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-05-11
+
+### Fixed
+
+- Panel edge glow is now continuous (no gaps between panels, no horizontal line artifacts): moved shadow to the full-height `.viewer_img._img_viewer_area` container instead of individual images; `display:inline-block` shrinks the container to image width so the glow falls at the reading column edge (inside the vignette's transparent zone); `overflow:visible` on `.viewer_lst` unclips the shadow
+
 ## [1.0.99] - 2026-05-11
 
 ### Fixed
