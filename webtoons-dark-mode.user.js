@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.12
+// @version      1.0.13
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -727,11 +727,19 @@
         .detail_other h2 .point { color: var(--wt-accent) !important; }
 
         /* Skin image (per-series artwork at the top of the page).
-           Don't override the artist's background-image — let it show at full
-           brightness. Earlier versions (.55 → .7 → .9) progressively dimmed
-           it; v1.0.12 removes the dim entirely so the artwork is as vivid as
-           it is in light mode. */
-        .detail_bg { filter: none !important; }
+           The inline style sets `background:url(...) repeat-x` which uses the
+           shorthand and clears background-color to TRANSPARENT. The artist
+           designed the image assuming it sits on WHITE — the gold sparkles,
+           pink bubbles, etc. composite onto white, with their transparent
+           regions = white. With our dark page underneath, those transparent
+           regions show dark through, muting the artwork.
+           Force background-color back to white so the artwork composites the
+           way the artist intended. Trade-off: the title banner area is a
+           light strip in dark mode, but the per-series identity is preserved. */
+        .detail_bg {
+            background-color: #fff !important;
+            filter: none !important;
+        }
 
         /* Series with .type_white skin (e.g. Sweet Romance, Spicy Roommates):
            the base CSS hard-codes .info text to #000 / #252525 which assumes

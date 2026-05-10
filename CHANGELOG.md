@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.13] - 2026-05-10
+
+### Fixed
+- **Per-series artwork on the title banner appeared dim/muted** in dark mode (gold sparkles for *The Cup of Vengeance*, pink bubbles for *Sweet Romance*, sky/clouds for *Best Teacher Baek*, etc.). Root cause traced after the user pointed out a clear before/after comparison: `.detail_bg` carries the artwork via inline `style="background:url(...) repeat-x"`, but the `background:` shorthand also resets `background-color` to **transparent**. The artist designed the image assuming a **white** backdrop — gold-on-white, pink-on-white, etc. With our dark `#content` showing through the image's transparent regions, the artwork looked muted.
+  - Removing the dim filter (v1.0.12) wasn't enough because the issue was compositing, not brightness.
+  - The fix is to force `background-color: #fff` on `.detail_bg` so the inline image paints onto white the way the artist intended. Trade-off: the title banner area is a light strip in dark mode (~321px tall at the top of series detail pages). Net: the per-series identity is preserved exactly as in light mode.
+
 ## [1.0.12] - 2026-05-10
 
 ### Fixed
