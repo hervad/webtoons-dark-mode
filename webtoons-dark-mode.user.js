@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.86
+// @version      1.0.87
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.86';
+    const VERSION = '1.0.87';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -447,15 +447,14 @@
             border-bottom: 1px solid var(--wt-border) !important;
         }
 
-        /* Viewer depth — body.wt-viewer is set/cleared by JS on every navigation.
-           No CSS :has() fallback: body:has(#content.viewer) caused false positives
-           on detail pages (Webtoons briefly adds class viewer to #content during
-           SPA transitions) and the position:fixed z-index:9999 overlay made those
-           false positives very visible. JS is the only gate for this rule. */
-        body.wt-viewer {
-            background-color: var(--wt-bg) !important;
-        }
-        body.wt-viewer::before {
+        /* Vignette gradient — applied to viewer, detail, and home/listing pages.
+           All three classes are set/cleared by JS on every navigation; no CSS
+           :has() fallback (caused false positives — see detail-page-dom.md).
+           position:fixed + inset:0 locks the overlay to the viewport so it
+           never scrolls away. pointer-events:none lets all clicks through. */
+        body.wt-viewer::before,
+        body.wt-detail::before,
+        body.wt-home::before {
             content: '' !important;
             position: fixed !important;
             inset: 0 !important;
@@ -464,6 +463,9 @@
                 transparent 86%, #000000 100%) !important;
             pointer-events: none !important;
             z-index: 9999 !important;
+        }
+        body.wt-viewer {
+            background-color: var(--wt-bg) !important;
         }
         body.wt-viewer #container,
         body.wt-viewer #content,
@@ -1485,34 +1487,38 @@
     // regardless of which element has focus.
     window.addEventListener('keydown', handleKey, true);
 
-    // Sync body.wt-viewer class for the vignette gradient — CSS :has() alone
-    // doesn't re-fire reliably after SPA navigation (pushState). This ensures
-    // the class is set on every navigation, initial load, and theme toggle.
-    function syncViewerClass() {
+    // Sync vignette body classes for all three page types. JS is the only gate —
+    // no CSS :has() fallbacks (they cause false positives during SPA transitions).
+    function syncBodyClasses() {
         if (!document.body) return;
-        document.body.classList.toggle('wt-viewer', !!document.querySelector('#content.viewer'));
+        const isViewer = !!document.querySelector('#content.viewer');
+        // Detail page: series episode list (has the full-width artwork banner).
+        const isDetail = !isViewer && !!document.querySelector('.detail_bg');
+        // Home / genre listing pages: has the trending carousel or series grid,
+        // but is not a detail or viewer page.
+        const isHome = !isViewer && !isDetail && !!document.querySelector('.main_section, .webtoon_list_wrap');
+        document.body.classList.toggle('wt-viewer', isViewer);
+        document.body.classList.toggle('wt-detail', isDetail);
+        document.body.classList.toggle('wt-home',   isHome);
     }
-    syncViewerClass();
-    document.addEventListener('DOMContentLoaded', syncViewerClass);
-    // Schedule multiple retries — SPA content may not be ready at the first check.
-    // 100ms catches fast loads; 600ms and 1500ms catch lazy-rendered pages.
+    syncBodyClasses();
+    document.addEventListener('DOMContentLoaded', syncBodyClasses);
     function scheduleViewerSync() {
-        [100, 600, 1500].forEach(d => setTimeout(syncViewerClass, d));
+        [100, 600, 1500].forEach(d => setTimeout(syncBodyClasses, d));
     }
     ['pushState', 'replaceState'].forEach(fn => {
         const orig = history[fn];
         history[fn] = function () {
             orig.apply(this, arguments);
-            // Optimistically remove wt-viewer immediately — the new page's DOM
-            // hasn't rendered yet so querySelector would still see the old page.
-            // scheduleViewerSync will re-add it if the destination is a viewer.
-            if (document.body) document.body.classList.remove('wt-viewer');
+            // Optimistically clear all page classes — the new page's DOM hasn't
+            // rendered yet so querySelector would still see the old page content.
+            if (document.body) document.body.classList.remove('wt-viewer', 'wt-detail', 'wt-home');
             scheduleViewerSync();
             scheduleViewerCards();
         };
     });
     window.addEventListener('popstate', () => {
-        if (document.body) document.body.classList.remove('wt-viewer');
+        if (document.body) document.body.classList.remove('wt-viewer', 'wt-detail', 'wt-home');
         scheduleViewerSync(); scheduleViewerCards(); scheduleViewerBanners();
     });
 
