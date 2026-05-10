@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-05-10
+
+### Changed
+- **Palette tuning** based on a contrast/perception review against Material 3, Apple HIG, GitHub Dark, Tailwind Slate and Catppuccin reference palettes:
+  - `--wt-text-mute` lifted from `#6B7079` to `#7B828D`. The previous value computed to ~3.9:1 against the page background, failing WCAG AA for normal text. The new value is ~5:1 and still clearly muted.
+  - `--wt-border` lifted from `#2C3036` to `#363B44`. The previous value was ~1.3:1 against the page background — card edges and table dividers were nearly invisible. The new value sits at ~2:1 so the elevation hierarchy reads.
+- **Palette consolidated.** The two hard-coded colors that were sprinkled in the theme CSS (`#30353c` button-hover, `#0a0a0a` text on accent surfaces) are now the new variables `--wt-bg-hover` and `--wt-text-on-accent`. The whole theme is once again re-skinnable from a single block at the top of the file.
+
+### Fixed
+- `ensureStyle()` now updates the `<style>` element's `textContent` if it already exists. Previously a second call with the same `id` but different CSS would silently do nothing — a latent bug that would have surfaced the moment a preset switcher was added.
+
 ## [1.0.2] - 2026-05-10
 
 ### Fixed
