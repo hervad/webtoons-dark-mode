@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.23
+// @version      1.0.24
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.23';
+    const VERSION   = '1.0.24';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -791,8 +791,12 @@
            the SVG sprite at those positions has a white rectangle baked in.
            Filter the CONTAINER so the whole badge (bg + number) inverts
            together: white chip → dark chip, dark number → white number. */
+        /* invert(1): white chip→black, dark number→white.
+           mix-blend-mode:screen: black pixels become transparent against
+           the parent, so the chip bg disappears while white numbers stay. */
         .webtoon_list [class^="ranking_number_"] {
-            filter: invert(1) opacity(.9) !important;
+            filter: invert(1) !important;
+            mix-blend-mode: screen !important;
         }
 
         /* Homepage "Trending" / "Popular" tab pills — base CSS uses
