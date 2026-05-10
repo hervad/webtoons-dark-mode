@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.59] - 2026-05-10
+
+### Fixed
+- Detail page: `.detail_body` was height-0 (floated children collapsed it), so its background never painted — artwork bled through card corners. Fixed with `display: flow-root` (contains floats), `overflow: hidden` (clips artwork at boundary), `border-radius: 16px` (rounded outer shape), and `padding-top: 24px` (breathing room between header and cards).
+
 ## [1.0.58] - 2026-05-10
 
 ### Fixed
