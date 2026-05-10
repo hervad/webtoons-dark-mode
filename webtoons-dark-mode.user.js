@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.7
+// @version      1.0.8
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -91,25 +91,37 @@
         .header_right .btn_search:hover { background: var(--wt-bg-hover) !important; }
         .header_right .btn_search:before { filter: brightness(0) invert(1) opacity(.85) !important; }
 
-        /* Search dropdown — recent searches + autocomplete shown when search is opened. */
-        .search_cont, .search_area, ._searchArea {
+        /* Search dropdown — recent searches + autocomplete shown when search opens.
+           Has three nested layers: .search_area (outer panel) → .input_box
+           (the rounded grey pill) → .input_search (the actual transparent
+           <input>). v1.0.6 missed .input_box, so the pill stayed light grey. */
+        .search_cont, .search_area, ._searchArea, .big_search.search_area {
             background: var(--wt-bg-elev) !important;
             border: 1px solid var(--wt-border) !important;
             box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
         }
-        .input_search, ._txtKeyword {
+        .search_area .input_box {
             background: var(--wt-bg-input) !important;
-            color: var(--wt-text) !important;
             border: 1px solid var(--wt-border) !important;
         }
+        .input_search, ._txtKeyword,
+        .search_area .input_search {
+            background: transparent !important;
+            color: var(--wt-text) !important;
+        }
+        input::placeholder { color: var(--wt-text-mute) !important; }
         .ly_autocomplete, ._searchLayer {
             background: var(--wt-bg-elev) !important;
             border: 1px solid var(--wt-border) !important;
             border-radius: 4px;
         }
         .ly_autocomplete li, ._searchLayer li { background: transparent !important; }
-        .ly_autocomplete li:hover, ._searchLayer li:hover { background: var(--wt-bg-elev2) !important; }
-        .ly_autocomplete a, ._searchLayer a { color: var(--wt-text) !important; }
+        .ly_autocomplete li:hover, ._searchLayer li:hover,
+        .ly_autocomplete li.on, ._searchLayer li.on {
+            background: var(--wt-bg-elev2) !important;
+        }
+        .ly_autocomplete a, ._searchLayer a, .ly_autocomplete .title { color: var(--wt-text) !important; }
+        .search_area .ly_autocomplete .autocomplete_foot a { color: var(--wt-text-dim) !important; }
 
         /* Cards / lists */
         .card_lst li, .card_item, .detail_lst li, .lst_area li,
@@ -167,7 +179,7 @@
             border-color: var(--wt-border) !important;
         }
         .snb_item:hover .snb_tab, .snb_tab:hover {
-            color: var(--wt-text) !important;
+            color: var(--wt-accent) !important;
             background-color: var(--wt-bg-elev2) !important;
         }
         .snb_item.is_selected .snb_tab,
@@ -276,18 +288,10 @@
         .tool_area .subj_info .subj, .tool_area .subj_episode { color: var(--wt-text) !important; }
         .tool_area a { color: var(--wt-text) !important; }
 
-        /* Restore native rendering for sprite icons in the viewer contexts.
-           The v1.0.5 filter (brightness(0) invert(1)) makes them appear as
-           solid white circles here — the same .ico_* classes are reused but
-           the sprite positions for the viewer pick up icons that have a
-           colored circle background baked in. */
-        .tool_area .ico_facebook, .tool_area .ico_twitter, .tool_area .ico_copy,
-        .tool_area .ico_favorites,
-        .viewer_lst .spi_area .ico_facebook, .viewer_lst .spi_area .ico_twitter,
-        .viewer_lst .spi_area .ico_copy, .viewer_lst .spi_area .ico_favorites,
-        .viewer_lst .spi_area .ico_like2, .viewer_lst .spi_area .ico_plus3 {
-            filter: none !important;
-        }
+        /* (The viewer-context filter override added in v1.0.7 is no longer
+           needed in v1.0.8 — social SHARE icons are now never filtered, and
+           the .ico_favorites / .ico_like2 / .ico_plus3 are stats glyphs that
+           render fine in their native state inside the viewer.) */
 
         /* Episode thumbnail strip below the comic (top + bottom of viewer).
            Base CSS sets background:#f5f5f5 on bare .episode_area. */
@@ -478,6 +482,13 @@
             background: var(--wt-bg) !important;
             border-right-color: var(--wt-border) !important;
         }
+        /* Base CSS: .detail_body .detail_lst .subj span { color: #3d3d3d } —
+           higher specificity than our .subj rule, plus it targets the inner
+           <span>. Restate at matching specificity. */
+        .detail_body .detail_lst .subj span,
+        .detail_lst .subj span,
+        .detail_lst li .subj { color: var(--wt-text) !important; }
+        .detail_lst li .date { color: var(--wt-text-dim) !important; }
         .detail_other .lst_type1 li, .lst_type1 li {
             background: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
@@ -491,22 +502,21 @@
         .detail_other h2 .point { color: var(--wt-accent) !important; }
 
         /* Skin image (per-series artwork at the top of the page).
-           Don't override the artist's background-image — just dim it so the
-           bright artwork doesn't clash with our dark chrome on the sides. */
-        .detail_bg { filter: brightness(.55) !important; }
+           Don't override the artist's background-image — just slightly dim it
+           so the bright artwork sits comfortably with the dark chrome on the
+           sides. v1.0.5 used .55 which was too dim; .7 keeps the art readable. */
+        .detail_bg { filter: brightness(.7) !important; }
 
-        /* Title-banner social-share icons (FB / X / Tumblr / Reddit / Copy / RSS)
-           and stats icons (view / subscribe / grade). Sprite glyphs from a
-           dark-on-transparent SVG sheet — same trick as the footer icons. */
-        .ico_facebook, .ico_twitter, .ico_tumblr, .ico_reddit,
-        .ico_copy, .ico_rss,
+        /* Stats sprite glyphs (eye for view count, person for subscribers, star
+           for grade). These are plain dark glyphs designed for light bg —
+           bleach to white so they're visible on dark.
+           Brand SOCIAL icons (FB / X / Tumblr / Reddit / Copy / RSS) intentionally
+           NOT filtered — the sprite at those positions includes brand-colored
+           disc backgrounds that bleach to solid white circles when filtered.
+           Native colors render fine on the dark theme. */
         .ico_subscribe, .ico_view, .ico_view2,
         .ico_grade, .ico_grade2 {
             filter: brightness(0) invert(1) opacity(.85) !important;
-        }
-        .ico_facebook:hover, .ico_twitter:hover, .ico_tumblr:hover, .ico_reddit:hover,
-        .ico_copy:hover, .ico_rss:hover {
-            filter: brightness(0) invert(1) opacity(1) !important;
         }
 
         /* Pagination row at the bottom of the episode list */
@@ -548,6 +558,25 @@
         .terms_area h3, .terms_area strong { color: var(--wt-text) !important; }
         .terms_area .date                  { color: var(--wt-text-mute) !important; }
         .terms_area a                      { color: var(--wt-link) !important; }
+
+        /* Terms / Policy language pills (English / Français / Indonesia / 中文 / ภาษาไทย).
+           Base: inactive = #f3f3f3 bg + #666 text (invisible on dark).
+                 active = #000 bg + #fff text (off-theme black pill). */
+        .terms_lang_area .terms_lang_list .link,
+        .terms_lang_area .terms_tab_list .link {
+            background-color: var(--wt-bg-elev2) !important;
+            color: var(--wt-text-dim) !important;
+        }
+        .terms_lang_area .terms_lang_list .link[aria-selected="true"],
+        .terms_lang_area .terms_tab_list .link[aria-selected="true"] {
+            background-color: var(--wt-accent) !important;
+            color: var(--wt-text-on-accent) !important;
+        }
+        .terms_lang_area .terms_lang_list .link[aria-selected="false"]:hover,
+        .terms_lang_area .terms_tab_list .link[aria-selected="false"]:hover {
+            background-color: var(--wt-bg-hover) !important;
+            color: var(--wt-text) !important;
+        }
 
         /* Static Next.js subapp pages (About, Contact, Feedback, etc.).
            These are rendered by a separate bundle from /static/wec/.../next/...
