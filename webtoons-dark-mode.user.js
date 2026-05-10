@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.9
+// @version      1.0.10
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -127,6 +127,23 @@
         }
         .ly_autocomplete a, ._searchLayer a, .ly_autocomplete .title { color: var(--wt-text) !important; }
         .search_area .ly_autocomplete .autocomplete_foot a { color: var(--wt-text-dim) !important; }
+
+        /* Search autocomplete RESULT LIST (e.g. typing "roman" → Selfish Romance,
+           Sweet Romance, ... Each <li class="link"> has white-on-hover from base
+           CSS, plus #000 title + #8c8c8c info — all needs overriding. */
+        .search_area .list_autocomplete li.on,
+        .search_area .list_autocomplete .link:hover,
+        .search_area .list_autocomplete li.on .link {
+            background: var(--wt-bg-elev2) !important;
+        }
+        .search_area .list_autocomplete .subj { color: var(--wt-text) !important; }
+        .search_area .list_autocomplete .info { color: var(--wt-text-dim) !important; }
+        /* Bold-highlighted matching substring (e.g. "roman" inside "Sweet Romance").
+           Base uses brand green #03aa5a — keep brand identity but use our accent var. */
+        .search_area .list_autocomplete strong { color: var(--wt-accent) !important; }
+        .search_area .list_autocomplete+.title { border-top-color: var(--wt-border) !important; }
+        .search_area .list_autocomplete .info .bar { background: var(--wt-border) !important; }
+        .search_area .list_autocomplete .pic:before { border-color: var(--wt-border) !important; }
 
         /* Cards / lists */
         .card_lst li, .card_item, .detail_lst li, .lst_area li,
@@ -321,6 +338,18 @@
             border-color: var(--wt-border) !important;
         }
         .episode_lst { background: transparent !important; }
+        /* Currently-viewing episode highlight in the thumbnail strip.
+           Base CSS gives just a 3px green border on the .thmb. Make it pop more
+           with a green glow halo + bold subj text so the "you are here" is
+           obvious at a glance. */
+        .episode_lst li .on .thmb {
+            border: 3px solid var(--wt-accent) !important;
+            box-shadow: 0 0 0 1px rgba(0, 213, 100, .25), 0 0 14px rgba(0, 213, 100, .55) !important;
+        }
+        .episode_lst li .on .subj {
+            color: var(--wt-accent) !important;
+            font-weight: 700 !important;
+        }
 
         /* Right-side aside on viewer page ("Trending & Popular") */
         .aside.viewer { background: transparent !important; }
@@ -659,7 +688,11 @@
            disc backgrounds that bleach to solid white circles when filtered.
            Native colors render fine on the dark theme. */
         .ico_subscribe, .ico_view, .ico_view2,
-        .ico_grade, .ico_grade2 {
+        .ico_grade, .ico_grade2,
+        /* Ranking numbers in trending/popular sidebars (1, 2, 3, ... 10) are
+           also sprite digit glyphs designed for white bg — invisible on dark. */
+        .ico_n1, .ico_n2, .ico_n3, .ico_n4, .ico_n5,
+        .ico_n6, .ico_n7, .ico_n8, .ico_n9, .ico_n10 {
             filter: brightness(0) invert(1) opacity(.85) !important;
         }
 

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.10] - 2026-05-10
+
+### Fixed
+- **Trending sidebar ranking numbers (1–10) invisible on dark.** They render as sprite digit glyphs (`.ico_n1` ... `.ico_n10`) designed for white bg — previously left untouched. Now bleached white via the same filter trick used on stats glyphs.
+- **Search autocomplete result hover/select highlight went white.** When typing in the search box and getting autocomplete suggestions (e.g. "roman" → Selfish Romance / Sweet Romance / …), hovering or arrow-key-selecting an item set `.list_autocomplete li.on` and `.link:hover` to `background:#f3f3f3` — a near-white pill — and the title text underneath stayed `#000`. Hover/active bg now uses `--wt-bg-elev2`; title text uses `--wt-text`; author/info uses `--wt-text-dim`; the bold matched-substring (`<strong>roman</strong>` inside "Sweet Romance") uses `--wt-accent` (was `#03aa5a`, kept brand-green identity).
+
+### Changed
+- **Currently-viewing episode highlight is now visibly louder.** The base 3px green border on the active `.thmb` is preserved, but now sits inside a softer outer ring + a 14px green glow halo. The active episode title (`.subj`) is also bolded. Makes the "you are here" position obvious at a glance when scrubbing the thumbnail strip.
+
 ## [1.0.9] - 2026-05-10
 
 ### Fixed
