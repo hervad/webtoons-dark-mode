@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.95
+// @version      1.0.96
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.95';
+    const VERSION = '1.0.96';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -489,22 +489,14 @@
         img._images {
             border-radius: 0 !important;
         }
-        /* Subtle left/right edge shadow on the image container — purely horizontal
-           gradient so it never creates lines between stacked panels.
-           4% width at 28% opacity: barely-perceptible edge darkening that
-           reads as depth without visibly dimming the artwork content. */
+        /* Left/right edge depth on the panel strip container — x-axis-only
+           box-shadow creates zero top/bottom effect → no horizontal-line artifacts
+           between stacked panels. A faint white outer glow is the only thing
+           visible against the dark page background (dark-on-dark is invisible). */
         .viewer_img._img_viewer_area {
-            position: relative !important;
-        }
-        .viewer_img._img_viewer_area::before {
-            content: '' !important;
-            position: absolute !important;
-            inset: 0 !important;
-            background: linear-gradient(to right,
-                rgba(0,0,0,.28) 0%, transparent 4%,
-                transparent 96%, rgba(0,0,0,.28) 100%) !important;
-            pointer-events: none !important;
-            z-index: 2 !important;
+            box-shadow:
+                -1px 0 10px rgba(255,255,255,.08),
+                 1px 0 10px rgba(255,255,255,.08) !important;
         }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */

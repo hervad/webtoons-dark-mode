@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.96] - 2026-05-11
+
+### Changed
+
+- Panel edge depth: replaced `::before` gradient overlay with an x-axis-only `box-shadow` on the panel strip container (`-1px 0 10px` and `1px 0 10px` rgba white glow); this is the only technique that creates visible vertical-edge depth against a dark background without any top/bottom effect — so zero horizontal-line artifacts between stacked panels
+
 ## [1.0.95] - 2026-05-11
 
 ### Changed
