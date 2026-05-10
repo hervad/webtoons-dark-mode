@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.77] - 2026-05-10
+
+### Fixed
+- Viewer "Want more?" banner and other unknown cont_box children: added `fixViewerBanners()` JS function that scans direct children of `#_viewerBox`, skips known elements (viewer_lst, aside, comment_area), and forces `background-color: var(--wt-bg-elev)` via inline style on everything else. CSS `!important` alone was not reaching these elements because their class names are unknown and may be set via Webtoons' own JS.
+
 ## [1.0.76] - 2026-05-10
 
 ### Fixed
