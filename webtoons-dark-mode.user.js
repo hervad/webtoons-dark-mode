@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.73
+// @version      1.0.74
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.73';
+    const VERSION = '1.0.74';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -498,12 +498,11 @@
         hr { border-color: var(--wt-border) !important; background: var(--wt-border) !important; }
 
         /* === Viewer page elevation ===
-           Three-level hierarchy: page (--wt-bg) → viewer sidebar card (--wt-bg-elev)
-           → ranking items (--wt-bg-elev2). */
+           Cards are injected by buildViewerCards() in JS — CSS only provides the
+           class definition and resets; JS handles the section grouping. */
 
-        /* Aside: transparent flex column — width:330px keeps float from exceeding
-           the 1200px cont_box; height:fit-content prevents stretching to match
-           the taller comment column. */
+        /* width:330px keeps the float from exceeding the 1200px cont_box;
+           height:fit-content prevents stretching to match the comment column. */
         .aside.viewer {
             box-sizing: border-box !important;
             width: 330px !important;
@@ -511,48 +510,30 @@
             border-radius: 0 !important;
             padding: 0 !important;
             box-shadow: none !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 12px !important;
             height: fit-content !important;
         }
-        /* Direct child wrapper: transparent pass-through, flex column to space
-           the two .ranking_wrap sections. */
-        .aside.viewer > * {
+        .aside .ranking_lst.viewer {
             background: transparent !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-            box-shadow: none !important;
             display: flex !important;
             flex-direction: column !important;
             gap: 12px !important;
+            padding: 0 !important;
         }
-        /* Each .aside_item = one section (Trending & Popular / Top Originals).
-           Wraps both the section header and the ranked list. */
-        .aside.viewer .aside_item {
-            background: var(--wt-bg-elev) !important;
-            border-radius: 14px !important;
-            padding: 16px !important;
-            border: 1px solid var(--wt-border) !important;
-            box-shadow: 0 8px 32px rgba(0,0,0,.35) !important;
-        }
-        /* Fallback: if the sections use .ranking_wrap instead of .aside_item. */
-        .aside.viewer .ranking_wrap {
-            background: var(--wt-bg-elev) !important;
-            border-radius: 14px !important;
-            padding: 16px !important;
-            border: 1px solid var(--wt-border) !important;
-            box-shadow: 0 8px 32px rgba(0,0,0,.35) !important;
-        }
-        .aside .ranking_lst.viewer { background: transparent !important; }
         /* Ranking list items: transparent so they don't nest card-on-card. */
         .aside.viewer .ranking_lst li {
             background-color: transparent !important;
             border-radius: 0 !important;
             border: none !important;
         }
-        /* Section header arrow (.ico_arr1) — sprite background-image, not text;
-           color has no effect, need filter to make it visible on dark. */
+        /* Card class injected by JS onto each section wrapper. */
+        .wt-viewer-card {
+            background: var(--wt-bg-elev) !important;
+            border-radius: 14px !important;
+            padding: 16px !important;
+            border: 1px solid var(--wt-border) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,.35) !important;
+        }
+        /* Section header arrow — sprite, needs filter not color. */
         .aside.viewer .ico_arr1 {
             filter: brightness(0) invert(1) opacity(.6) !important;
         }
@@ -1487,9 +1468,68 @@
     }
     ['pushState', 'replaceState'].forEach(fn => {
         const orig = history[fn];
-        history[fn] = function() { orig.apply(this, arguments); scheduleViewerSync(); };
+        history[fn] = function() {
+            orig.apply(this, arguments);
+            scheduleViewerSync();
+            scheduleViewerCards();
+        };
     });
-    window.addEventListener('popstate', scheduleViewerSync);
+    window.addEventListener('popstate', () => { scheduleViewerSync(); scheduleViewerCards(); });
+
+    // Inject card wrappers into the viewer sidebar. CSS selectors for inner
+    // sections are unreliable (class names vary); JS groups children of
+    // .ranking_lst by "non-UL header + following UL" and wraps each pair.
+    function buildViewerCards() {
+        const aside = document.querySelector('.aside.viewer');
+        if (!aside || aside.dataset.wtCards) return;
+        const lst = aside.querySelector('.ranking_lst');
+        if (!lst) return;
+
+        const children = Array.from(lst.children);
+        if (!children.length) return;
+
+        // Group children: whenever we hit a non-UL element, start a new section.
+        const groups = [];
+        let cur = null;
+        for (const el of children) {
+            if (el.tagName !== 'UL') { cur = []; groups.push(cur); }
+            if (cur) cur.push(el);
+        }
+
+        aside.dataset.wtCards = '1';
+
+        if (groups.length < 2) {
+            // Fallback: single card around the whole ranking_lst.
+            lst.classList.add('wt-viewer-card');
+            lst.style.flexDirection = '';
+            lst.style.gap = '';
+            return;
+        }
+
+        // Rebuild lst with each group wrapped in a card div.
+        while (lst.firstChild) lst.removeChild(lst.firstChild);
+        groups.forEach(group => {
+            const card = document.createElement('div');
+            card.className = 'wt-viewer-card';
+            group.forEach(el => card.appendChild(el));
+            lst.appendChild(card);
+        });
+    }
+    function scheduleViewerCards() {
+        aside_cards_done = false;
+        [300, 900, 2000].forEach(d => setTimeout(() => {
+            if (!aside_cards_done) buildViewerCards();
+        }, d));
+    }
+    let aside_cards_done = false;
+    // Override buildViewerCards to track completion.
+    const _bvc = buildViewerCards;
+    buildViewerCards = function() {
+        _bvc();
+        if (document.querySelector('.aside.viewer[data-wt-cards]')) aside_cards_done = true;
+    };
+    document.addEventListener('DOMContentLoaded', buildViewerCards);
+    scheduleViewerCards();
 
     console.info(`[webtoons-dark-mode] v${VERSION} ready — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
 })();
