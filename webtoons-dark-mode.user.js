@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.59
+// @version      1.0.60
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.59';
+    const VERSION = '1.0.60';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -205,7 +205,7 @@
             overflow: hidden !important;
             border-radius: 16px !important;
             background: var(--wt-bg) !important;
-            padding-top: 24px !important;
+            padding-top: 0px !important;
         }
         .detail_header { color: var(--wt-text) !important; }
 
@@ -440,11 +440,20 @@
             border-bottom: 1px solid var(--wt-border) !important;
         }
 
-        /* Viewer (reading page) — radial gradient creates a subtle center
-           spotlight so the comic column feels raised above the dark sides. */
+        /* Viewer (reading page) — #content.viewer is the actual DOM selector
+           (#_viewerArea does not exist in current Webtoons markup).
+           Radial gradient: slightly lighter behind the comic column, fading to
+           darkest at the screen edges — creates atmospheric depth on flat sides. */
+        #content.viewer,
         #_viewerArea {
-            background: radial-gradient(ellipse 55% 80% at center top, #1d2026 0%, var(--wt-bg) 65%) !important;
+            background: radial-gradient(ellipse 50% 80% at 50% 5%, #1d2228 0%, var(--wt-bg) 65%) !important;
             color: var(--wt-text) !important;
+        }
+        /* Horizontal shadow from the comic column — soft dark bloom on both
+           sides so the comic reads as elevated above the background field. */
+        #_imageList,
+        .viewer_img._img_viewer_area {
+            box-shadow: 30px 0 70px rgba(0,0,0,.65), -30px 0 70px rgba(0,0,0,.65) !important;
         }
         .viewer_lst, .viewer_lst .on, .viewer_header,
         .viewer_footer, ._toolBox, .ly_episode {

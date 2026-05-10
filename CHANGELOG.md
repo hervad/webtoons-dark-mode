@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.60] - 2026-05-10
+
+### Fixed
+- Viewer page: gradient background was on `#_viewerArea` which doesn't exist in current Webtoons markup — moved to `#content.viewer` so it actually fires. Added horizontal `box-shadow` on the comic panel column to create depth on the flat side areas.
+
 ## [1.0.59] - 2026-05-10
 
 ### Fixed
