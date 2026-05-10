@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.71
+// @version      1.0.72
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.71';
+    const VERSION = '1.0.72';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -533,8 +533,8 @@
             background: var(--wt-bg-elev) !important;
             border-radius: 14px !important;
             padding: 16px !important;
-            box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 8px 32px rgba(0,0,0,.35) !important;
-            border: none !important;
+            border: 1px solid var(--wt-border) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,.35) !important;
         }
         .aside .ranking_lst.viewer { background: transparent !important; }
         /* Ranking list items: transparent so they don't nest card-on-card. */
