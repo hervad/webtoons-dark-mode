@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.0
+// @version      1.1.1
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.0';
+    const VERSION = '1.1.1';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -479,26 +479,23 @@
             background-color: transparent !important;
             color: var(--wt-text) !important;
         }
-        /* Base CSS: .cont_box .viewer_lst { overflow:hidden } — this clips any
-           box-shadow that extends outside the container's bounds. Make it visible
-           so the panel-strip shadow can escape onto the dark background. */
+        /* Base CSS: .cont_box .viewer_lst { overflow:hidden } clips shadows from
+           children. Allow them to escape onto the dark page background. */
         .viewer_lst { overflow: visible !important; }
         /* Never touch comic panels — filter:none preserves original colors. */
         .viewer_lst img, ._images, ._images img, .viewer_img img { filter: none !important; }
-        /* Continuous left/right glow on the entire panel strip (not per-image)
-           so there are no gaps or horizontal line artifacts at panel junctions.
-           display:inline-block shrinks the container to image width so the shadow
-           falls at the reading column edge (inside the vignette's transparent zone),
-           not at the viewport edge where the vignette gradient would hide it.
-           Parent .viewer_lst text-align:center keeps it centered.
-           spread = -blur cancels top/bottom bleed — glow on sides only. */
-        .viewer_img._img_viewer_area {
-            display: inline-block !important;
+        /* Left/right edge glow on each panel image.
+           spread (-25px) > blur (20px): the shadow source starts fully INSIDE the
+           image boundary, so Gaussian falloff reaches genuine zero at the image's
+           top and bottom edges — zero top/bottom bleed → no horizontal line
+           artifacts at panel junctions. The glow extends ~15px outside each
+           panel edge into the dark background, appearing at the correct location. */
+        img._images {
+            border-radius: 0 !important;
             box-shadow:
-                -25px 0 25px -25px rgba(255,255,255,.4),
-                 25px 0 25px -25px rgba(255,255,255,.4) !important;
+                -20px 0 20px -25px rgba(255,255,255,.55),
+                 20px 0 20px -25px rgba(255,255,255,.55) !important;
         }
-        img._images { border-radius: 0 !important; }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
         .tool_area {
