@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.29
+// @version      1.0.30
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.29';
+    const VERSION   = '1.0.30';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -78,13 +78,25 @@
         .gnb, .lnb {
             background-color: var(--wt-bg-elev) !important;
         }
-        .gnb a, .lnb a            { color: var(--wt-text) !important; transition: color .15s, background-color .15s; }
-        .gnb .on a, .lnb .on a    { color: var(--wt-accent) !important; }
-        /* Hover highlight on top-nav links (Originals / Categories / Rankings / Canvas / Webtoon Shop / Creators 101). */
+        .gnb a, .lnb a {
+            color: var(--wt-text-dim) !important;
+            letter-spacing: .05em !important;
+            padding: 5px 10px !important;
+            border-radius: 6px !important;
+            transition: color .15s, background-color .15s !important;
+        }
+        /* Active page link — accent green + inset underline (box-shadow avoids
+           clipping, works even when the parent has overflow:hidden). */
+        .gnb .on a, .lnb .on a {
+            color: var(--wt-accent) !important;
+            box-shadow: inset 0 -2px 0 var(--wt-accent) !important;
+            border-radius: 6px 6px 0 0 !important;
+        }
+        /* Hover — rounded dark pill + accent text. */
         .gnb a:hover, .lnb a:hover, .gnb .link:hover, .header .link_menu:hover {
             color: var(--wt-accent) !important;
             background-color: var(--wt-bg-elev2) !important;
-            border-radius: 4px;
+            border-radius: 6px !important;
         }
 
         /* Search button (top-right of header). Base CSS sets a light-grey
