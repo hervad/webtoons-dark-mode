@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.11
+// @version      1.0.12
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -727,14 +727,17 @@
         .detail_other h2 .point { color: var(--wt-accent) !important; }
 
         /* Skin image (per-series artwork at the top of the page).
-           Don't override the artist's background-image — let it show. Bumped
-           from v1.0.8's .7 to .9 so the artwork on the sides stays vivid. */
-        .detail_bg { filter: brightness(.9) !important; }
+           Don't override the artist's background-image — let it show at full
+           brightness. Earlier versions (.55 → .7 → .9) progressively dimmed
+           it; v1.0.12 removes the dim entirely so the artwork is as vivid as
+           it is in light mode. */
+        .detail_bg { filter: none !important; }
 
         /* Series with .type_white skin (e.g. Sweet Romance, Spicy Roommates):
            the base CSS hard-codes .info text to #000 / #252525 which assumes
-           the page is light. Override so author / title / "i" icon are
-           readable on dark theme. */
+           the page is light. Override so author / title are readable on dark.
+           (.ico_info2 is intentionally NOT filtered here — that was the
+           "white blob" bug from v1.0.11.) */
         .detail_header.type_white .subj,
         .detail_header.type_white h1.subj { color: var(--wt-text) !important; }
         .detail_header.type_white .info .author,
@@ -743,26 +746,20 @@
         .detail_header.type_white .author_area {
             color: var(--wt-text-dim) !important;
         }
-        .detail_header.type_white .info .ico_info2,
-        .detail_header.type_white .ico_info2 {
-            filter: brightness(0) invert(1) opacity(.85) !important;
-        }
 
-        /* Stats sprite glyphs (eye for view count, person for subscribers, star
-           for grade). These are plain dark glyphs designed for light bg —
-           bleach to white so they're visible on dark.
-           Brand SOCIAL icons (FB / X / Tumblr / Reddit / Copy / RSS) intentionally
-           NOT filtered — the sprite at those positions includes brand-colored
-           disc backgrounds that bleach to solid white circles when filtered.
-           Native colors render fine on the dark theme. */
-        .ico_subscribe, .ico_view, .ico_view2,
-        .ico_grade, .ico_grade2,
-        /* Ranking numbers in trending/popular sidebars (1, 2, 3, ... 10) are
-           also sprite digit glyphs designed for white bg — invisible on dark. */
+        /* Ranking number sprite digits (1, 2, 3, ... 10) in trending/popular
+           sidebars — these ARE plain dark glyphs designed for white bg, so
+           bleaching them to white is the correct fix. */
         .ico_n1, .ico_n2, .ico_n3, .ico_n4, .ico_n5,
         .ico_n6, .ico_n7, .ico_n8, .ico_n9, .ico_n10 {
             filter: brightness(0) invert(1) opacity(.85) !important;
         }
+        /* Stats glyphs (.ico_view / .ico_view2 / .ico_subscribe / .ico_grade /
+           .ico_grade2) and the author-info icon (.ico_info2) are intentionally
+           NOT filtered: the sprite at those positions has the BRAND GREEN
+           color baked in. Filtering bleaches it to grey/white — losing the
+           brand identity AND turning the info icon into a solid white blob.
+           Brand green renders fine against our dark surface as-is. */
 
         /* Pagination row at the bottom of the episode list. Base CSS hard-codes
            color:#070707 on both .paginate a and strong — invisible on dark. */

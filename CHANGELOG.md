@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.12] - 2026-05-10
+
+### Fixed
+- **Brand-green stats icons turned grey** in "You may also like" recommendation cards (and elsewhere). The view eye, subscribe person, and grade star sprites have brand green baked in — my v1.0.5 filter (`brightness(0) invert(1)`) was bleaching them to white/grey, killing the brand identity. Removed `.ico_view`, `.ico_view2`, `.ico_subscribe`, `.ico_grade`, `.ico_grade2` from the filter list; they render natively now (brand green, fully visible against dark).
+- **Author-info "i" icon rendered as a solid white blob** on series detail pages (e.g. *The Cup of Vengeance Is in Your Hands*). Same root cause: `brightness(0) invert(1)` bleaches the entire sprite area, not just the glyph. Removed `.ico_info2` from the filter; same as v1.0.11's `.detail_header.type_white .ico_info2` carve-out (now removed since the global rule is gone).
+
+### Changed
+- **Skin-image dimming removed entirely.** Earlier versions stepped from `.55` → `.7` → `.9`; v1.0.12 sets `filter: none` so the per-series artwork on the sides matches its light-mode brightness exactly. The artwork was designed by the artist for that brightness — there's no real reason to dim it for dark mode beyond initial caution that turned out to be unnecessary.
+
+### Filter scope (unchanged)
+- Filter is still applied to ranking-number digits (`.ico_n1` … `.ico_n10`) — those ARE plain dark glyphs designed for white bg.
+- Footer brand social icons (`.btn_foot_*`) keep their separate `.75` opacity filter.
+
 ## [1.0.11] - 2026-05-10
 
 ### Fixed
