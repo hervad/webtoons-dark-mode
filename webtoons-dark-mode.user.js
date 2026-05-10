@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.93
+// @version      1.0.94
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.93';
+    const VERSION = '1.0.94';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -485,26 +485,11 @@
            edge. box-shadow doesn't alter image colors. No display override —
            Webtoons centers images inside a text-align:center container and
            display:block would break that centering. */
-        /* border-radius:0 removes corner gap artifacts at panel junctions. */
+        /* border-radius:0 removes corner gap artifacts at panel junctions.
+           No additional shadow — the viewport vignette (body.wt-viewer::before)
+           already provides left/right depth; panel-level overlays darken artwork. */
         img._images {
             border-radius: 0 !important;
-        }
-        /* Left/right darkening overlay on the image list container.
-           Inset shadows on <img> don't render (replaced element).
-           A ::before gradient on the parent div does — and since the gradient
-           is purely horizontal it creates zero horizontal-line artifacts. */
-        .viewer_img._img_viewer_area {
-            position: relative !important;
-        }
-        .viewer_img._img_viewer_area::before {
-            content: '' !important;
-            position: absolute !important;
-            inset: 0 !important;
-            background: linear-gradient(to right,
-                rgba(0,0,0,.45) 0%, transparent 10%,
-                transparent 90%, rgba(0,0,0,.45) 100%) !important;
-            pointer-events: none !important;
-            z-index: 2 !important;
         }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
