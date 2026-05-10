@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.76] - 2026-05-10
+
+### Fixed
+- Added `.cont_box` to the dark background selector — transparent viewer sub-elements were revealing the cont_box native gray background instead of the page dark color.
+- Changed viewer sub-sections (`viewer_info_area`, `viewer_ad_area`, `viewer_patron_area`) from `background: transparent` to explicit `var(--wt-bg)`.
+- Broadened the app download banner (`foot_app`) rule to cover all occurrences inside the viewer box.
+
 ## [1.0.75] - 2026-05-10
 
 ### Fixed
