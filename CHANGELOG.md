@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.48] - 2026-05-10
+
+### Added
+- Series detail page: full dark theme — episode list, paywall strip, sort dropdown, subscribe button, recommendation cards, author info tooltip, subscribe-tier popup
+- Series detail page: `.detail_header` background left transparent so `.detail_bg` series artwork shows through correctly in the header area
+- Series detail page: header typography — text-shadow on title/genre/author for legibility on any artwork; genre label uppercase with wide letter-spacing
+- Series detail page: subscribe "+" icon (`ico_plus4`) inverted to white on dark background
+- Episode list typography: 17px episode titles, accent hover, visible date color, red-tinted like area, muted episode-number column
+- Homepage: carousel arrow glassmorphic buttons, ranking number sprite replaced with CSS text, tab pill overrides
+
+### Fixed
+- Navigation artifacts (ghost backgrounds on nav items) caused by applying `border-color`/`box-shadow` to `.gnb`/`.lnb` — moved to outer header shell only
+- Dead CSS selectors (`.wrap`, `.container`, `.section`) that matched nothing — removed
+- `#wrap` excluded from section background rule (caused nav artifacts)
+- Recently-viewed panel white background and sprite icon
+- Sort dropdown, subscribe popup, episode sort, recommendation cards — all had white backgrounds
+- Author info icon (`.ico_info2`) showing dark rectangle over series artwork
+- `.detail_header` was incorrectly given `background-color: var(--wt-bg)` which painted over the series artwork in the center; removed from section rule
+
 ## [1.0.16] - 2026-05-10
 
 ### Diagnostic

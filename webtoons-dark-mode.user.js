@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.34
+// @version      1.0.48
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.34';
+    const VERSION = '1.0.48';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -178,12 +178,19 @@
 
         /* Sections — #content and #container are the actual IDs in the DOM.
            #wrap wraps the entire page including header so excluded here —
-           html/body already covers the page background. */
+           html/body already covers the page background.
+           .detail_header is intentionally excluded: it is 1200px centered and
+           sits ON TOP of the full-width .detail_bg artwork element. Setting its
+           background-color to dark would paint over the artwork in the center
+           while leaving the artwork visible on the sides — the opposite of
+           what we want. .detail_header background defaults to transparent, which
+           lets the .detail_bg artwork show through in the header area. */
         #content, #container, .cont_area,
-        .detail_body, .detail_header, .detail_lst_wrap {
+        .detail_body, .detail_lst_wrap {
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
         }
+        .detail_header { color: var(--wt-text) !important; }
 
         /* Popups / modals */
         .layer_popup, ._popupLayer, .layer_box, .pop_layer,
@@ -749,6 +756,13 @@
             background: var(--wt-bg) !important;
             border-right-color: var(--wt-border) !important;
         }
+        /* Episode list dividers — base CSS uses #f5f5f5 (nearly white) on both
+           top and bottom borders of each row. */
+        .detail_body .detail_lst li,
+        .detail_body .detail_lst li:first-child {
+            border-color: var(--wt-border) !important;
+        }
+        .detail_body .detail_lst li:hover { background: var(--wt-bg-elev2) !important; }
         /* Base CSS: .detail_body .detail_lst .subj span { color: #3d3d3d } and
            .date { color: #b1b1b1 } — invisible on dark. Restate at matching
            specificity, plus broader fallbacks to catch any internal element. */
@@ -759,9 +773,67 @@
             color: var(--wt-text) !important;
         }
         .detail_body .detail_lst .date, .detail_lst .date,
-        .detail_body .detail_lst .tx, .detail_lst .tx {
-            color: var(--wt-text-dim) !important;
+        .detail_body .detail_lst .tx, .detail_lst .tx,
+        .detail_body .detail_lst .like_area { color: var(--wt-text-dim) !important; }
+
+        /* Paywall notice and install-app strip at the bottom of the episode list.
+           Base CSS uses border-top: 1px solid #f5f5f5 which is nearly invisible
+           on dark; tint to our border colour. */
+        .detail_paywall, .detail_install_app {
+            border-top-color: var(--wt-border) !important;
+            color: var(--wt-text) !important;
         }
+        .detail_install_app em { color: var(--wt-accent) !important; }
+
+        /* Subscribe / bookmark button (.btn_favorite) — base CSS hardcodes
+           background:#fff + color:#000. This element is NOT a <button> so our
+           generic button rule misses it. */
+        .btn_favorite {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+        .btn_favorite:hover { background: var(--wt-bg-hover) !important; }
+
+        /* .ly_area — inline popup/dropdown used for share menus and author info
+           tooltips throughout the detail page. Base CSS: background:#fff; border:
+           1px solid #b4b4b4. Our general .ly_box popup rule does not catch this. */
+        .ly_area {
+            background: var(--wt-bg-elev) !important;
+            border-color: var(--wt-border) !important;
+            color: var(--wt-text) !important;
+        }
+
+        /* Subscribe-tier popup (.ly_subscribe) — white panel that appears when
+           the subscribe button is clicked; right:20px, top:239px, z-index:120. */
+        .ly_subscribe {
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
+        }
+
+        /* Episode sort dropdown (.sort_box) — "Latest / Oldest" selector above
+           the episode list; base CSS: background:#fff; border:1px solid #ddd. */
+        .sort_box {
+            background: var(--wt-bg-elev) !important;
+            border-color: var(--wt-border) !important;
+            color: var(--wt-text) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,.5) !important;
+        }
+        .sort_box a, .sort_box button { color: var(--wt-text-dim) !important; background: transparent !important; }
+        .sort_box a:hover, .sort_box button:hover,
+        .sort_box .on, .sort_box [aria-current="true"] { color: var(--wt-text) !important; }
+
+        /* "You may also like" recommendation card items (.other_card_item) —
+           base CSS: background:#fff. They sit inside .detail_other which has
+           no background set, so overriding the item itself is enough. */
+        .other_card_item {
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+        }
+        .other_card_item:hover { background: var(--wt-bg-elev2) !important; }
+
         .detail_other .lst_type1 li, .lst_type1 li {
             background: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
@@ -774,19 +846,76 @@
         .detail_other h2 { color: var(--wt-text) !important; }
         .detail_other h2 .point { color: var(--wt-accent) !important; }
 
-        /* Skin image (per-series artwork at the top of the page).
-           The inline style sets background:url(...) repeat-x which uses the
-           shorthand and clears background-color to TRANSPARENT. The artist
-           designed the image assuming it sits on WHITE — the gold sparkles,
-           pink bubbles, etc. composite onto white, with their transparent
-           regions = white. With our dark page underneath, those transparent
-           regions show dark through, muting the artwork.
-           Force background-color back to white so the artwork composites the
-           way the artist intended. Trade-off: the title banner area is a
-           light strip in dark mode, but the per-series identity is preserved. */
-        .detail_bg {
-            background-color: #fff !important;
-            filter: none !important;
+        /* Skin image — filter:none prevents any parent rule from inverting the
+           artwork. We let the artwork tile naturally: the inline background-image
+           shorthand resets background-color to transparent, so the dark
+           .detail_header background shows in the side margins where the image
+           doesn't fully cover (no artificial clipping or masking). */
+        .detail_bg { filter: none !important; }
+
+        /* Author info icon (.ico_info2) inside the detail header is typically
+           a <button> element, so our generic button rule gives it a dark
+           background rectangle. Since .detail_header is now transparent (shows
+           artwork), that rectangle is visible against the artwork. Clear it. */
+        .detail_header .ico_info2, .detail_header [class*="ico_info"] {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Series title and genre text — text-shadow improves legibility on any
+           artwork background; letter-spacing and uppercase on the genre label
+           give the header a more editorial, polished look. */
+        .detail_header .info .subj {
+            letter-spacing: .04em !important;
+            text-shadow: 0 2px 16px rgba(0,0,0,.95), 0 0 48px rgba(0,0,0,.6) !important;
+        }
+        .detail_header .info .genre {
+            letter-spacing: .18em !important;
+            text-transform: uppercase !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            text-shadow: 0 1px 6px rgba(0,0,0,.95) !important;
+        }
+        .detail_header .info .author_area {
+            text-shadow: 0 1px 4px rgba(0,0,0,.9) !important;
+        }
+
+        /* Subscribe button "+" icon (.ico_plus4 sprite). The sprite was designed
+           for the original white btn_favorite background (dark glyph on white).
+           Now that btn_favorite has a dark background, invert the sprite to white. */
+        .btn_favorite .ico_plus4 {
+            filter: brightness(0) invert(1) !important;
+        }
+
+        /* Episode list typography — clear visual hierarchy across the four columns:
+           title > date > likes > episode number. */
+        .detail_body .detail_lst .subj span {
+            font-size: 17px !important;
+            font-weight: 500 !important;
+            color: var(--wt-text) !important;
+            letter-spacing: .01em !important;
+        }
+        .detail_body .detail_lst li > a:hover .subj span {
+            color: var(--wt-accent) !important;
+        }
+        .detail_body .detail_lst .date {
+            font-size: 13px !important;
+            color: var(--wt-text) !important;
+            letter-spacing: .03em !important;
+        }
+        /* Like area — the ♥ character is text inside .like_area (not a sprite),
+           so color: red applies to both the heart and the count number. */
+        .detail_body .detail_lst .like_area {
+            color: #e05252 !important;
+            font-size: 13px !important;
+        }
+        /* Episode number (#5, #4 …) — slightly muted so it reads as metadata. */
+        .detail_body .detail_lst .tx {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: var(--wt-text-mute) !important;
+            letter-spacing: .03em !important;
         }
 
         /* Series with .type_white skin (e.g. Sweet Romance, Spicy Roommates):
