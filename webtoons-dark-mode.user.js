@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.55
+// @version      1.0.56
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.55';
+    const VERSION = '1.0.56';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -194,8 +194,13 @@
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
         }
-        /* Allow elevation card shadows to extend outside .detail_body bounds. */
-        .detail_body { overflow: visible !important; }
+        /* Allow elevation card shadows to extend outside .detail_body bounds.
+           Gradient fills the top 16px with card colour (--wt-bg-elev) so the
+           rounded card top corners blend in instead of showing dark cutouts. */
+        .detail_body {
+            overflow: visible !important;
+            background: linear-gradient(var(--wt-bg-elev) 16px, var(--wt-bg) 16px) !important;
+        }
         .detail_header { color: var(--wt-text) !important; }
 
         /* Popups / modals */
@@ -880,7 +885,7 @@
            keep that so pagination stays in its original position. */
         .detail_body .detail_lst {
             background: var(--wt-bg-elev) !important;
-            border-radius: 0 0 16px 16px !important;
+            border-radius: 16px !important;
             padding-bottom: 66px !important;
             border: none !important;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,.1), 0 8px 32px rgba(0,0,0,.55) !important;
@@ -888,10 +893,10 @@
         /* Right sidebar — its own elevated card. */
         .aside.detail {
             background: var(--wt-bg-elev) !important;
-            border-radius: 0 0 16px 16px !important;
+            border-radius: 16px !important;
             padding: 16px !important;
-            border: 1px solid rgba(255,255,255,.1) !important;
-            box-shadow: 0 2px 0 rgba(255,255,255,.06), 0 12px 40px rgba(0,0,0,.55) !important;
+            border: none !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.1), 0 12px 40px rgba(0,0,0,.55) !important;
         }
         /* Sidebar CTA buttons (Continue reading / First episode). */
         .aside.detail .aside_btn .btn_type7 {
