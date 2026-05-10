@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.25
+// @version      1.0.26
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.25';
+    const VERSION   = '1.0.26';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -787,6 +787,34 @@
         .ico_n6, .ico_n7, .ico_n8, .ico_n9, .ico_n10 {
             filter: brightness(0) invert(1) opacity(.85) !important;
         }
+        /* Homepage trending card badges (.ranking_number_X:before) — the SVG
+           sprite bakes in a white rectangle. Replace the sprite entirely with
+           CSS-generated text: clear background-image, set content per number,
+           and override the text-indent/overflow that the sprite class hides. */
+        .webtoon_list [class^="ranking_number_"]:before {
+            background-image: none !important;
+            text-indent: 0 !important;
+            overflow: visible !important;
+            width: auto !important;
+            height: auto !important;
+            font-size: 58px !important;
+            font-weight: 900 !important;
+            color: var(--wt-text) !important;
+            text-shadow: 0 2px 10px rgba(0,0,0,.95) !important;
+            white-space: normal !important;
+            vertical-align: bottom !important;
+            line-height: 1 !important;
+        }
+        .webtoon_list .ranking_number_1:before  { content: "1"  !important; }
+        .webtoon_list .ranking_number_2:before  { content: "2"  !important; }
+        .webtoon_list .ranking_number_3:before  { content: "3"  !important; }
+        .webtoon_list .ranking_number_4:before  { content: "4"  !important; }
+        .webtoon_list .ranking_number_5:before  { content: "5"  !important; }
+        .webtoon_list .ranking_number_6:before  { content: "6"  !important; }
+        .webtoon_list .ranking_number_7:before  { content: "7"  !important; }
+        .webtoon_list .ranking_number_8:before  { content: "8"  !important; }
+        .webtoon_list .ranking_number_9:before  { content: "9"  !important; }
+        .webtoon_list .ranking_number_10:before { content: "10" !important; }
         /* Homepage "Trending" / "Popular" tab pills — base CSS uses
            #f3f3f3 (inactive) and #000 (active). Our generic button rule
            targets the <button> element, not <div class="button">. */
