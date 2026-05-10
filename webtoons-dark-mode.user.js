@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.18
+// @version      1.0.19
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.18';
+    const VERSION   = '1.0.19';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -292,12 +292,17 @@
            surface and invert the :before arrow glyph to white. */
         .carousel_wrap .carousel_paging .next,
         .carousel_wrap .carousel_paging .prev {
-            background: var(--wt-bg-elev2) !important;
-            border: 1px solid var(--wt-border) !important;
+            background: rgba(255,255,255,.12) !important;
+            border: 1px solid rgba(255,255,255,.18) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,.4) !important;
+        }
+        .carousel_wrap .carousel_paging .next:hover,
+        .carousel_wrap .carousel_paging .prev:hover {
+            background: rgba(255,255,255,.2) !important;
         }
         .carousel_wrap .carousel_paging .next:before,
         .carousel_wrap .carousel_paging .prev:before {
-            filter: brightness(0) invert(1) opacity(.8) !important;
+            filter: brightness(0) invert(1) opacity(.9) !important;
         }
         /* discover_spot arrows are sprite elements — invert to white on dark bg */
         .discover_spot .paging .btn_next,
