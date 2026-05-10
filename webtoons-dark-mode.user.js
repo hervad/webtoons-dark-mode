@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.0
+// @version      1.0.1
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Persistent toggle, optional reader dim, no image inversion, no SPA observers.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -108,7 +108,7 @@
             filter: brightness(.85);
         }
 
-        /* Tabs */
+        /* Tabs (older markup) */
         .tab_lst li, .tab_lst a, .sub_tab li, .sub_tab a {
             background-color: var(--wt-bg-elev) !important;
             color: var(--wt-text-dim) !important;
@@ -117,6 +117,70 @@
         .tab_lst li.on, .tab_lst li.on a, .sub_tab li.on, .sub_tab li.on a {
             background-color: var(--wt-bg-elev2) !important;
             color: var(--wt-accent) !important;
+        }
+
+        /* Sub-nav (snb): day-of-week picker AND genre tabs share this component */
+        .snb_wrap, .snb_inner, .snb {
+            background-color: var(--wt-bg) !important;
+            border-color: var(--wt-border) !important;
+        }
+        .snb_item, .snb_tab, ._snb_tab_a {
+            background-color: transparent !important;
+            color: var(--wt-text-dim) !important;
+            border-color: var(--wt-border) !important;
+        }
+        .snb_item:hover .snb_tab, .snb_tab:hover { color: var(--wt-text) !important; }
+        .snb_item.is_selected .snb_tab,
+        .snb_tab[aria-current="true"],
+        .snb_tab[aria-current="page"] {
+            color: var(--wt-accent) !important;
+        }
+        .btn_snb_prev, .btn_snb_next {
+            background-color: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+
+        /* List page section header: "143 series" + by Popularity / Likes / Date */
+        .webtoon_list_wrap, .section_header {
+            background-color: var(--wt-bg) !important;
+            color: var(--wt-text) !important;
+        }
+        .series_count, .series_count .number, .series_count span {
+            color: var(--wt-text-dim) !important;
+        }
+        .sort_area, .sort_by_area {
+            background-color: transparent !important;
+        }
+        .sort_by, ._sort_by_a {
+            color: var(--wt-text-dim) !important;
+            background-color: transparent !important;
+        }
+        .sort_by[aria-current="true"], ._sort_by_a[aria-current="true"] {
+            color: var(--wt-text) !important;
+        }
+
+        /* Notice strip above the footer (shown conditionally) */
+        .notice_area, #noticeArea {
+            background-color: var(--wt-bg-elev) !important;
+            color: var(--wt-text-dim) !important;
+            border-top: 1px solid var(--wt-border) !important;
+            border-bottom: 1px solid var(--wt-border) !important;
+        }
+        .notice_area a, #noticeArea a { color: var(--wt-text) !important; }
+
+        /* "Download WEBTOON now!" app-download strip in the footer */
+        .foot_app, .foot_cont, .foot_down_msg, .footapp_icon_cont {
+            background-color: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border-color: var(--wt-border) !important;
+        }
+        .foot_app .txt, .foot_down_msg .txt, .foot_app p { color: var(--wt-text) !important; }
+        /* QR code stays on a white tile so it remains scannable */
+        .ico_qrcode {
+            background-color: #fff !important;
+            padding: 4px;
+            border-radius: 4px;
         }
 
         /* Buttons */
