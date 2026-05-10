@@ -737,7 +737,7 @@
         .detail_other h2 .point { color: var(--wt-accent) !important; }
 
         /* Skin image (per-series artwork at the top of the page).
-           The inline style sets `background:url(...) repeat-x` which uses the
+           The inline style sets background:url(...) repeat-x which uses the
            shorthand and clears background-color to TRANSPARENT. The artist
            designed the image assuming it sits on WHITE — the gold sparkles,
            pink bubbles, etc. composite onto white, with their transparent

@@ -108,6 +108,8 @@ Issues and pull requests welcome. For "this surface is still light" bug reports,
 - The element class/ID (right-click → Inspect)
 - A screenshot if possible
 
+For local development setup (Fedora + VS Code recommended), see [SETUP.md](SETUP.md). The short version: `git clone`, `npm install`, open in VS Code, install Tampermonkey in your browser. The repo includes ESLint config (with userscript-metadata validation), helper scripts to grep Webtoons' minified CSS bundles, and a metadata validator.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

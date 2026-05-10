@@ -1,12 +1,22 @@
 # Claude Code local settings
 .claude/
 
-# OS / editor cruft
+# Node
+node_modules/
+
+# Helper-script cache (downloaded Webtoons CSS bundles, etc.)
+scripts/cache/
+
+# Editor / OS cruft
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
 *.swp
+
+# VS Code: ignore everything EXCEPT the workspace files we want to share
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 
 # Logs
 *.log
