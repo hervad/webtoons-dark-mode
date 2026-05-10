@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11] - 2026-05-10
+
+### Fixed
+- **Comments still had a white background** despite v1.0.9's WCC overhaul. Found the missing piece: WCC has a master container called `wcc_App__root` that wraps the entire comment widget. v1.0.9 covered the inner items (CommentItem / CommentBody / CommentHeader) but the outer App container itself stayed white. Now covered.
+- **Comment editor (the input where you type a reply) was uncovered.** Added all the WCC `Editor__*` sub-classes: `root`, `content`, `editor` (the contenteditable area), `scrollArea`, `actionBar`, `toolbar`, `attachment`, `replyContainer`, `modifyContainer`, `spoilerWrapper`, etc. Caret color also set so it's visible against the dark input.
+- **Spoiler toggle** in the comment editor (`wcc_Spoiler__*` and `wcc_SpoilerGuard__*`).
+- **Kebab-case WCC loaders** (`wcc-comment-list-loader`, `wcc-sort-order-loader`) — these don't match `[class*="wcc_"]` because they use dashes, not underscores. Added separate selectors.
+- **Notice popup buttons (Yes / No / OK / Cancel) were dark-on-dark** in v1.0.9. The buttons used `--wt-bg-elev2` which sat too close to the popup card's `--wt-bg-elev` — they disappeared into the surface. Switched to the lighter `--wt-bg-hover` with a visible border so they read as clickable pills. Hover lifts further to elev2 with a brighter border.
+- **`.detail_header.type_white` series banners** (e.g. Sweet Romance / Spicy Roommates with the pink skin) had the title (`#000`), author (`#252525`), and info `i` icon hard-coded for light page bg. Author was nearly invisible, title was pure black-on-dark. All three retinted: title uses `--wt-text`, author uses `--wt-text-dim`, info icon bleached to white.
+
+### Changed
+- **Skin image brightness bumped from `.7` to `.9`.** v1.0.5 set it to `.55`, v1.0.8 raised to `.7`. The remaining dimming was making the per-series artwork on the sides too washed out — `.9` keeps the art vivid while still preventing the worst clashes with the dark chrome.
+
 ## [1.0.10] - 2026-05-10
 
 ### Fixed
