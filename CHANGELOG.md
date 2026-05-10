@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.88] - 2026-05-11
+
+### Added
+
+- Comic panels (`img._images`) now have a drop shadow (`0 6px 28px rgba(0,0,0,.7)`) and hairline edge highlight (`0 0 0 1px rgba(255,255,255,.07)`) so each panel lifts off the dark background; `box-shadow` is purely decorative and does not affect image colors
+
 ## [1.0.87] - 2026-05-11
 
 ### Added
