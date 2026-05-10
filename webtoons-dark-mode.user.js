@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.62
+// @version      1.0.63
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.62';
+    const VERSION = '1.0.63';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -440,15 +440,21 @@
             border-bottom: 1px solid var(--wt-border) !important;
         }
 
-        /* Viewer (reading page) — depth via a short ellipse (25% height) so the
-           gradient fades fully before reaching the like/subscribe area or the
-           thumbnail strip. #content.viewer outspecifies the general #content rule
-           so this wins. #_viewerArea kept as fallback for older markup. */
-        #content.viewer,
-        #_viewerArea {
-            background: radial-gradient(ellipse 55% 25% at 50% 0%, #1d2228 0%, var(--wt-bg) 100%) !important;
-            color: var(--wt-text) !important;
+        /* Viewer depth — horizontal edge vignette scoped via :has() to viewer pages.
+           gradient on body; #container and #content become transparent so the
+           body shows in the dead side zones beyond the 1200px cont_box.
+           Elements with their own backgrounds (toolbar, episode strip, sidebar,
+           comment area) are fully opaque and unaffected. */
+        body:has(#content.viewer) {
+            background: linear-gradient(to right,
+                #0d1014 0%, var(--wt-bg) 20%,
+                var(--wt-bg) 80%, #0d1014 100%) !important;
         }
+        body:has(#content.viewer) #container,
+        body:has(#content.viewer) #content {
+            background-color: transparent !important;
+        }
+        #_viewerArea { background-color: transparent !important; }
         .viewer_lst, .viewer_lst .on, .viewer_header,
         .viewer_footer, ._toolBox, .ly_episode {
             background-color: transparent !important;
