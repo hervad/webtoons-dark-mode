@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.58
+// @version      1.0.59
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.58';
+    const VERSION = '1.0.59';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -194,12 +194,18 @@
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
         }
-        /* detail_body background must cover the artwork that bleeds through
-           rounded card corners, but must match the page bg so the container
-           rectangle isn't visible below the shorter sidebar card. */
+        /* detail_body children are floated, so detail_body collapses to height 0
+           and its background paints nothing — artwork bleeds through card corners.
+           display:flow-root forces detail_body to contain its floats (proper height).
+           overflow:hidden clips the artwork at the rounded boundary.
+           background:--wt-bg matches the page so the container is invisible below
+           the shorter sidebar card, and card corners show the page colour naturally. */
         .detail_body {
-            overflow: visible !important;
+            display: flow-root !important;
+            overflow: hidden !important;
+            border-radius: 16px !important;
             background: var(--wt-bg) !important;
+            padding-top: 24px !important;
         }
         .detail_header { color: var(--wt-text) !important; }
 
