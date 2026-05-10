@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.80] - 2026-05-11
+
+### Fixed
+- Viewer page vignette gradient now persists through the full scroll. Root cause: `.cont_box` and `.comment_area` had solid `var(--wt-bg)` backgrounds which covered the body gradient below the first panel. Fixed by adding `body.wt-viewer .cont_box` and `body.wt-viewer .comment_area` to the transparent overrides, and changing `fixViewerBanners()` to set `background-color: transparent` instead of `var(--wt-bg)` on viewer sub-sections.
+
 ## [1.0.79] - 2026-05-11
 
 ### Fixed

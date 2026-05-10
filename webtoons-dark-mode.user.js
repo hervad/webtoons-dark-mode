@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.79
+// @version      1.0.80
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.79';
+    const VERSION = '1.0.80';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -450,8 +450,12 @@
         }
         body.wt-viewer #container,
         body.wt-viewer #content,
+        body.wt-viewer .cont_box,
+        body.wt-viewer .comment_area,
         body:has(#content.viewer) #container,
-        body:has(#content.viewer) #content {
+        body:has(#content.viewer) #content,
+        body:has(#content.viewer) .cont_box,
+        body:has(#content.viewer) .comment_area {
             background-color: transparent !important;
         }
         #_viewerArea { background-color: transparent !important; }
@@ -1498,27 +1502,24 @@
         if (!box) return;
         box.dataset.wtBanners = '1';
 
-        const setBg = (el, val) => {
-            el.style.setProperty('background-color', val, 'important');
+        const clearBg = (el) => {
+            el.style.setProperty('background-color', 'transparent', 'important');
             el.style.setProperty('color', 'var(--wt-text)', 'important');
         };
 
-        // 1. Direct children of #_viewerBox except known structural elements
+        // 1. Direct non-structural children of #_viewerBox
         for (const child of Array.from(box.children)) {
             if (child.matches('.aside, .aside.viewer, .comment_area')) continue;
-            if (!child.matches('.viewer_lst')) {
-                setBg(child, 'var(--wt-bg-elev)');
-            }
+            if (!child.matches('.viewer_lst')) clearBg(child);
         }
 
-        // 2. Children of viewer_lst — make everything uniform var(--wt-bg)
-        //    Exempt: comic panel wrapper and the episode strip card itself.
+        // 2. viewer_lst children — transparent so the body gradient shows through.
+        //    Only the comic panel wrapper is exempt (images must not be touched).
         const lst = box.querySelector('.viewer_lst');
         if (lst) {
             for (const child of Array.from(lst.children)) {
                 if (child.matches('.viewer_img, ._img_viewer_area, #_imageList')) continue;
-                setBg(child, 'var(--wt-bg)');
-                // Also flatten any opaque grandchildren (the foot_app inner divs, etc.)
+                clearBg(child);
                 for (const gc of Array.from(child.children)) {
                     const gcBg = window.getComputedStyle(gc).backgroundColor;
                     if (gcBg && gcBg !== 'transparent' && gcBg !== 'rgba(0, 0, 0, 0)') {
