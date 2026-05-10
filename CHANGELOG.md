@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-05-10
+
+### Fixed
+- **White wrapper around the episode list on series detail pages** (e.g. `/en/action/best-teacher-baek/list?...`). The base CSS sets `background:#fff` on `.detail_body .detail_lst` directly — overridden with our dark surface.
+- **"You may also like" recommendation cards** (`.detail_other .lst_type1 li`) were also explicitly white. Now styled as elevated dark cards with hover state, plus dark-mode-appropriate text colors for title (`.subj`), author, and stats.
+- **Title-banner social icons** — Facebook, X, Tumblr, Reddit, Copy-link, RSS (`.ico_facebook`, `.ico_twitter`, `.ico_tumblr`, `.ico_reddit`, `.ico_copy`, `.ico_rss`). Same sprite-glyph fix used on the footer icons in v1.0.2: `filter: brightness(0) invert(1) opacity(.85)`.
+- **Stats icons** in the title banner (view / subscribe / grade) were also invisible sprite glyphs — same treatment.
+- **Pagination** at the bottom of the episode list (`.paginate`). Page numbers were hard-coded to `#070707` text in the base CSS, invisible on dark.
+
+### Added
+- **Skin-image preservation.** Each series has a unique skin image at the top of its detail page (sky/clouds for Best Teacher Baek, flames for Surviving the Game as a Barbarian, etc.) painted on `.detail_bg` via inline `background:url(...)`. Previous versions implicitly hid this with the chrome dark-out. Now the artist's image is kept visible, with `filter: brightness(.55)` applied so it doesn't clash with our dark chrome on the sides.
+
 ## [1.0.4] - 2026-05-10
 
 ### Added
