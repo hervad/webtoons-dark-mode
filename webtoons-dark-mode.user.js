@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.48
+// @version      1.0.49
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.48';
+    const VERSION = '1.0.49';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -163,6 +163,11 @@
         .search_area .list_autocomplete+.title { border-top-color: var(--wt-border) !important; }
         .search_area .list_autocomplete .info .bar { background: var(--wt-border) !important; }
         .search_area .list_autocomplete .pic:before { border-color: var(--wt-border) !important; }
+
+        /* Creators section in search autocomplete — base hover is #f3f3f3 (white). */
+        .search_area .list_creator .link:hover { background: var(--wt-bg-elev2) !important; }
+        .search_area .list_creator .info { color: var(--wt-text-dim) !important; }
+        .search_area .list_creator .info .bar { background: var(--wt-border) !important; }
 
         /* Cards / lists */
         .card_lst li, .card_item, .detail_lst li, .lst_area li,
@@ -399,6 +404,9 @@
             font-weight: 700 !important;
         }
 
+        /* Horizontal rules — base CSS leaves them with default browser styling. */
+        hr { border-color: var(--wt-border) !important; background: var(--wt-border) !important; }
+
         /* Right-side aside on viewer page ("Trending & Popular") */
         .aside.viewer { background: transparent !important; }
         .aside .ranking_lst.viewer { background: var(--wt-bg) !important; }
@@ -407,6 +415,25 @@
         }
         .ranking_lst .title_area h2 span em { color: var(--wt-text-dim) !important; }
         .ranking_lst .ico_arr1 { color: var(--wt-text-dim) !important; }
+        /* Ranking list item dividers and section separators in the viewer sidebar. */
+        .ranking_lst li, .aside_item, .aside_wrap,
+        .cont_box .aside { border-color: var(--wt-border) !important; }
+        .cont_box .aside .section_wrap, .cont_box .aside .ranking_wrap {
+            border-top-color: var(--wt-border) !important;
+            border-bottom-color: var(--wt-border) !important;
+        }
+        /* Viewer info / ad / patron section top separators. */
+        .viewer_lst .viewer_info_area,
+        .viewer_lst .viewer_ad_area { border-top-color: var(--wt-border) !important; }
+        .viewer_patron_area { border-top-color: var(--wt-border) !important; }
+        /* WCC comment sort tabs bottom border. */
+        [class*="wcc_SortOrderTabs__root"] { border-bottom-color: var(--wt-border) !important; }
+        /* Sidebar patron/section separator inside .aside.detail. */
+        .aside.detail .aside_patron { border-top-color: var(--wt-border) !important; }
+        /* Ranking list section bottom border (.lst_type1 = the ranked item list). */
+        .lst_type1 { border-bottom-color: var(--wt-border) !important; }
+        /* CANVAS Weekly round-up / challenge_spot top separator. */
+        .challenge_spot, .viewer .challenge_spot { border-top-color: var(--wt-border) !important; }
 
         /* "Share this series and show support" prompt + Like/Subscribe pills */
         .viewer_lst .dsc_encourage { color: var(--wt-text) !important; }
@@ -414,9 +441,22 @@
             background: var(--wt-bg-elev2) !important;
             color: var(--wt-text) !important;
             border: 1px solid var(--wt-border) !important;
+            transition: background .15s, border-color .15s, box-shadow .15s, transform .1s !important;
         }
         .viewer_lst .spi_area .bx:hover, .spi_area .bx:hover {
             background: var(--wt-bg-hover) !important;
+            border-color: var(--wt-accent) !important;
+            box-shadow: 0 0 0 1px var(--wt-accent), 0 4px 14px rgba(0,213,100,.15) !important;
+            transform: translateY(-1px) !important;
+        }
+        /* Heart sprite (ico_like2) — tint red to signal "like". */
+        .spi_area .ico_like2 {
+            filter: brightness(0) saturate(100%) invert(47%) sepia(89%) saturate(505%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
+        }
+        /* Subscribe "+" icon (ico_plus3/ico_plus4) — sprite is dark-on-transparent,
+           invert to white so it's visible on the dark button background. */
+        .spi_area .ico_plus3, .spi_area .ico_plus4 {
+            filter: brightness(0) invert(1) opacity(.9) !important;
         }
         .cont_box .viewer_lst .spi_area .lnk_favorites.on { color: var(--wt-text-dim) !important; }
 
@@ -752,17 +792,68 @@
 
         /* The episode list and "You may also like" cards are explicitly white
            in the base CSS — both follow our dark surface now. */
-        .detail_body .detail_lst {
+        .detail_lst, .detail_body .detail_lst {
             background: var(--wt-bg) !important;
-            border-right-color: var(--wt-border) !important;
+            border-right: none !important;
+        }
+        /* Right sidebar panel — base CSS: border-left: 2px solid #f5f5f5 (white divider). */
+        .aside.detail {
+            border-left: 1px solid rgba(255,255,255,.06) !important;
+        }
+        /* Sidebar CTA buttons (Continue reading / First episode). */
+        .aside.detail .aside_btn .btn_type7 {
+            background: var(--wt-bg-elev2) !important;
+            border: 1px solid var(--wt-border) !important;
+            color: var(--wt-text) !important;
+            transition: background .15s, border-color .15s, box-shadow .15s, transform .1s !important;
+        }
+        .aside.detail .aside_btn .btn_type7:hover {
+            background: var(--wt-bg-hover) !important;
+            border-color: var(--wt-accent) !important;
+            box-shadow: 0 0 0 1px var(--wt-accent), 0 4px 16px rgba(0,213,100,.18) !important;
+            transform: translateY(-1px) !important;
+            color: var(--wt-accent) !important;
         }
         /* Episode list dividers — base CSS uses #f5f5f5 (nearly white) on both
            top and bottom borders of each row. */
         .detail_body .detail_lst li,
         .detail_body .detail_lst li:first-child {
             border-color: var(--wt-border) !important;
+            transition: background .12s, box-shadow .12s !important;
         }
-        .detail_body .detail_lst li:hover { background: var(--wt-bg-elev2) !important; }
+        .detail_body .detail_lst li:hover {
+            background: var(--wt-bg-elev2) !important;
+        }
+        /* Cap .subj so the row's total column widths fit inside the li and don't
+           overflow past the ::after border. Overrides base CSS width:411px. */
+        .detail_body .detail_lst .subj {
+            max-width: 385px !important;
+            width: 385px !important;
+        }
+        /* Pseudo-element border renders above thumbnail and all children. */
+        .detail_body .detail_lst li:hover::after {
+            content: '' !important;
+            position: absolute !important;
+            inset: 0 !important;
+            border: 2px solid var(--wt-accent) !important;
+            border-radius: 6px !important;
+            pointer-events: none !important;
+            z-index: 5 !important;
+        }
+        /* Turn date and like count accent green on hover. */
+        .detail_body .detail_lst li > a:hover .date {
+            color: var(--wt-accent) !important;
+        }
+        .detail_body .detail_lst li > a:hover .like_area {
+            color: var(--wt-accent) !important;
+        }
+        /* Also tint the heart sprite green on hover. */
+        .detail_body .detail_lst li > a:hover .ico_like {
+            filter: brightness(0) saturate(100%) invert(62%) sepia(67%) saturate(475%) hue-rotate(103deg) brightness(95%) contrast(92%) !important;
+        }
+        .detail_body .detail_lst li > a:hover .tx {
+            color: var(--wt-text-dim) !important;
+        }
         /* Base CSS: .detail_body .detail_lst .subj span { color: #3d3d3d } and
            .date { color: #b1b1b1 } — invisible on dark. Restate at matching
            specificity, plus broader fallbacks to catch any internal element. */
@@ -773,8 +864,7 @@
             color: var(--wt-text) !important;
         }
         .detail_body .detail_lst .date, .detail_lst .date,
-        .detail_body .detail_lst .tx, .detail_lst .tx,
-        .detail_body .detail_lst .like_area { color: var(--wt-text-dim) !important; }
+        .detail_body .detail_lst .tx, .detail_lst .tx { color: var(--wt-text-dim) !important; }
 
         /* Paywall notice and install-app strip at the bottom of the episode list.
            Base CSS uses border-top: 1px solid #f5f5f5 which is nearly invisible
@@ -904,18 +994,23 @@
             color: var(--wt-text) !important;
             letter-spacing: .03em !important;
         }
-        /* Like area — the ♥ character is text inside .like_area (not a sprite),
-           so color: red applies to both the heart and the count number. */
+        /* Like area count number — red to match the heart icon. */
         .detail_body .detail_lst .like_area {
             color: #e05252 !important;
             font-size: 13px !important;
         }
-        /* Episode number (#5, #4 …) — slightly muted so it reads as metadata. */
+        /* .ico_like is a sprite (background-image), not text — filter it red. */
+        .detail_body .detail_lst .ico_like {
+            filter: brightness(0) saturate(100%) invert(47%) sepia(89%) saturate(505%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
+        }
+        /* Episode number (#5, #4 …) — slightly muted so it reads as metadata.
+           padding-right keeps it clear of the 2px hover border. */
         .detail_body .detail_lst .tx {
             font-size: 14px !important;
             font-weight: 600 !important;
             color: var(--wt-text-mute) !important;
             letter-spacing: .03em !important;
+            padding-right: 6px !important;
         }
 
         /* Series with .type_white skin (e.g. Sweet Romance, Spicy Roommates):
