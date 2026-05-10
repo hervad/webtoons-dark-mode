@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2026-05-10
+
+### Fixed
+- **Viewer top toolbar** (`.tool_area`, the fixed bar at the top of every chapter page). Was natively `#2f2f2f` — now uses `--wt-bg-elev` for theme consistency, with a `--wt-border` bottom edge.
+- **Top-toolbar icons rendering as solid white circles.** The same `.ico_facebook` / `.ico_twitter` / `.ico_copy` / `.ico_favorites` classes are reused in the title banner (where v1.0.5's `filter: brightness(0) invert(1)` works well) and in the viewer toolbar (where the sprite picks up icons that have a colored circle background baked in — the filter then bleached the whole disc to solid white). Filter is now suppressed in the viewer-toolbar and viewer-share contexts; icons render in their native colors.
+- **Episode thumbnail strip** above and below the comic (`.episode_area`). Base CSS hard-codes `background:#f5f5f5`. Now `--wt-bg-elev` with `--wt-border` outline.
+- **"Trending & Popular" sidebar** on the viewer (`.aside.viewer`, `.ranking_lst.viewer`). Wrapper gets dark surface, headings + counts get proper text/dim colors.
+- **"Share this series and show support for the creator!" prompt** (`.viewer_lst .dsc_encourage`). Was hard-coded to `color:#080808` — invisible on dark.
+- **Like / Subscribe pill buttons** in the viewer footer (`.spi_area .bx`). Were `background:#ececec` `color:#585858` by default. Now elevated dark surface with hover state.
+- **Creator-note card** at the top of the comments section (`.comment_area .creator_note`, `.creator_note .title`, `.author_area .author`). Title was `#3c3c3c`; now muted-dim. Author name is now full primary text.
+- **Comments section header** (`.comment_head .title_comments`, `.count`).
+
+### Added
+- **Defensive cbox-widget catch-alls** for slightly different class variants (`[class*="cbox_nick"]`, `[class*="cbox_date"]`, `[class*="cbox_sort"]`). Addresses "user nicknames almost invisible" reports without changing the v1.0.2 rules that already work.
+
 ## [1.0.6] - 2026-05-10
 
 ### Fixed

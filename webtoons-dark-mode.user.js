@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.6
+// @version      1.0.7
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -266,6 +266,84 @@
         }
         /* Never touch comic panels */
         .viewer_lst img, ._images, ._images img, .viewer_img img { filter: none !important; }
+
+        /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
+        .tool_area {
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border-bottom: 1px solid var(--wt-border) !important;
+        }
+        .tool_area .subj_info .subj, .tool_area .subj_episode { color: var(--wt-text) !important; }
+        .tool_area a { color: var(--wt-text) !important; }
+
+        /* Restore native rendering for sprite icons in the viewer contexts.
+           The v1.0.5 filter (brightness(0) invert(1)) makes them appear as
+           solid white circles here — the same .ico_* classes are reused but
+           the sprite positions for the viewer pick up icons that have a
+           colored circle background baked in. */
+        .tool_area .ico_facebook, .tool_area .ico_twitter, .tool_area .ico_copy,
+        .tool_area .ico_favorites,
+        .viewer_lst .spi_area .ico_facebook, .viewer_lst .spi_area .ico_twitter,
+        .viewer_lst .spi_area .ico_copy, .viewer_lst .spi_area .ico_favorites,
+        .viewer_lst .spi_area .ico_like2, .viewer_lst .spi_area .ico_plus3 {
+            filter: none !important;
+        }
+
+        /* Episode thumbnail strip below the comic (top + bottom of viewer).
+           Base CSS sets background:#f5f5f5 on bare .episode_area. */
+        .episode_area {
+            background: var(--wt-bg-elev) !important;
+            border-color: var(--wt-border) !important;
+        }
+        .episode_lst { background: transparent !important; }
+
+        /* Right-side aside on viewer page ("Trending & Popular") */
+        .aside.viewer { background: transparent !important; }
+        .aside .ranking_lst.viewer { background: var(--wt-bg) !important; }
+        .ranking_lst .title_area h2 a, .ranking_lst .title_area h2 span {
+            color: var(--wt-text) !important;
+        }
+        .ranking_lst .title_area h2 span em { color: var(--wt-text-dim) !important; }
+        .ranking_lst .ico_arr1 { color: var(--wt-text-dim) !important; }
+
+        /* "Share this series and show support" prompt + Like/Subscribe pills */
+        .viewer_lst .dsc_encourage { color: var(--wt-text) !important; }
+        .viewer_lst .spi_area .bx, .spi_area .bx {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+        .viewer_lst .spi_area .bx:hover, .spi_area .bx:hover {
+            background: var(--wt-bg-hover) !important;
+        }
+        .cont_box .viewer_lst .spi_area .lnk_favorites.on { color: var(--wt-text-dim) !important; }
+
+        /* Comments section header + creator note card */
+        .comment_area { background: var(--wt-bg) !important; color: var(--wt-text) !important; }
+        .comment_head .title_comments { color: var(--wt-text) !important; }
+        .comment_head .count { color: var(--wt-text-dim) !important; }
+        .comment_area .creator_note {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .comment_area .creator_note .title { color: var(--wt-text-dim) !important; }
+        .comment_area .creator_note .author_area .author,
+        .comment_area .creator_note .author_area .author_name { color: var(--wt-text) !important; }
+        .comment_area .creator_note .author_area .author_name span { color: var(--wt-text) !important; }
+
+        /* Defensive widening of the v1.0.2 cbox rules — newer comment widget
+           variants sometimes use slightly different class names. Catches
+           "almost-invisible nickname" reports without overriding existing rules. */
+        [class*="cbox_nick"], [class*="cbox_name"], [class*="comment_nick"], [class*="user_nick"] {
+            color: var(--wt-link) !important;
+        }
+        [class*="cbox_date"], [class*="comment_date"] { color: var(--wt-text-mute) !important; }
+        [class*="cbox_sort"] a, [class*="cbox_sort"] button { color: var(--wt-text-dim) !important; }
+        [class*="cbox_sort"] .on, [class*="cbox_sort"] [aria-current="true"] {
+            color: var(--wt-text) !important;
+        }
 
         /* Comments (Naver u_cbox widget) */
         #_cmtArea, .cmt_area, .u_cbox, .u_cbox_content_wrap,
