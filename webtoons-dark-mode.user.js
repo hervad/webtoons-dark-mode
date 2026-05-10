@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.16
+// @version      1.0.17
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.16';
+    const VERSION   = '1.0.17';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -639,12 +639,24 @@
             color: var(--wt-text) !important;
         }
 
-        /* "Recently viewed" floating bar on the right edge.
-           The site paints a white PNG background — we replace it with our dark surface. */
+        /* "Recently viewed" floating bar on the right edge. */
         .recently_area {
             background: var(--wt-bg-elev) !important;
             background-image: none !important;
             border-left: 1px solid var(--wt-border) !important;
+        }
+        /* .menu is the collapsed tab — its white appearance comes from the sprite
+           sheet, not the bg PNG. Clear the sprite and draw our own dark pill. */
+        .recently_area .menu {
+            background-image: none !important;
+            background-color: var(--wt-bg-elev) !important;
+            border-radius: 8px 0 0 8px !important;
+            border: 1px solid var(--wt-border) !important;
+            border-right: none !important;
+        }
+        /* Collapse/expand chevron (← arrow) — dark sprite glyph on white. */
+        .recently_area.unfd .ico_recently {
+            filter: brightness(0) invert(1) opacity(.7) !important;
         }
         .recently_area .t_recently,
         .recently_area .t_recently2,
