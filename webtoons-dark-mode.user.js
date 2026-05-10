@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.4
+// @version      1.0.5
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -350,6 +350,54 @@
             background: var(--wt-bg-hover) !important;
         }
         ._btnLoginLayerClose, ._backToDefaultLoginButton { color: var(--wt-text) !important; }
+
+        /* ---------- Series detail page (e.g. /<lang>/<genre>/<slug>/list?title_no=...) ---------- */
+
+        /* The episode list and "You may also like" cards are explicitly white
+           in the base CSS — both follow our dark surface now. */
+        .detail_body .detail_lst {
+            background: var(--wt-bg) !important;
+            border-right-color: var(--wt-border) !important;
+        }
+        .detail_other .lst_type1 li, .lst_type1 li {
+            background: var(--wt-bg-elev) !important;
+            border-color: var(--wt-border) !important;
+            border-radius: 6px;
+        }
+        .lst_type1 li:hover { background: var(--wt-bg-elev2) !important; }
+        .lst_type1 .subj   { color: var(--wt-text) !important; }
+        .lst_type1 .author { color: var(--wt-text-dim) !important; }
+        .lst_type1 .grade_num, .lst_type1 .grade_area { color: var(--wt-text-mute) !important; }
+        .detail_other h2 { color: var(--wt-text) !important; }
+        .detail_other h2 .point { color: var(--wt-accent) !important; }
+
+        /* Skin image (per-series artwork at the top of the page).
+           Don't override the artist's background-image — just dim it so the
+           bright artwork doesn't clash with our dark chrome on the sides. */
+        .detail_bg { filter: brightness(.55) !important; }
+
+        /* Title-banner social-share icons (FB / X / Tumblr / Reddit / Copy / RSS)
+           and stats icons (view / subscribe / grade). Sprite glyphs from a
+           dark-on-transparent SVG sheet — same trick as the footer icons. */
+        .ico_facebook, .ico_twitter, .ico_tumblr, .ico_reddit,
+        .ico_copy, .ico_rss,
+        .ico_subscribe, .ico_view, .ico_view2,
+        .ico_grade, .ico_grade2 {
+            filter: brightness(0) invert(1) opacity(.85) !important;
+        }
+        .ico_facebook:hover, .ico_twitter:hover, .ico_tumblr:hover, .ico_reddit:hover,
+        .ico_copy:hover, .ico_rss:hover {
+            filter: brightness(0) invert(1) opacity(1) !important;
+        }
+
+        /* Pagination row at the bottom of the episode list */
+        .paginate a, .paginate strong, .paginate span {
+            color: var(--wt-text-dim) !important;
+        }
+        .paginate a:hover { color: var(--wt-text) !important; }
+        .paginate .on, .paginate [aria-current="true"] {
+            color: var(--wt-text-on-accent) !important;
+        }
 
         /* Defensive catch-all for any other dialog Webtoons might add later. */
         [role="dialog"], [aria-modal="true"] {
