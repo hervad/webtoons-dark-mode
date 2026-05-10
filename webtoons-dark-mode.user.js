@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.21
+// @version      1.0.22
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.21';
+    const VERSION   = '1.0.22';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -781,15 +781,36 @@
             color: var(--wt-text-dim) !important;
         }
 
-        /* Ranking number sprite digits — two sprite systems:
-           .ico_n1-10: small glyphs in sidebars (dark on transparent)
-           .ranking_number_X:before: large card badges (SVG with white bg baked in)
-           Both inverted to white on transparent/dark. */
+        /* Ranking number sprite digits (1, 2, 3, ... 10) in trending/popular
+           sidebars — plain dark glyphs on transparent, invert to white. */
         .ico_n1, .ico_n2, .ico_n3, .ico_n4, .ico_n5,
-        .ico_n6, .ico_n7, .ico_n8, .ico_n9, .ico_n10,
-        [class^="ranking_number_"]:before,
-        [class*=" ranking_number_"]:before {
+        .ico_n6, .ico_n7, .ico_n8, .ico_n9, .ico_n10 {
             filter: brightness(0) invert(1) opacity(.85) !important;
+        }
+        /* Large ranking badge (.ranking_number_X) on homepage trending cards —
+           the SVG sprite at those positions has a white rectangle baked in.
+           Filter the CONTAINER so the whole badge (bg + number) inverts
+           together: white chip → dark chip, dark number → white number. */
+        .webtoon_list [class^="ranking_number_"] {
+            filter: brightness(0) invert(1) opacity(.9) !important;
+        }
+
+        /* Homepage "Trending" / "Popular" tab pills — base CSS uses
+           #f3f3f3 (inactive) and #000 (active). Our generic button rule
+           targets the <button> element, not <div class="button">. */
+        .main_section_tab .button {
+            background-color: var(--wt-bg-elev2) !important;
+            color: var(--wt-text-dim) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+        .main_section_tab .button:hover {
+            background-color: var(--wt-bg-hover) !important;
+            color: var(--wt-text) !important;
+        }
+        .main_section_tab .button[aria-selected="true"] {
+            background-color: var(--wt-accent) !important;
+            color: var(--wt-text-on-accent) !important;
+            border-color: var(--wt-accent) !important;
         }
         /* Stats glyphs (.ico_view / .ico_view2 / .ico_subscribe / .ico_grade /
            .ico_grade2) and the author-info icon (.ico_info2) are intentionally
