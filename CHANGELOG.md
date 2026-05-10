@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.14] - 2026-05-10
+
+### Fixed
+- **`Alt + Shift + T` / `Alt + Shift + N` keyboard shortcuts stopped firing** on some pages. Most likely cause: a focused contenteditable in the WCC comment editor (added in v1.0.11) intercepts the keystroke before our window-level capture handler, OR a Webtoons handler calls `stopImmediatePropagation` ahead of ours. Hardened the keyboard handler:
+  - Bound to **both `window` and `document`** capture phase so we catch the event regardless of which root Webtoons attaches to.
+  - Matches both `e.code` (physical key, layout-independent) AND `e.key` (translated character) so non-QWERTY layouts also work.
+  - Calls `e.stopImmediatePropagation()` + `e.stopPropagation()` after a successful toggle so Webtoons' own handlers can't undo or interfere.
+  - Wraps `toggle()` calls in `try/catch` so a single `GM_setValue` failure doesn't silently kill the binding for the rest of the session — errors now log to the console with a `[webtoons-dark-mode]` prefix.
+
 ## [1.0.13] - 2026-05-10
 
 ### Fixed

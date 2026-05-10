@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.13
+// @version      1.0.14
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -939,9 +939,33 @@
     }
 
     // Alt+Shift+T = theme, Alt+Shift+N = night dim. Avoid bare Alt+D (= focus URL bar).
-    window.addEventListener('keydown', (e) => {
+    // Hardened in v1.0.14:
+    //   - bound to both window and document so we catch the event regardless of
+    //     which one Webtoons uses as the propagation root,
+    //   - matches both e.code (physical key) and e.key (layout-translated char)
+    //     so non-QWERTY layouts work,
+    //   - calls stopImmediatePropagation when we handled it so Webtoons' own
+    //     keydown handlers (e.g. WCC comment editor) can't undo the effect,
+    //   - try/catch around toggle so a GM_* failure doesn't silently swallow
+    //     the binding for the rest of the session.
+    function handleKey(e) {
         if (!e.altKey || !e.shiftKey || e.ctrlKey || e.metaKey) return;
-        if (e.code === 'KeyT') { e.preventDefault(); toggle(KEY_THEME, applyTheme, themeDefault); }
-        else if (e.code === 'KeyN') { e.preventDefault(); toggle(KEY_DIM, applyDim, false); }
-    }, true);
+        const code = e.code;
+        const key = (e.key || '').toUpperCase();
+        let handled = false;
+        if (code === 'KeyT' || key === 'T') {
+            try { toggle(KEY_THEME, applyTheme, themeDefault); handled = true; }
+            catch (err) { console.error('[webtoons-dark-mode] toggle theme failed:', err); }
+        } else if (code === 'KeyN' || key === 'N') {
+            try { toggle(KEY_DIM, applyDim, false); handled = true; }
+            catch (err) { console.error('[webtoons-dark-mode] toggle dim failed:', err); }
+        }
+        if (handled) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+        }
+    }
+    window.addEventListener('keydown', handleKey, true);
+    document.addEventListener('keydown', handleKey, true);
 })();
