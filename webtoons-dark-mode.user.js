@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.72
+// @version      1.0.73
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.72';
+    const VERSION = '1.0.73';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -527,8 +527,16 @@
             flex-direction: column !important;
             gap: 12px !important;
         }
-        /* Each .ranking_wrap = one section (Trending & Popular / Top Originals).
-           These are the actual section containers inside .ranking_lst.viewer. */
+        /* Each .aside_item = one section (Trending & Popular / Top Originals).
+           Wraps both the section header and the ranked list. */
+        .aside.viewer .aside_item {
+            background: var(--wt-bg-elev) !important;
+            border-radius: 14px !important;
+            padding: 16px !important;
+            border: 1px solid var(--wt-border) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,.35) !important;
+        }
+        /* Fallback: if the sections use .ranking_wrap instead of .aside_item. */
         .aside.viewer .ranking_wrap {
             background: var(--wt-bg-elev) !important;
             border-radius: 14px !important;
