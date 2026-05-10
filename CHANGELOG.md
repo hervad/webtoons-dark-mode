@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.87] - 2026-05-11
+
+### Added
+
+- Left/right vignette gradient now applies to series detail pages (`body.wt-detail`) and home/genre listing pages (`body.wt-home`), matching the existing viewer-page gradient; all three classes are synced by a unified `syncBodyClasses()` function on every navigation
+
 ## [1.0.86] - 2026-05-11
 
 ### Fixed
