@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.15] - 2026-05-10
+
+### Added
+- **Backup keyboard shortcuts** for users whose OS or keyboard layout swallows `Alt+Shift+T`. On Windows specifically, `Alt+Shift` is the default Switch Input Language hotkey on multi-language setups — that can intercept the keystroke before it reaches our handler. Now also accepts:
+  - **`Ctrl + Alt + D`** → toggle theme (alongside `Alt + Shift + T`)
+  - **`Ctrl + Alt + Shift + D`** → toggle reader dim (alongside `Alt + Shift + N`)
+- **`console.info` startup banner** so you can confirm the script actually loaded and which version Tampermonkey is serving: open DevTools → Console and look for `[webtoons-dark-mode] v1.0.15 loaded …`. Each successful toggle also logs `theme toggled` / `reader dim toggled` so we can tell whether the handler is firing.
+
+### Changed
+- **Handler attached to four roots** (`window`, `document`, `<html>`, `<body>`) in capture phase. If a focus-stealing widget (WCC comment editor) somehow blocks one root, another will still see the event.
+
 ## [1.0.14] - 2026-05-10
 
 ### Fixed

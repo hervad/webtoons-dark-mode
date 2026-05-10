@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.14
+// @version      1.0.15
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -938,27 +938,41 @@
         GM_registerMenuCommand('Toggle reader dim',         () => toggle(KEY_DIM,   applyDim,   false));
     }
 
-    // Alt+Shift+T = theme, Alt+Shift+N = night dim. Avoid bare Alt+D (= focus URL bar).
-    // Hardened in v1.0.14:
-    //   - bound to both window and document so we catch the event regardless of
-    //     which one Webtoons uses as the propagation root,
-    //   - matches both e.code (physical key) and e.key (layout-translated char)
-    //     so non-QWERTY layouts work,
-    //   - calls stopImmediatePropagation when we handled it so Webtoons' own
-    //     keydown handlers (e.g. WCC comment editor) can't undo the effect,
-    //   - try/catch around toggle so a GM_* failure doesn't silently swallow
-    //     the binding for the rest of the session.
-    function handleKey(e) {
-        if (!e.altKey || !e.shiftKey || e.ctrlKey || e.metaKey) return;
+    // Keyboard shortcuts. Multiple combos so the user can use whichever doesn't
+    // conflict with their OS / browser / keyboard-layout switcher:
+    //   - Alt+Shift+T  OR  Ctrl+Alt+D       → toggle theme
+    //   - Alt+Shift+N  OR  Ctrl+Alt+Shift+D → toggle reader dim
+    // Note: bare Alt+D opens the address bar; Alt+Shift on Windows can also
+    // trigger the input-language switcher, which can swallow Alt+Shift+T on
+    // multi-language setups. The Ctrl+Alt+D backup avoids both.
+    function matchCombo(e, want) {
+        if (!!e.altKey   !== want.alt)   return false;
+        if (!!e.shiftKey !== want.shift) return false;
+        if (!!e.ctrlKey  !== want.ctrl)  return false;
+        if (e.metaKey)                    return false; // never with Cmd
         const code = e.code;
         const key = (e.key || '').toUpperCase();
+        return code === want.code || key === want.letter;
+    }
+    function handleKey(e) {
+        const themeAltShiftT = matchCombo(e, { alt:true,  shift:true,  ctrl:false, code:'KeyT', letter:'T' });
+        const themeCtrlAltD  = matchCombo(e, { alt:true,  shift:false, ctrl:true,  code:'KeyD', letter:'D' });
+        const dimAltShiftN   = matchCombo(e, { alt:true,  shift:true,  ctrl:false, code:'KeyN', letter:'N' });
+        const dimCtrlAltShD  = matchCombo(e, { alt:true,  shift:true,  ctrl:true,  code:'KeyD', letter:'D' });
+
         let handled = false;
-        if (code === 'KeyT' || key === 'T') {
-            try { toggle(KEY_THEME, applyTheme, themeDefault); handled = true; }
-            catch (err) { console.error('[webtoons-dark-mode] toggle theme failed:', err); }
-        } else if (code === 'KeyN' || key === 'N') {
-            try { toggle(KEY_DIM, applyDim, false); handled = true; }
-            catch (err) { console.error('[webtoons-dark-mode] toggle dim failed:', err); }
+        try {
+            if (themeAltShiftT || themeCtrlAltD) {
+                toggle(KEY_THEME, applyTheme, themeDefault);
+                handled = true;
+                console.info('[webtoons-dark-mode] theme toggled');
+            } else if (dimAltShiftN || dimCtrlAltShD) {
+                toggle(KEY_DIM, applyDim, false);
+                handled = true;
+                console.info('[webtoons-dark-mode] reader dim toggled');
+            }
+        } catch (err) {
+            console.error('[webtoons-dark-mode] toggle failed:', err);
         }
         if (handled) {
             e.preventDefault();
@@ -966,6 +980,15 @@
             e.stopPropagation();
         }
     }
+    // Attach to every reasonable root so a focus-stealing widget can't hide
+    // the event from us. Capture phase so we run before any page handler.
     window.addEventListener('keydown', handleKey, true);
     document.addEventListener('keydown', handleKey, true);
+    if (document.documentElement) document.documentElement.addEventListener('keydown', handleKey, true);
+    if (document.body) document.body.addEventListener('keydown', handleKey, true);
+    else document.addEventListener('DOMContentLoaded', () => {
+        document.body.addEventListener('keydown', handleKey, true);
+    }, { once: true });
+
+    console.info('[webtoons-dark-mode] v1.0.15 loaded — Alt+Shift+T / Ctrl+Alt+D toggles theme, Alt+Shift+N / Ctrl+Alt+Shift+D toggles reader dim');
 })();
