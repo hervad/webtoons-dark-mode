@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.66
+// @version      1.0.67
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.66';
+    const VERSION = '1.0.67';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -507,7 +507,7 @@
            which + viewer_lst exceeds the 1200px cont_box and wraps below. */
         .aside.viewer {
             box-sizing: border-box !important;
-            width: 330px !important;
+            width: 375px !important;
             overflow: hidden !important;
             background: var(--wt-bg-elev) !important;
             border-radius: 14px !important;
@@ -1364,6 +1364,8 @@
         new MutationObserver(() => {
             if (darkOn && !document.getElementById('wt-dark-style')) applyTheme(true);
             if (dimOn && !document.getElementById('wt-dim-style')) applyDim(true);
+            // Head changes during SPA stylesheet swaps — re-check viewer state
+            typeof syncViewerClass === 'function' && syncViewerClass();
         }).observe(document.head, { childList: true });
     }
     if (document.head) watchHead();
@@ -1440,11 +1442,16 @@
     }
     syncViewerClass();
     document.addEventListener('DOMContentLoaded', syncViewerClass);
+    // Schedule multiple retries — SPA content may not be ready at the first check.
+    // 100ms catches fast loads; 600ms and 1500ms catch lazy-rendered pages.
+    function scheduleViewerSync() {
+        [100, 600, 1500].forEach(d => setTimeout(syncViewerClass, d));
+    }
     ['pushState', 'replaceState'].forEach(fn => {
         const orig = history[fn];
-        history[fn] = function() { orig.apply(this, arguments); setTimeout(syncViewerClass, 150); };
+        history[fn] = function() { orig.apply(this, arguments); scheduleViewerSync(); };
     });
-    window.addEventListener('popstate', () => setTimeout(syncViewerClass, 150));
+    window.addEventListener('popstate', scheduleViewerSync);
 
     console.info(`[webtoons-dark-mode] v${VERSION} ready — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
 })();

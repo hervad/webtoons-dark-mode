@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.67] - 2026-05-10
+
+### Fixed
+- Viewer sidebar: width increased from 330px to 375px so longer titles aren't truncated.
+- Viewer vignette SPA persistence: single 150ms retry replaced with three retries at 100ms / 600ms / 1500ms; `watchHead()` MutationObserver now also calls `syncViewerClass()` so head stylesheet swaps during SPA navigation re-trigger the check.
+
 ## [1.0.66] - 2026-05-10
 
 ### Fixed
