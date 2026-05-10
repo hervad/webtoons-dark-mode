@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.81] - 2026-05-11
+
+### Fixed
+- Viewer vignette gradient now persists through all scroll positions: added `fixed` to the `background` shorthand so the gradient uses `background-attachment: fixed` — it is positioned relative to the viewport and never scrolls away.
+
 ## [1.0.80] - 2026-05-11
 
 ### Fixed
