@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.84
+// @version      1.0.85
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.84';
+    const VERSION = '1.0.85';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -440,17 +440,15 @@
             border-bottom: 1px solid var(--wt-border) !important;
         }
 
-        /* Viewer depth — body.wt-viewer is set by JS (more reliable for SPA nav);
-           body:has() kept as CSS-only fallback. Both target the same gradient.
-           ::before with position:fixed keeps the vignette locked to the viewport
-           at all scroll positions — background-attachment:fixed on body doesn't
-           work because the body itself doesn't scroll on this layout. */
-        body.wt-viewer,
-        body:has(#content.viewer) {
+        /* Viewer depth — body.wt-viewer is set/cleared by JS on every navigation.
+           No CSS :has() fallback: body:has(#content.viewer) caused false positives
+           on detail pages (Webtoons briefly adds class viewer to #content during
+           SPA transitions) and the position:fixed z-index:9999 overlay made those
+           false positives very visible. JS is the only gate for this rule. */
+        body.wt-viewer {
             background-color: var(--wt-bg) !important;
         }
-        body.wt-viewer::before,
-        body:has(#content.viewer)::before {
+        body.wt-viewer::before {
             content: '' !important;
             position: fixed !important;
             inset: 0 !important;
@@ -463,11 +461,7 @@
         body.wt-viewer #container,
         body.wt-viewer #content,
         body.wt-viewer .cont_box,
-        body.wt-viewer .comment_area,
-        body:has(#content.viewer) #container,
-        body:has(#content.viewer) #content,
-        body:has(#content.viewer) .cont_box,
-        body:has(#content.viewer) .comment_area {
+        body.wt-viewer .comment_area {
             background-color: transparent !important;
         }
         #_viewerArea { background-color: transparent !important; }
