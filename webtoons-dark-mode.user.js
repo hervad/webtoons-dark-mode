@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.81
+// @version      1.0.82
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.81';
+    const VERSION = '1.0.82';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -441,12 +441,24 @@
         }
 
         /* Viewer depth — body.wt-viewer is set by JS (more reliable for SPA nav);
-           body:has() kept as CSS-only fallback. Both target the same gradient. */
+           body:has() kept as CSS-only fallback. Both target the same gradient.
+           ::before with position:fixed keeps the vignette locked to the viewport
+           at all scroll positions — background-attachment:fixed on body doesn't
+           work because the body itself doesn't scroll on this layout. */
         body.wt-viewer,
         body:has(#content.viewer) {
+            background-color: var(--wt-bg) !important;
+        }
+        body.wt-viewer::before,
+        body:has(#content.viewer)::before {
+            content: '' !important;
+            position: fixed !important;
+            inset: 0 !important;
             background: linear-gradient(to right,
-                #000000 0%, var(--wt-bg) 14%,
-                var(--wt-bg) 86%, #000000 100%) fixed !important;
+                #000000 0%, transparent 14%,
+                transparent 86%, #000000 100%) !important;
+            pointer-events: none !important;
+            z-index: 9999 !important;
         }
         body.wt-viewer #container,
         body.wt-viewer #content,
@@ -1486,7 +1498,7 @@
     }
     ['pushState', 'replaceState'].forEach(fn => {
         const orig = history[fn];
-        history[fn] = function() {
+        history[fn] = function () {
             orig.apply(this, arguments);
             scheduleViewerSync();
             scheduleViewerCards();
@@ -1583,7 +1595,7 @@
     let aside_cards_done = false;
     // Override buildViewerCards to track completion.
     const _bvc = buildViewerCards;
-    buildViewerCards = function() {
+    buildViewerCards = function () {
         _bvc();
         if (document.querySelector('.aside.viewer[data-wt-cards]')) aside_cards_done = true;
     };
