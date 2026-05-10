@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.58] - 2026-05-10
+
+### Fixed
+- Detail page: `.detail_body` background changed from `--wt-bg-elev` to `--wt-bg` so the container rectangle is invisible against the page — previously the elevated color showed as a visible box below the shorter sidebar card.
+
 ## [1.0.51] - 2026-05-10
 
 ### Fixed
