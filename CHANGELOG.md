@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.63] - 2026-05-10
+
+### Fixed
+- Viewer depth: previous gradient on `#content.viewer` never reached the side dead zones (the ellipse was too narrow) and lightened the like/subscribe area. New approach: gradient on `body` scoped via `body:has(#content.viewer)`, with `#container` and `#content` transparent so the body shows in the side areas. Elements with own backgrounds (toolbar, sidebar, episode strip, comments) are unaffected.
+
 ## [1.0.62] - 2026-05-10
 
 ### Fixed
