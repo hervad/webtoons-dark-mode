@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.68
+// @version      1.0.69
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.68';
+    const VERSION = '1.0.69';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -501,22 +501,32 @@
            Three-level hierarchy: page (--wt-bg) → viewer sidebar card (--wt-bg-elev)
            → ranking items (--wt-bg-elev2). */
 
-        /* Right-side aside: elevate from transparent into a card.
-           box-sizing:border-box + width:330px keeps padding inside the original
-           330px width — without this, padding:16px expands the aside to 362px,
-           which + viewer_lst exceeds the 1200px cont_box and wraps below. */
+        /* Aside is a transparent flex column — each direct child becomes its own
+           card. width:330px keeps the float from exceeding the 1200px cont_box
+           (viewer_lst takes the rest). height:fit-content prevents stretching
+           to match the taller comment column. */
         .aside.viewer {
             box-sizing: border-box !important;
             width: 330px !important;
+            background: transparent !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            height: fit-content !important;
+        }
+        /* Each top-level section in the aside (Trending & Popular, Top Originals)
+           gets its own card surface. */
+        .aside.viewer > * {
             background: var(--wt-bg-elev) !important;
             border-radius: 14px !important;
             padding: 16px !important;
             box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 8px 32px rgba(0,0,0,.35) !important;
         }
         .aside .ranking_lst.viewer { background: transparent !important; }
-        /* Ranking list items inherit the card background from .aside.viewer — reset
-           the generic .ranking_lst li card rule so items don't nest card-on-card.
-           Also remove borders to eliminate separator lines at card edges. */
+        /* Ranking list items: transparent so they don't nest card-on-card. */
         .aside.viewer .ranking_lst li {
             background-color: transparent !important;
             border-radius: 0 !important;
