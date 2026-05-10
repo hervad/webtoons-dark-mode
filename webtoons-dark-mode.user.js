@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.20
+// @version      1.0.21
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.20';
+    const VERSION   = '1.0.21';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -781,11 +781,14 @@
             color: var(--wt-text-dim) !important;
         }
 
-        /* Ranking number sprite digits (1, 2, 3, ... 10) in trending/popular
-           sidebars — these ARE plain dark glyphs designed for white bg, so
-           bleaching them to white is the correct fix. */
+        /* Ranking number sprite digits — two sprite systems:
+           .ico_n1-10: small glyphs in sidebars (dark on transparent)
+           .ranking_number_X:before: large card badges (SVG with white bg baked in)
+           Both inverted to white on transparent/dark. */
         .ico_n1, .ico_n2, .ico_n3, .ico_n4, .ico_n5,
-        .ico_n6, .ico_n7, .ico_n8, .ico_n9, .ico_n10 {
+        .ico_n6, .ico_n7, .ico_n8, .ico_n9, .ico_n10,
+        [class^="ranking_number_"]:before,
+        [class*=" ranking_number_"]:before {
             filter: brightness(0) invert(1) opacity(.85) !important;
         }
         /* Stats glyphs (.ico_view / .ico_view2 / .ico_subscribe / .ico_grade /
