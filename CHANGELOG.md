@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.93] - 2026-05-11
+
+### Fixed
+
+- Side shadow now actually renders: moved left/right gradient from `inset` box-shadow on `<img>` (doesn't work on replaced elements) to a `::before` pseudo-element on `.viewer_img._img_viewer_area` (the parent div); purely horizontal gradient creates no horizontal-line artifacts between stacked panels
+
 ## [1.0.92] - 2026-05-11
 
 ### Changed

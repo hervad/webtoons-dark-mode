@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.92
+// @version      1.0.93
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.92';
+    const VERSION = '1.0.93';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -485,14 +485,26 @@
            edge. box-shadow doesn't alter image colors. No display override —
            Webtoons centers images inside a text-align:center container and
            display:block would break that centering. */
-        /* Inset left/right shadows darken the panel edges, adding visible volume
-           without creating horizontal lines between stacked panels.
-           border-radius:0 removes corner artifacts at panel junctions. */
+        /* border-radius:0 removes corner gap artifacts at panel junctions. */
         img._images {
-            box-shadow:
-                inset -28px 0 28px rgba(0,0,0,.5),
-                inset  28px 0 28px rgba(0,0,0,.5) !important;
             border-radius: 0 !important;
+        }
+        /* Left/right darkening overlay on the image list container.
+           Inset shadows on <img> don't render (replaced element).
+           A ::before gradient on the parent div does — and since the gradient
+           is purely horizontal it creates zero horizontal-line artifacts. */
+        .viewer_img._img_viewer_area {
+            position: relative !important;
+        }
+        .viewer_img._img_viewer_area::before {
+            content: '' !important;
+            position: absolute !important;
+            inset: 0 !important;
+            background: linear-gradient(to right,
+                rgba(0,0,0,.45) 0%, transparent 10%,
+                transparent 90%, rgba(0,0,0,.45) 100%) !important;
+            pointer-events: none !important;
+            z-index: 2 !important;
         }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
