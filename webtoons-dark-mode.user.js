@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.52
+// @version      1.0.53
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.52';
+    const VERSION = '1.0.53';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -873,17 +873,19 @@
            Three-level hierarchy: page (--wt-bg) → episode list + sidebar cards
            (--wt-bg-elev) → episode rows (--wt-bg-elev2). */
 
-        /* Episode list column — the actual DOM element is .detail_body .detail_lst
-           (float:left, width:761px in base CSS). .detail_lst_wrap does not exist.
-           overflow:hidden clips episode rows to the border-radius. */
+        /* Episode list column — .detail_body .detail_lst is float:left, 761px wide.
+           No border-top: it connects to the app-download banner above.
+           No overflow:hidden: the pagination is position:absolute at the bottom
+           and clips badly with hidden overflow. Base padding-bottom was 66px —
+           keep that so pagination stays in its original position. */
         .detail_body .detail_lst {
             background: var(--wt-bg-elev) !important;
-            border-radius: 16px !important;
-            padding: 8px 0 !important;
+            border-radius: 0 0 16px 16px !important;
+            padding-bottom: 66px !important;
             border: 1px solid rgba(255,255,255,.1) !important;
-            box-shadow: 0 2px 0 rgba(255,255,255,.06), 0 12px 40px rgba(0,0,0,.55) !important;
+            border-top: none !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,.55) !important;
             border-right: none !important;
-            overflow: hidden !important;
         }
         /* Right sidebar — its own elevated card. */
         .aside.detail {
