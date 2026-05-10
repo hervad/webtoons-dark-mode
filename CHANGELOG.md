@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.98] - 2026-05-11
+
+### Changed
+
+- Panel edge glow: increased to `30px 50%` (was `15px 18%`) so the white shadow is clearly visible against the dark page background
+
 ## [1.0.97] - 2026-05-11
 
 ### Fixed
