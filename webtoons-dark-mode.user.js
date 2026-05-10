@@ -22,18 +22,9 @@
 (function () {
     'use strict';
 
-    // Diagnostic banner FIRST -- if you don't see this in the console after
-    // reloading, the script isn't running at all (Tampermonkey disabled,
-    // wrong @match, or the script hasn't actually been updated).
-    try {
-        console.info('[webtoons-dark-mode] v1.0.16 starting',
-            'GM_getValue:', typeof GM_getValue,
-            'GM_setValue:', typeof GM_setValue,
-            'GM_registerMenuCommand:', typeof GM_registerMenuCommand);
-    } catch (_) {}
-
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
+    const VERSION   = '1.0.16';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -106,10 +97,9 @@
             background: var(--wt-bg-hover) !important;
         }
 
-        /* Search dropdown — recent searches + autocomplete shown when search opens.
-           Has three nested layers: .search_area (outer panel) → .input_box
-           (the rounded grey pill) → .input_search (the actual transparent
-           <input>). v1.0.6 missed .input_box, so the pill stayed light grey. */
+        /* Search dropdown — three nested layers: .search_area (outer panel) →
+           .input_box (the rounded grey pill) → .input_search (the transparent
+           <input>). All three need overriding; .input_box has its own bg. */
         .search_cont, .search_area, ._searchArea, .big_search.search_area {
             background: var(--wt-bg-elev) !important;
             border: 1px solid var(--wt-border) !important;
@@ -336,11 +326,6 @@
         .tool_area .subj_info .subj, .tool_area .subj_episode { color: var(--wt-text) !important; }
         .tool_area a { color: var(--wt-text) !important; }
 
-        /* (The viewer-context filter override added in v1.0.7 is no longer
-           needed in v1.0.8 — social SHARE icons are now never filtered, and
-           the .ico_favorites / .ico_like2 / .ico_plus3 are stats glyphs that
-           render fine in their native state inside the viewer.) */
-
         /* Episode thumbnail strip below the comic (top + bottom of viewer).
            Base CSS sets background:#f5f5f5 on bare .episode_area. */
         .episode_area {
@@ -397,9 +382,8 @@
         .comment_area .creator_note .author_area .author_name { color: var(--wt-text) !important; }
         .comment_area .creator_note .author_area .author_name span { color: var(--wt-text) !important; }
 
-        /* Defensive widening of the v1.0.2 cbox rules — newer comment widget
-           variants sometimes use slightly different class names. Catches
-           "almost-invisible nickname" reports without overriding existing rules. */
+        /* Wildcard attribute selectors catch variant class names the WCC
+           component ships — avoids invisible-text regressions on updates. */
         [class*="cbox_nick"], [class*="cbox_name"], [class*="comment_nick"], [class*="user_nick"] {
             color: var(--wt-link) !important;
         }
@@ -409,11 +393,9 @@
             color: var(--wt-text) !important;
         }
 
-        /* Comments — Webtoons replaced the legacy Naver u_cbox widget with a
-           new "WCC" (Webtoon Comment Component) loaded from
-           ssl.pstatic.net/static/wcc/gw/prod-1.0/index.js. It uses CSS-Module
-           class names of the form wcc_<Component>__<element>. The legacy
-           .u_cbox_* selectors below are kept as a fallback for older pages. */
+        /* Webtoons replaced the legacy Naver u_cbox widget with "WCC"
+           (Webtoon Comment Component), which uses CSS-module class names of
+           the form wcc_<Component>__<element>. Legacy .u_cbox_* kept as fallback. */
 
         /* WCC App MASTER container -- this is the OUTERMOST wrapper of the
            comment widget (wcc_App__root). v1.0.9 missed this; comment
@@ -557,10 +539,8 @@
         }
         [class*="wcc_AlertPopup__title"],
         [class*="wcc_CommentReportPopup__title"] { color: var(--wt-text) !important; }
-        /* Popup buttons (Yes / No / OK / Cancel). v1.0.9 used --wt-bg-elev2
-           which sat too close to the popup card's --wt-bg-elev — buttons
-           disappeared into the card. Use the lighter --wt-bg-hover and a
-           visible border so they read as clickable pills. */
+        /* Popup buttons — --wt-bg-hover (not --wt-bg-elev2) keeps visible
+           contrast against the popup card's --wt-bg-elev background. */
         [class*="wcc_AlertPopup__content"] button,
         [class*="wcc_CommentReportPopup__content"] button,
         [class*="wcc_AlertPopup__cancel"],
@@ -602,9 +582,8 @@
         }
         .footer a, #footer a { color: var(--wt-text-dim) !important; }
 
-        /* Footer social icons (sprite glyphs — invisible against dark bg).
-           v1.0.6 dropped opacity to .65 to even out FB vs the line-style
-           Instagram/X/YouTube glyphs. .65 was a touch too dim — bumped to .75. */
+        /* Footer social icons are sprite glyphs — invert to white. Opacity .75
+           balances the filled Facebook glyph against line-style Instagram/X/YouTube. */
         .btn_foot_facebook, .btn_foot_instagram, .btn_foot_twitter,
         .btn_foot_youtube, .btn_foot_pinterest, .btn_foot_line {
             filter: brightness(0) invert(1) opacity(.75) !important;
@@ -895,9 +874,9 @@
             if (!el) {
                 el = document.createElement('style');
                 el.id = id;
+                el.textContent = css;
                 (document.head || document.documentElement).appendChild(el);
             }
-            if (el.textContent !== css) el.textContent = css;
         } else if (el) {
             el.remove();
         }
@@ -914,11 +893,14 @@
 
     // First-run default follows the OS preference — once the user toggles, their
     // choice persists and OS changes are ignored.
-    const prefersDark = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const themeDefault = prefersDark;
+    const themeDefault = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-    applyTheme(GM_getValue(KEY_THEME, themeDefault));
-    applyDim(GM_getValue(KEY_DIM, false));
+    // Cached state — avoids GM IPC calls in the hot MutationObserver path.
+    let darkOn = GM_getValue(KEY_THEME, themeDefault);
+    let dimOn  = GM_getValue(KEY_DIM, false);
+
+    applyTheme(darkOn);
+    applyDim(dimOn);
 
     // SPA / late-loading bundle defense: if our <style> ever gets removed
     // (Webtoons swaps stylesheets on some chapter transitions), put it back.
@@ -926,26 +908,29 @@
     function watchHead() {
         if (!document.head) return;
         new MutationObserver(() => {
-            if (GM_getValue(KEY_THEME, themeDefault) && !document.getElementById('wt-dark-style')) {
-                applyTheme(true);
-            }
-            if (GM_getValue(KEY_DIM, false) && !document.getElementById('wt-dim-style')) {
-                applyDim(true);
-            }
+            if (darkOn && !document.getElementById('wt-dark-style')) applyTheme(true);
+            if (dimOn  && !document.getElementById('wt-dim-style'))  applyDim(true);
         }).observe(document.head, { childList: true });
     }
     if (document.head) watchHead();
     else document.addEventListener('DOMContentLoaded', watchHead, { once: true });
 
-    function toggle(key, fn, defaultVal) {
-        const next = !GM_getValue(key, defaultVal);
-        GM_setValue(key, next);
-        fn(next);
+    function toggleTheme() {
+        darkOn = !darkOn;
+        GM_setValue(KEY_THEME, darkOn);
+        applyTheme(darkOn);
+        console.info('[webtoons-dark-mode] theme →', darkOn ? 'dark' : 'light');
+    }
+    function toggleDim() {
+        dimOn = !dimOn;
+        GM_setValue(KEY_DIM, dimOn);
+        applyDim(dimOn);
+        console.info('[webtoons-dark-mode] reader dim →', dimOn ? 'on' : 'off');
     }
 
     if (typeof GM_registerMenuCommand === 'function') {
-        GM_registerMenuCommand('Toggle Webtoons dark mode', () => toggle(KEY_THEME, applyTheme, themeDefault));
-        GM_registerMenuCommand('Toggle reader dim',         () => toggle(KEY_DIM,   applyDim,   false));
+        GM_registerMenuCommand('Toggle Webtoons dark mode', toggleTheme);
+        GM_registerMenuCommand('Toggle reader dim',         toggleDim);
     }
 
     // Keyboard shortcuts. Multiple combos so the user can use whichever doesn't
@@ -973,13 +958,11 @@
         let handled = false;
         try {
             if (themeAltShiftT || themeCtrlAltD) {
-                toggle(KEY_THEME, applyTheme, themeDefault);
+                toggleTheme();
                 handled = true;
-                console.info('[webtoons-dark-mode] theme toggled');
             } else if (dimAltShiftN || dimCtrlAltShD) {
-                toggle(KEY_DIM, applyDim, false);
+                toggleDim();
                 handled = true;
-                console.info('[webtoons-dark-mode] reader dim toggled');
             }
         } catch (err) {
             console.error('[webtoons-dark-mode] toggle failed:', err);
@@ -990,15 +973,9 @@
             e.stopPropagation();
         }
     }
-    // Attach to every reasonable root so a focus-stealing widget can't hide
-    // the event from us. Capture phase so we run before any page handler.
+    // Capture phase on window catches all keydowns before any page handler,
+    // regardless of which element has focus.
     window.addEventListener('keydown', handleKey, true);
-    document.addEventListener('keydown', handleKey, true);
-    if (document.documentElement) document.documentElement.addEventListener('keydown', handleKey, true);
-    if (document.body) document.body.addEventListener('keydown', handleKey, true);
-    else document.addEventListener('DOMContentLoaded', () => {
-        document.body.addEventListener('keydown', handleKey, true);
-    }, { once: true });
 
-    console.info('[webtoons-dark-mode] v1.0.16 fully loaded — Alt+Shift+T / Ctrl+Alt+D toggles theme, Alt+Shift+N / Ctrl+Alt+Shift+D toggles reader dim');
+    console.info(`[webtoons-dark-mode] v${VERSION} ready — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
 })();
