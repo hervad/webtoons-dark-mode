@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.3
-// @description  Targeted dark theme for Webtoons (desktop + mobile). Persistent toggle, optional reader dim, no image inversion, no SPA observers.
+// @version      1.0.4
+// @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
 // @match        https://m.webtoons.com/*
@@ -385,11 +385,39 @@
         }
     }
 
-    const applyTheme = (on) => ensureStyle('wt-dark-style', palette + theme, on);
-    const applyDim   = (on) => ensureStyle('wt-dim-style',  dimCss,           on);
+    // Set a hook on <html> so power users can write their own CSS like
+    //     html[data-wt-dark="on"] .my-thing { ... }
+    // and have it scoped to only fire when our theme is active.
+    const applyTheme = (on) => {
+        ensureStyle('wt-dark-style', palette + theme, on);
+        document.documentElement.dataset.wtDark = on ? 'on' : 'off';
+    };
+    const applyDim = (on) => ensureStyle('wt-dim-style', dimCss, on);
 
-    applyTheme(GM_getValue(KEY_THEME, true));
+    // First-run default follows the OS preference — once the user toggles, their
+    // choice persists and OS changes are ignored.
+    const prefersDark = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const themeDefault = prefersDark;
+
+    applyTheme(GM_getValue(KEY_THEME, themeDefault));
     applyDim(GM_getValue(KEY_DIM, false));
+
+    // SPA / late-loading bundle defense: if our <style> ever gets removed
+    // (Webtoons swaps stylesheets on some chapter transitions), put it back.
+    // Cheap — only fires on direct childList changes to <head>.
+    function watchHead() {
+        if (!document.head) return;
+        new MutationObserver(() => {
+            if (GM_getValue(KEY_THEME, themeDefault) && !document.getElementById('wt-dark-style')) {
+                applyTheme(true);
+            }
+            if (GM_getValue(KEY_DIM, false) && !document.getElementById('wt-dim-style')) {
+                applyDim(true);
+            }
+        }).observe(document.head, { childList: true });
+    }
+    if (document.head) watchHead();
+    else document.addEventListener('DOMContentLoaded', watchHead, { once: true });
 
     function toggle(key, fn, defaultVal) {
         const next = !GM_getValue(key, defaultVal);
@@ -398,14 +426,14 @@
     }
 
     if (typeof GM_registerMenuCommand === 'function') {
-        GM_registerMenuCommand('Toggle Webtoons dark mode', () => toggle(KEY_THEME, applyTheme, true));
+        GM_registerMenuCommand('Toggle Webtoons dark mode', () => toggle(KEY_THEME, applyTheme, themeDefault));
         GM_registerMenuCommand('Toggle reader dim',         () => toggle(KEY_DIM,   applyDim,   false));
     }
 
     // Alt+Shift+T = theme, Alt+Shift+N = night dim. Avoid bare Alt+D (= focus URL bar).
     window.addEventListener('keydown', (e) => {
         if (!e.altKey || !e.shiftKey || e.ctrlKey || e.metaKey) return;
-        if (e.code === 'KeyT') { e.preventDefault(); toggle(KEY_THEME, applyTheme, true); }
+        if (e.code === 'KeyT') { e.preventDefault(); toggle(KEY_THEME, applyTheme, themeDefault); }
         else if (e.code === 'KeyN') { e.preventDefault(); toggle(KEY_DIM, applyDim, false); }
     }, true);
 })();
