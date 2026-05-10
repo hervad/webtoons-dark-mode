@@ -37,18 +37,21 @@ When a surface on the site still looks light after a Webtoons CSS bundle update:
 # 1. Download the current bundle (re-run whenever Webtoons ships a redesign)
 node .claude/scripts/fetch-bundle.mjs
 
-# 2. Find the selector controlling the broken element
-#    (get the class name from DevTools → Inspect → right-click element)
+# 2. Verify the class actually exists before writing CSS (critical — saves hours)
 node .claude/scripts/grep-css.mjs 'class_name_from_devtools'
+# If no output: the class doesn't exist. Re-inspect the DOM.
 
-# 3. Check what the base rule does (background, color, specificity)
-# 4. Add an override in the theme CSS string with !important at matching or
-#    higher specificity
+# 3. Check if we already override it
+grep -n 'class_name' webtoons-dark-mode.user.js
+
+# 4. Add an override in the theme CSS string with !important
 # 5. Hard-reload webtoons.com (Ctrl+F5) to verify
 ```
 
 The DevTools **Computed** tab shows which rule wins — useful when `!important` doesn't take effect
 (means there's a more specific rule still beating it).
+
+**Use `/project:diagnose` for the full workflow including common pitfalls.**
 
 ## CSS selector conventions
 
@@ -115,5 +118,17 @@ There is no automated test suite — this is a DOM-manipulation script. Manual t
 
 ## Custom slash commands (local only)
 
-- `/project:diagnose` — step-by-step CSS diagnosis workflow
+- `/project:diagnose` — step-by-step CSS diagnosis workflow with common pitfalls
 - `/project:release` — guided release checklist
+
+## Reference library (`.claude/references/`)
+
+| File | Contents |
+|---|---|
+| `homepage-dom-structure.md` | Homepage DOM, stylesheet load order, selector gotchas |
+| `detail-page-dom.md` | Series detail/episode list page — full DOM structure |
+| `viewer-page-dom.md` | Episode viewer page — toolbar, panels, aside |
+| `css-techniques.md` | Reusable CSS patterns (elevation, inset shadows, flow-root, filter recoloring) |
+| `design-system.md` | Color palette, elevation hierarchy, typography decisions |
+
+Read the relevant reference before working on any page — it will tell you the actual class names and DOM structure without needing to inspect the site.
