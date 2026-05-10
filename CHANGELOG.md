@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-05-10
+
+### Added
+- **`prefers-color-scheme` first-run default.** New installs now default to whatever the OS dark/light preference is (was: always on regardless of OS). Once the user toggles for the first time, that choice is persisted via `GM_setValue` and OS preference is ignored. Existing users with a stored preference are unaffected — only fresh installs see this.
+- **`html[data-wt-dark]` hook.** When the theme is on, `<html>` gets `data-wt-dark="on"`; when off, `data-wt-dark="off"`. Power users can write personal CSS like `html[data-wt-dark="on"] .my-thing { ... }` and have it scoped to only the dark state.
+- **SPA-resilience MutationObserver.** A small observer watches `<head>` for direct childList changes. If our `<style>` element is ever removed (Webtoons swaps stylesheets on some chapter transitions, and external bundles can race with our injection), it's re-applied. The observer only fires on direct head-child mutations, so its overhead is negligible.
+
+### Not done (intentional)
+- The "split `theme` into named chunks" refactor item was reconsidered and skipped. The existing section comments already act as a TOC, the planned v1.1 preset switcher only swaps the palette (not the theme), and the diff churn (~330 lines moved) doesn't pay back. If we hit a real maintainability problem later, we can revisit.
+
 ## [1.0.3] - 2026-05-10
 
 ### Changed
