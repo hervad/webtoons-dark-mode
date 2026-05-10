@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.92] - 2026-05-11
+
+### Changed
+
+- Comic panels: replaced outer dark glow with `inset` left/right side shadows (`inset ±28px 0 28px rgba(0,0,0,.5)`) — adds visible volume at panel edges without creating horizontal lines between stacked panels; removed `border-radius:2px` which was causing corner gap artifacts at panel boundaries
+
 ## [1.0.91] - 2026-05-11
 
 ### Fixed
