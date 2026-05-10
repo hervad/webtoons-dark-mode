@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.63
+// @version      1.0.64
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.63';
+    const VERSION = '1.0.64';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -447,8 +447,8 @@
            comment area) are fully opaque and unaffected. */
         body:has(#content.viewer) {
             background: linear-gradient(to right,
-                #0d1014 0%, var(--wt-bg) 20%,
-                var(--wt-bg) 80%, #0d1014 100%) !important;
+                #020304 0%, var(--wt-bg) 28%,
+                var(--wt-bg) 72%, #020304 100%) !important;
         }
         body:has(#content.viewer) #container,
         body:has(#content.viewer) #content {
@@ -501,8 +501,13 @@
            Three-level hierarchy: page (--wt-bg) → viewer sidebar card (--wt-bg-elev)
            → ranking items (--wt-bg-elev2). */
 
-        /* Right-side aside: elevate from transparent into a card. */
+        /* Right-side aside: elevate from transparent into a card.
+           box-sizing:border-box + width:330px keeps padding inside the original
+           330px width — without this, padding:16px expands the aside to 362px,
+           which + viewer_lst exceeds the 1200px cont_box and wraps below. */
         .aside.viewer {
+            box-sizing: border-box !important;
+            width: 330px !important;
             background: var(--wt-bg-elev) !important;
             border-radius: 14px !important;
             padding: 16px !important;
