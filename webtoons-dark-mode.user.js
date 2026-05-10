@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.78
+// @version      1.0.79
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.78';
+    const VERSION = '1.0.79';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -472,13 +472,11 @@
         .tool_area .subj_info .subj, .tool_area .subj_episode { color: var(--wt-text) !important; }
         .tool_area a { color: var(--wt-text) !important; }
 
-        /* Episode thumbnail strip below the comic (top + bottom of viewer).
-           Base CSS sets background:#f5f5f5 on bare .episode_area. */
+        /* Episode thumbnail strip — same base background as the rest of the
+           viewer area so there are no visible shade shifts between sections. */
         .episode_area {
-            background: var(--wt-bg-elev) !important;
+            background: var(--wt-bg) !important;
             border-color: var(--wt-border) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 4px 20px rgba(0,0,0,.4) !important;
         }
         .episode_lst { background: transparent !important; }
         /* Currently-viewing episode highlight in the thumbnail strip.
@@ -1518,7 +1516,7 @@
         const lst = box.querySelector('.viewer_lst');
         if (lst) {
             for (const child of Array.from(lst.children)) {
-                if (child.matches('.viewer_img, ._img_viewer_area, #_imageList, .episode_area')) continue;
+                if (child.matches('.viewer_img, ._img_viewer_area, #_imageList')) continue;
                 setBg(child, 'var(--wt-bg)');
                 // Also flatten any opaque grandchildren (the foot_app inner divs, etc.)
                 for (const gc of Array.from(child.children)) {
