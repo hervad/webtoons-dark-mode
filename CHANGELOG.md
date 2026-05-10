@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.74] - 2026-05-10
+
+### Changed
+- Viewer sidebar cards now built by JS (`buildViewerCards`) instead of CSS class guessing. Groups children of `.ranking_lst` by "non-UL header + following UL" and wraps each section in a `div.wt-viewer-card`, bypassing the need to know Webtoons' internal class names.
+
 ## [1.0.73] - 2026-05-10
 
 ### Fixed
