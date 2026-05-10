@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.1
+// @version      1.0.2
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Persistent toggle, optional reader dim, no image inversion, no SPA observers.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -250,6 +250,37 @@
         }
         .footer a, #footer a { color: var(--wt-text-dim) !important; }
 
+        /* Footer social icons (sprite glyphs — invisible against dark bg). */
+        .btn_foot_facebook, .btn_foot_instagram, .btn_foot_twitter,
+        .btn_foot_youtube, .btn_foot_pinterest, .btn_foot_line {
+            filter: brightness(0) invert(1) opacity(.85) !important;
+        }
+        .btn_foot_facebook:hover, .btn_foot_instagram:hover, .btn_foot_twitter:hover,
+        .btn_foot_youtube:hover, .btn_foot_pinterest:hover, .btn_foot_line:hover {
+            filter: brightness(0) invert(1) opacity(1) !important;
+        }
+
+        /* Footer language selector (English ▾ button + dropdown) */
+        .foot_menu .language .lk_lang {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            color: var(--wt-text) !important;
+        }
+        .foot_menu .language .lk_lang:after {
+            border-top-color: var(--wt-text) !important;
+        }
+        .foot_menu .language .ly_lang {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            box-shadow: 0 0 8px rgba(0,0,0,.5) !important;
+        }
+        .foot_menu .language .ly_lang li        { background: transparent !important; }
+        .foot_menu .language .ly_lang a         { color: var(--wt-text-dim) !important; }
+        .foot_menu .language .ly_lang li:hover a,
+        .foot_menu .language .ly_lang a[aria-current="true"] {
+            color: var(--wt-accent) !important;
+        }
+
         /* Scrollbars (WebKit) */
         ::-webkit-scrollbar              { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track        { background: var(--wt-bg); }
@@ -273,6 +304,60 @@
         .header_wrap, .navigation, .nav_wrap, .lst_episode, .episode_cont {
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
+        }
+
+        /* "Recently viewed" floating bar on the right edge.
+           The site paints a white PNG background — we replace it with our dark surface. */
+        .recently_area {
+            background: var(--wt-bg-elev) !important;
+            background-image: none !important;
+            border-left: 1px solid var(--wt-border) !important;
+        }
+        .recently_area .t_recently,
+        .recently_area .t_recently2,
+        .recently_cont .subj { color: var(--wt-text) !important; }
+        .recently_cont .episode { color: var(--wt-text-dim) !important; }
+        .recently_cont .bar { background: var(--wt-border) !important; }
+        .recently_area.unfd [class$="_line"] { border-left-color: var(--wt-border) !important; }
+
+        /* Login modal (Naver SNS-login widget). Uses ._loginLayer / ._loginDimLayer
+           injected by /static/bundle/common/gnb-*.js when "Log In" is clicked. */
+        ._loginDimLayer { background: rgba(0,0,0,.7) !important; }
+        ._loginLayer, ._loginComponentParent,
+        ._defaultLoginComponent, .emailLoginComponent {
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+            box-shadow: 0 12px 32px rgba(0,0,0,.6) !important;
+        }
+        ._loginLayer h1, ._loginLayer h2, ._loginLayer h3,
+        ._loginLayer p, ._loginLayer label, ._loginLayer span,
+        ._defaultLoginComponent h1, ._defaultLoginComponent h2,
+        ._defaultLoginComponent p, ._defaultLoginComponent span,
+        ._defaultLoginComponent label {
+            color: var(--wt-text) !important;
+            background: transparent !important;
+        }
+        ._btnLoginSns, .btn_sns, ._emailLoginButton, ._btnLoginEmail {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+        ._btnLoginSns:hover, .btn_sns:hover,
+        ._emailLoginButton:hover, ._btnLoginEmail:hover {
+            background: #30353c !important;
+        }
+        ._btnLoginLayerClose, ._backToDefaultLoginButton { color: var(--wt-text) !important; }
+
+        /* Defensive catch-all for any other dialog Webtoons might add later. */
+        [role="dialog"], [aria-modal="true"] {
+            background-color: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+        }
+        [role="dialog"] input, [role="dialog"] textarea, [role="dialog"] select {
+            background-color: var(--wt-bg-input) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
         }
     `;
 

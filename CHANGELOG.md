@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-05-10
+
+### Fixed
+- **"Recently viewed" floating bar** on the right edge of every page (`.recently_area`). The site paints a white PNG sprite (`bg_recently.png`) as the background — overridden with our dark surface, plus dark text/border colors for the inner thumbnails (`.t_recently`, `.t_recently2`, `.recently_cont .subj`, `.episode`, `.bar`).
+- **Footer social icons** (Facebook / Instagram / Twitter / YouTube / Pinterest / LINE). They are CSS-sprite glyphs positioned out of a single dark-on-white SVG sheet. With our dark background they were nearly invisible. Forced to white via `filter: brightness(0) invert(1) opacity(.85)`, with full opacity on hover.
+- **Footer language selector** — both the closed "English ▾" button (`.foot_menu .language .lk_lang`) and the dropdown (`.ly_lang`, items, dropdown arrow). Active language now uses the brand-green accent.
+- **Login modal** ("Log in now and enjoy free comics") injected by `/static/bundle/common/gnb-*.js` on Log-In click. Targets the actual JS-hook classes: `._loginLayer`, `._loginDimLayer` (backdrop overlay), `._loginComponentParent`, `._defaultLoginComponent`, `.emailLoginComponent`, plus the SNS buttons (`._btnLoginSns`, `.btn_sns`, `._emailLoginButton`, `._btnLoginEmail`) and the close + back buttons.
+- Added a defensive `[role="dialog"], [aria-modal="true"]` catch-all so any future Webtoons dialog inherits dark surfaces by default.
+
 ## [1.0.1] - 2026-05-10
 
 ### Fixed
