@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.10
+// @version      1.0.11
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -405,6 +405,47 @@
            class names of the form wcc_<Component>__<element>. The legacy
            .u_cbox_* selectors below are kept as a fallback for older pages. */
 
+        /* WCC App MASTER container -- this is the OUTERMOST wrapper of the
+           comment widget (wcc_App__root). v1.0.9 missed this; comment
+           items inside were dark, but the whole widget sat on a white App. */
+        [class*="wcc_App__root"], [class*="wcc_App__loader"] {
+            background: var(--wt-bg) !important;
+            color: var(--wt-text) !important;
+        }
+        /* Kebab-case wcc loaders (don't match [class*="wcc_"] -- they use dashes) */
+        [class*="wcc-comment-list-loader"], [class*="wcc-sort-order-loader"] {
+            background: transparent !important;
+            color: var(--wt-text-dim) !important;
+        }
+        /* Comment editor (where the user types). Multiple sub-classes. */
+        [class*="wcc_Editor__root"], [class*="wcc_Editor__content"],
+        [class*="wcc_Editor__editor"], [class*="wcc_Editor__scrollArea"],
+        [class*="wcc_Editor__actionBar"], [class*="wcc_Editor__toolbar"],
+        [class*="wcc_Editor__attachment"], [class*="wcc_Editor__creatorPost"],
+        [class*="wcc_Editor__modifyContainer"], [class*="wcc_Editor__replyContainer"],
+        [class*="wcc_Editor__spoilerWrapper"], [class*="wcc_Editor__mobileShortened"],
+        [class*="wcc_Editor__bottomLeftCornerIcon"] {
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border-color: var(--wt-border) !important;
+        }
+        [class*="wcc_Editor__editor"] {
+            caret-color: var(--wt-text) !important;
+        }
+        /* Spoiler toggle inside the comment editor */
+        [class*="wcc_Spoiler__root"], [class*="wcc_Spoiler__text"] {
+            color: var(--wt-text) !important;
+            background: transparent !important;
+        }
+        [class*="wcc_Spoiler__switch"] {
+            background: var(--wt-bg-elev2) !important;
+            border-color: var(--wt-border) !important;
+        }
+        [class*="wcc_Spoiler__slider"] { background: var(--wt-text-dim) !important; }
+        [class*="wcc_Spoiler__disabled"] { color: var(--wt-text-mute) !important; }
+        [class*="wcc_SpoilerGuard__viewText"] { color: var(--wt-text-dim) !important; }
+        [class*="wcc_SpoilerGuard__viewAll"] { color: var(--wt-link) !important; }
+
         /* WCC widget root surfaces -- list, individual rows, body, header */
         [class*="wcc_CommentList__"], [class*="wcc_CommentLoader__"],
         [class*="wcc_CommentView__"], [class*="wcc_CommentEmpty__"] {
@@ -506,12 +547,23 @@
         }
         [class*="wcc_AlertPopup__title"],
         [class*="wcc_CommentReportPopup__title"] { color: var(--wt-text) !important; }
+        /* Popup buttons (Yes / No / OK / Cancel). v1.0.9 used --wt-bg-elev2
+           which sat too close to the popup card's --wt-bg-elev — buttons
+           disappeared into the card. Use the lighter --wt-bg-hover and a
+           visible border so they read as clickable pills. */
+        [class*="wcc_AlertPopup__content"] button,
+        [class*="wcc_CommentReportPopup__content"] button,
         [class*="wcc_AlertPopup__cancel"],
         [class*="wcc_CommentReportPopup__cancel"],
         [class*="wcc_CommentReportPopup__reason"] {
-            background: var(--wt-bg-elev2) !important;
+            background: var(--wt-bg-hover) !important;
             color: var(--wt-text) !important;
-            border-color: var(--wt-border) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+        [class*="wcc_AlertPopup__content"] button:hover,
+        [class*="wcc_CommentReportPopup__content"] button:hover {
+            background: var(--wt-bg-elev2) !important;
+            border-color: var(--wt-text-dim) !important;
         }
 
         /* Empty state */
@@ -675,10 +727,26 @@
         .detail_other h2 .point { color: var(--wt-accent) !important; }
 
         /* Skin image (per-series artwork at the top of the page).
-           Don't override the artist's background-image — just slightly dim it
-           so the bright artwork sits comfortably with the dark chrome on the
-           sides. v1.0.5 used .55 which was too dim; .7 keeps the art readable. */
-        .detail_bg { filter: brightness(.7) !important; }
+           Don't override the artist's background-image — let it show. Bumped
+           from v1.0.8's .7 to .9 so the artwork on the sides stays vivid. */
+        .detail_bg { filter: brightness(.9) !important; }
+
+        /* Series with .type_white skin (e.g. Sweet Romance, Spicy Roommates):
+           the base CSS hard-codes .info text to #000 / #252525 which assumes
+           the page is light. Override so author / title / "i" icon are
+           readable on dark theme. */
+        .detail_header.type_white .subj,
+        .detail_header.type_white h1.subj { color: var(--wt-text) !important; }
+        .detail_header.type_white .info .author,
+        .detail_header.type_white .info .author_area,
+        .detail_header.type_white .author,
+        .detail_header.type_white .author_area {
+            color: var(--wt-text-dim) !important;
+        }
+        .detail_header.type_white .info .ico_info2,
+        .detail_header.type_white .ico_info2 {
+            filter: brightness(0) invert(1) opacity(.85) !important;
+        }
 
         /* Stats sprite glyphs (eye for view count, person for subscribers, star
            for grade). These are plain dark glyphs designed for light bg —
