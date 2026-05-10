@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.65
+// @version      1.0.66
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.65';
+    const VERSION = '1.0.66';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -440,16 +440,16 @@
             border-bottom: 1px solid var(--wt-border) !important;
         }
 
-        /* Viewer depth — horizontal edge vignette scoped via :has() to viewer pages.
-           gradient on body; #container and #content become transparent so the
-           body shows in the dead side zones beyond the 1200px cont_box.
-           Elements with their own backgrounds (toolbar, episode strip, sidebar,
-           comment area) are fully opaque and unaffected. */
+        /* Viewer depth — body.wt-viewer is set by JS (more reliable for SPA nav);
+           body:has() kept as CSS-only fallback. Both target the same gradient. */
+        body.wt-viewer,
         body:has(#content.viewer) {
             background: linear-gradient(to right,
                 #000000 0%, var(--wt-bg) 14%,
                 var(--wt-bg) 86%, #000000 100%) !important;
         }
+        body.wt-viewer #container,
+        body.wt-viewer #content,
         body:has(#content.viewer) #container,
         body:has(#content.viewer) #content {
             background-color: transparent !important;
@@ -508,6 +508,7 @@
         .aside.viewer {
             box-sizing: border-box !important;
             width: 330px !important;
+            overflow: hidden !important;
             background: var(--wt-bg-elev) !important;
             border-radius: 14px !important;
             padding: 16px !important;
@@ -515,10 +516,12 @@
         }
         .aside .ranking_lst.viewer { background: transparent !important; }
         /* Ranking list items inherit the card background from .aside.viewer — reset
-           the generic .ranking_lst li card rule so items don't nest card-on-card. */
+           the generic .ranking_lst li card rule so items don't nest card-on-card.
+           Also remove borders to eliminate separator lines at card edges. */
         .aside.viewer .ranking_lst li {
             background-color: transparent !important;
             border-radius: 0 !important;
+            border: none !important;
         }
         .ranking_lst .title_area h2 a, .ranking_lst .title_area h2 span {
             color: var(--wt-text) !important;
@@ -1427,6 +1430,21 @@
     // Capture phase on window catches all keydowns before any page handler,
     // regardless of which element has focus.
     window.addEventListener('keydown', handleKey, true);
+
+    // Sync body.wt-viewer class for the vignette gradient — CSS :has() alone
+    // doesn't re-fire reliably after SPA navigation (pushState). This ensures
+    // the class is set on every navigation, initial load, and theme toggle.
+    function syncViewerClass() {
+        if (!document.body) return;
+        document.body.classList.toggle('wt-viewer', !!document.querySelector('#content.viewer'));
+    }
+    syncViewerClass();
+    document.addEventListener('DOMContentLoaded', syncViewerClass);
+    ['pushState', 'replaceState'].forEach(fn => {
+        const orig = history[fn];
+        history[fn] = function() { orig.apply(this, arguments); setTimeout(syncViewerClass, 150); };
+    });
+    window.addEventListener('popstate', () => setTimeout(syncViewerClass, 150));
 
     console.info(`[webtoons-dark-mode] v${VERSION} ready — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
 })();
