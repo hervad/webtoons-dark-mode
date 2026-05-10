@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.15
+// @version      1.0.16
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -21,6 +21,16 @@
 
 (function () {
     'use strict';
+
+    // Diagnostic banner FIRST -- if you don't see this in the console after
+    // reloading, the script isn't running at all (Tampermonkey disabled,
+    // wrong @match, or the script hasn't actually been updated).
+    try {
+        console.info('[webtoons-dark-mode] v1.0.16 starting',
+            'GM_getValue:', typeof GM_getValue,
+            'GM_setValue:', typeof GM_setValue,
+            'GM_registerMenuCommand:', typeof GM_registerMenuCommand);
+    } catch (_) {}
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
@@ -990,5 +1000,5 @@
         document.body.addEventListener('keydown', handleKey, true);
     }, { once: true });
 
-    console.info('[webtoons-dark-mode] v1.0.15 loaded — Alt+Shift+T / Ctrl+Alt+D toggles theme, Alt+Shift+N / Ctrl+Alt+Shift+D toggles reader dim');
+    console.info('[webtoons-dark-mode] v1.0.16 fully loaded — Alt+Shift+T / Ctrl+Alt+D toggles theme, Alt+Shift+N / Ctrl+Alt+Shift+D toggles reader dim');
 })();

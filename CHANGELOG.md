@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.16] - 2026-05-10
+
+### Diagnostic
+- **Moved the console-info banner to the very first line of the IIFE** so it logs *before* any other code that could throw. Previously it was at the end — so a single error anywhere upstream would silently kill the banner, making it impossible to tell whether the script "wasn't running" vs "was running but errored out."
+- The startup banner now also reports the type of `GM_getValue` / `GM_setValue` / `GM_registerMenuCommand` so we can see whether Tampermonkey is granting them.
+- The end-of-IIFE banner now says "fully loaded" — if you only see "starting" but not "fully loaded", an error happened in between and we can see exactly which line in the console.
+
 ## [1.0.15] - 2026-05-10
 
 ### Added
