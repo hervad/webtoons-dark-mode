@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.86] - 2026-05-11
+
+### Fixed
+
+- Detail page artwork now shows through the header area: `.detail_bg + .cont_box` makes the content box transparent on detail pages (sibling combinator scopes it safely without `:has()`), while `.detail_body`'s explicit background keeps the episode list dark
+
 ## [1.0.85] - 2026-05-11
 
 ### Fixed

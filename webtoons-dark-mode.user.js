@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.85
+// @version      1.0.86
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.85';
+    const VERSION = '1.0.86';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -193,6 +193,13 @@
         #content, #container, .cont_area, .cont_box, .detail_body {
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
+        }
+        /* On the detail page, .cont_box is a sibling of .detail_bg and sits
+           on top of the artwork div. Making it transparent lets the artwork
+           show through the detail_header area. .detail_body has its own
+           explicit background so the episode list area stays correctly dark. */
+        .detail_bg + .cont_box {
+            background-color: transparent !important;
         }
         /* detail_body children are floated, so detail_body collapses to height 0
            and its background paints nothing — artwork bleeds through card corners.
