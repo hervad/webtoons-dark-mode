@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.97] - 2026-05-11
+
+### Fixed
+
+- Panel edge shadow: use `spread = -blur` formula (`-15px 0 15px -15px`) so the blur's vertical spread exactly cancels — shadow is now visible only on left/right edges with zero top/bottom bleed
+
 ## [1.0.96] - 2026-05-11
 
 ### Changed
