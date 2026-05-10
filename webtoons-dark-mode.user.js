@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.82
+// @version      1.0.83
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.82';
+    const VERSION = '1.0.83';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -1500,11 +1500,18 @@
         const orig = history[fn];
         history[fn] = function () {
             orig.apply(this, arguments);
+            // Optimistically remove wt-viewer immediately — the new page's DOM
+            // hasn't rendered yet so querySelector would still see the old page.
+            // scheduleViewerSync will re-add it if the destination is a viewer.
+            if (document.body) document.body.classList.remove('wt-viewer');
             scheduleViewerSync();
             scheduleViewerCards();
         };
     });
-    window.addEventListener('popstate', () => { scheduleViewerSync(); scheduleViewerCards(); scheduleViewerBanners(); });
+    window.addEventListener('popstate', () => {
+        if (document.body) document.body.classList.remove('wt-viewer');
+        scheduleViewerSync(); scheduleViewerCards(); scheduleViewerBanners();
+    });
 
     // Force uniform background throughout the viewer area. All blocks inside
     // #_viewerBox use var(--wt-bg) so there are no rogue gray/brownish strips.

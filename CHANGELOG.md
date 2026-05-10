@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.83] - 2026-05-11
+
+### Fixed
+
+- Vignette overlay no longer bleeds onto detail pages after SPA navigation from viewer: `body.wt-viewer` is now removed immediately on `pushState`/`popstate` (optimistic removal), preventing the `::before` gradient from rendering during the ~100ms before the new page's DOM is ready
+
 ## [1.0.82] - 2026-05-11
 
 ### Fixed
