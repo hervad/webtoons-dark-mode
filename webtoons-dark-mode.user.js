@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.70
+// @version      1.0.71
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.70';
+    const VERSION = '1.0.71';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -571,8 +571,10 @@
         [class*="wcc_SortOrderTabs__root"] { border-bottom-color: var(--wt-border) !important; }
         /* Sidebar patron/section separator inside .aside.detail. */
         .aside.detail .aside_patron { border-top-color: var(--wt-border) !important; }
-        /* Ranking list section bottom border (.lst_type1 = the ranked item list). */
+        /* Ranking list section bottom border (.lst_type1 = the ranked item list).
+           Suppress in viewer aside — each .ranking_wrap is already a card. */
         .lst_type1 { border-bottom-color: var(--wt-border) !important; }
+        .aside.viewer .lst_type1 { border-bottom: none !important; }
         /* CANVAS Weekly round-up / challenge_spot top separator. */
         .challenge_spot, .viewer .challenge_spot { border-top-color: var(--wt-border) !important; }
 
