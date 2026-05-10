@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.72] - 2026-05-10
+
+### Fixed
+- Viewer sidebar cards: added `border: 1px solid var(--wt-border)` to match the visual style of the Creator and comment cards on the same page.
+
 ## [1.0.71] - 2026-05-10
 
 ### Fixed
