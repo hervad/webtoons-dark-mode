@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.69
+// @version      1.0.70
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.69';
+    const VERSION = '1.0.70';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -501,10 +501,9 @@
            Three-level hierarchy: page (--wt-bg) → viewer sidebar card (--wt-bg-elev)
            → ranking items (--wt-bg-elev2). */
 
-        /* Aside is a transparent flex column — each direct child becomes its own
-           card. width:330px keeps the float from exceeding the 1200px cont_box
-           (viewer_lst takes the rest). height:fit-content prevents stretching
-           to match the taller comment column. */
+        /* Aside: transparent flex column — width:330px keeps float from exceeding
+           the 1200px cont_box; height:fit-content prevents stretching to match
+           the taller comment column. */
         .aside.viewer {
             box-sizing: border-box !important;
             width: 330px !important;
@@ -517,13 +516,25 @@
             gap: 12px !important;
             height: fit-content !important;
         }
-        /* Each top-level section in the aside (Trending & Popular, Top Originals)
-           gets its own card surface. */
+        /* Direct child wrapper: transparent pass-through, flex column to space
+           the two .ranking_wrap sections. */
         .aside.viewer > * {
+            background: transparent !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+        }
+        /* Each .ranking_wrap = one section (Trending & Popular / Top Originals).
+           These are the actual section containers inside .ranking_lst.viewer. */
+        .aside.viewer .ranking_wrap {
             background: var(--wt-bg-elev) !important;
             border-radius: 14px !important;
             padding: 16px !important;
             box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 8px 32px rgba(0,0,0,.35) !important;
+            border: none !important;
         }
         .aside .ranking_lst.viewer { background: transparent !important; }
         /* Ranking list items: transparent so they don't nest card-on-card. */
@@ -532,15 +543,23 @@
             border-radius: 0 !important;
             border: none !important;
         }
+        /* Section header arrow (.ico_arr1) — sprite background-image, not text;
+           color has no effect, need filter to make it visible on dark. */
+        .aside.viewer .ico_arr1 {
+            filter: brightness(0) invert(1) opacity(.6) !important;
+        }
         .ranking_lst .title_area h2 a, .ranking_lst .title_area h2 span {
             color: var(--wt-text) !important;
         }
         .ranking_lst .title_area h2 span em { color: var(--wt-text-dim) !important; }
         .ranking_lst .ico_arr1 { color: var(--wt-text-dim) !important; }
-        /* Ranking list item dividers and section separators in the viewer sidebar. */
+        /* Ranking list item dividers and section separators. */
         .ranking_lst li, .aside_item, .aside_wrap,
         .cont_box .aside { border-color: var(--wt-border) !important; }
-        .cont_box .aside .section_wrap, .cont_box .aside .ranking_wrap {
+        /* .ranking_wrap inside .aside.viewer is now a card — no internal borders.
+           Keep the rule for .section_wrap and non-viewer asides only. */
+        .cont_box .aside:not(.viewer) .section_wrap,
+        .cont_box .aside:not(.viewer) .ranking_wrap {
             border-top-color: var(--wt-border) !important;
             border-bottom-color: var(--wt-border) !important;
         }

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.70] - 2026-05-10
+
+### Fixed
+- Viewer sidebar: target `.ranking_wrap` (not `> *`) as individual section cards — the two sections (Trending & Popular / Top Originals) are nested inside a single `.ranking_lst.viewer` wrapper, so `> *` only produced one card; now each `.ranking_wrap` gets its own elevated card.
+- Viewer sidebar section header arrows (`.ico_arr1`) were invisible — they are sprite background-images, not text, so `color` had no effect; added `filter: invert` to make them visible.
+- Scoped border rules on `.ranking_wrap` to non-viewer asides only, to avoid double-borders inside the new cards.
+
 ## [1.0.69] - 2026-05-10
 
 ### Changed
