@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.51
+// @version      1.0.52
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.51';
+    const VERSION = '1.0.52';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -873,19 +873,17 @@
            Three-level hierarchy: page (--wt-bg) → episode list + sidebar cards
            (--wt-bg-elev) → episode rows (--wt-bg-elev2). */
 
-        /* Episode list column — elevated card with visible border so it shows
-           even when box-shadow is clipped by a parent overflow. */
-        .detail_lst_wrap {
+        /* Episode list column — the actual DOM element is .detail_body .detail_lst
+           (float:left, width:761px in base CSS). .detail_lst_wrap does not exist.
+           overflow:hidden clips episode rows to the border-radius. */
+        .detail_body .detail_lst {
             background: var(--wt-bg-elev) !important;
             border-radius: 16px !important;
-            padding: 16px 20px !important;
+            padding: 8px 0 !important;
             border: 1px solid rgba(255,255,255,.1) !important;
             box-shadow: 0 2px 0 rgba(255,255,255,.06), 0 12px 40px rgba(0,0,0,.55) !important;
-        }
-        /* The episode list itself is transparent so the wrap card bg shows through. */
-        .detail_lst, .detail_body .detail_lst {
-            background: transparent !important;
             border-right: none !important;
+            overflow: hidden !important;
         }
         /* Right sidebar — its own elevated card. */
         .aside.detail {
