@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.26
+// @version      1.0.27
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.26';
+    const VERSION   = '1.0.27';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -157,8 +157,9 @@
             background-color: var(--wt-bg-elev2) !important;
         }
 
-        /* Sections */
-        #content, .cont_area, .section, .wrap, .container,
+        /* Sections — use actual IDs (#wrap, #container) as confirmed in DOM;
+           keep .cont_area for inner content areas on non-home pages. */
+        #content, #wrap, #container, .cont_area,
         .detail_body, .detail_header, .detail_lst_wrap {
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
@@ -652,10 +653,11 @@
         /* Selection */
         ::selection { background: var(--wt-accent); color: var(--wt-text-on-accent); }
 
-        /* Pure-white badge chips */
-        .label, .badge, .ico_new, .ico_up, .ico_hot {
-            background-color: var(--wt-bg-elev2) !important;
-            color: var(--wt-text) !important;
+        /* "NEW" / "UP" badge chips — actual classes are badge_new2, badge_up2.
+           Dim them slightly on dark rather than override with a solid color
+           (they're sprite-based so background-color would block the graphic). */
+        [class^="badge_new"], [class^="badge_up"] {
+            opacity: .85 !important;
         }
 
         /* Mobile (m.webtoons.com) */
