@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.8
+// @version      1.0.9
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -90,6 +90,11 @@
         }
         .header_right .btn_search:hover { background: var(--wt-bg-hover) !important; }
         .header_right .btn_search:before { filter: brightness(0) invert(1) opacity(.85) !important; }
+        /* Log In button hover -- base CSS is #e0e0e0 (light grey, almost white).
+           That made our white-glyph icon disappear into the hover background. */
+        .header_right .link_login:hover, .header_right .btn_login:hover {
+            background: var(--wt-bg-hover) !important;
+        }
 
         /* Search dropdown — recent searches + autocomplete shown when search opens.
            Has three nested layers: .search_area (outer panel) → .input_box
@@ -172,6 +177,22 @@
         .snb_wrap, .snb_inner, .snb {
             background-color: var(--wt-bg) !important;
             border-color: var(--wt-border) !important;
+        }
+        /* Force the bottom underline color so the strip reads continuously
+           on dark — base CSS uses .5px solid #e0e0e0 which is invisible. */
+        .snb_wrap, .snb_wrap.type_sub {
+            border-bottom: 1px solid var(--wt-border) !important;
+        }
+        /* Snb scroll arrow buttons (← / → on long tab strips). Base CSS
+           background is #fff with light hover — break the underline. */
+        .snb_inner .btn_snb_prev, .snb_inner .btn_snb_next {
+            background-color: var(--wt-bg) !important;
+            border-bottom: 1px solid var(--wt-border) !important;
+            border-right-color: var(--wt-border) !important;
+            border-left-color: var(--wt-border) !important;
+        }
+        .snb_inner .btn_snb_prev:hover, .snb_inner .btn_snb_next:hover {
+            background-color: var(--wt-bg-hover) !important;
         }
         .snb_item, .snb_tab, ._snb_tab_a {
             background-color: transparent !important;
@@ -349,7 +370,125 @@
             color: var(--wt-text) !important;
         }
 
-        /* Comments (Naver u_cbox widget) */
+        /* Comments — Webtoons replaced the legacy Naver u_cbox widget with a
+           new "WCC" (Webtoon Comment Component) loaded from
+           ssl.pstatic.net/static/wcc/gw/prod-1.0/index.js. It uses CSS-Module
+           class names of the form wcc_<Component>__<element>. The legacy
+           .u_cbox_* selectors below are kept as a fallback for older pages. */
+
+        /* WCC widget root surfaces -- list, individual rows, body, header */
+        [class*="wcc_CommentList__"], [class*="wcc_CommentLoader__"],
+        [class*="wcc_CommentView__"], [class*="wcc_CommentEmpty__"] {
+            background-color: var(--wt-bg) !important;
+            color: var(--wt-text) !important;
+        }
+        [class*="wcc_CommentItem__root"] {
+            background-color: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 8px !important;
+            margin-bottom: 8px !important;
+            padding: 12px !important;
+        }
+        [class*="wcc_CommentItem__inside"], [class*="wcc_CommentItem__corner"],
+        [class*="wcc_CommentItem__action"], [class*="wcc_CommentItem__bestOnly"],
+        [class*="wcc_CommentItem__replied"] {
+            background: transparent !important;
+            color: var(--wt-text) !important;
+        }
+        /* Comment text body */
+        [class*="wcc_CommentBody__"] {
+            background: transparent !important;
+            color: var(--wt-text) !important;
+        }
+        [class*="wcc_CommentBody__deleted"], [class*="wcc_CommentBody__blinded"],
+        [class*="wcc_CommentBody__emptyBody"] {
+            color: var(--wt-text-mute) !important;
+        }
+        /* Comment header: nickname + date + creator badge */
+        [class*="wcc_CommentHeader__root"], [class*="wcc_CommentHeader__identity"] {
+            background: transparent !important;
+        }
+        [class*="wcc_CommentHeader__name"]          { color: var(--wt-link) !important; }
+        [class*="wcc_CommentHeader__createdAt"]     { color: var(--wt-text-mute) !important; }
+        [class*="wcc_CommentHeader__creatorBadge"],
+        [class*="wcc_CommentHeader__ownerSign"]     { color: var(--wt-accent) !important; }
+
+        /* Sort-order tabs (TOP / NEWEST) */
+        [class*="wcc_SortOrderTabs__root"], [class*="wcc_SortOrderTab__root"] {
+            background: transparent !important;
+            color: var(--wt-text-dim) !important;
+        }
+        [class*="wcc_SortOrderTab__active"] {
+            color: var(--wt-accent) !important;
+        }
+
+        /* Reaction buttons (like / dislike / etc.) */
+        [class*="wcc_CommentReaction__root"],
+        [class*="wcc_CommentReaction__action"] {
+            background: transparent !important;
+            color: var(--wt-text-dim) !important;
+        }
+        [class*="wcc_CommentReaction__active"] { color: var(--wt-accent) !important; }
+        [class*="wcc_CommentReaction__disabled"] { color: var(--wt-text-mute) !important; }
+
+        /* "Best comment" badge + super-like badge */
+        [class*="wcc_BestBadge__root"] {
+            background-color: var(--wt-bg-elev2) !important;
+            color: var(--wt-accent) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+        [class*="wcc_SuperLikeBadge__root"] {
+            background-color: var(--wt-bg-elev2) !important;
+            color: var(--wt-accent) !important;
+        }
+
+        /* Reply folder + unfold buttons */
+        [class*="wcc_ReplyFolder__root"], [class*="wcc_ReplyUnfold__root"],
+        [class*="wcc_ReplyUnfold__unfold"], [class*="wcc_ReplyFolderToggle__root"] {
+            background: transparent !important;
+            color: var(--wt-link) !important;
+        }
+        [class*="wcc_ReplyUnfold__arrow"] { color: var(--wt-text-dim) !important; }
+
+        /* "More comments" loader / pagination */
+        [class*="wcc_CommentMore__root"], [class*="wcc_CommentMore__more"],
+        [class*="wcc_CommentMore__prev"], [class*="wcc_CommentMore__progress"],
+        [class*="wcc_CommentMore__noEditor"], [class*="wcc_CommentMore__reply"] {
+            background: transparent !important;
+            color: var(--wt-text-dim) !important;
+        }
+        [class*="wcc_CommentMore__more"]:hover,
+        [class*="wcc_CommentMore__prev"]:hover { color: var(--wt-text) !important; }
+        [class*="wcc_CommentMore__arrow"] { color: var(--wt-text-dim) !important; }
+
+        /* Alert / report / option-menu popups */
+        [class*="wcc_AlertPopup__overlay"],
+        [class*="wcc_CommentReportPopup__overlay"] {
+            background: rgba(0,0,0,.7) !important;
+        }
+        [class*="wcc_AlertPopup__content"],
+        [class*="wcc_CommentReportPopup__content"],
+        [class*="wcc_CommentOptionMenu__content"],
+        [class*="wcc_CommentOptionMenu__menu"] {
+            background-color: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
+        }
+        [class*="wcc_AlertPopup__title"],
+        [class*="wcc_CommentReportPopup__title"] { color: var(--wt-text) !important; }
+        [class*="wcc_AlertPopup__cancel"],
+        [class*="wcc_CommentReportPopup__cancel"],
+        [class*="wcc_CommentReportPopup__reason"] {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text) !important;
+            border-color: var(--wt-border) !important;
+        }
+
+        /* Empty state */
+        [class*="wcc_CommentEmpty__message"] { color: var(--wt-text-dim) !important; }
+
+        /* Legacy u_cbox widget (kept as fallback for older pages) */
         #_cmtArea, .cmt_area, .u_cbox, .u_cbox_content_wrap,
         .u_cbox_comment_box, .u_cbox_write, .u_cbox_module {
             background-color: var(--wt-bg) !important;
@@ -373,16 +512,15 @@
         .footer a, #footer a { color: var(--wt-text-dim) !important; }
 
         /* Footer social icons (sprite glyphs — invisible against dark bg).
-           Opacity .65 instead of .85 — softens the brighter glyphs (Facebook
-           especially fills more area than the line-style Instagram / X / YouTube
-           glyphs, so at high opacity it visibly dominated the row). */
+           v1.0.6 dropped opacity to .65 to even out FB vs the line-style
+           Instagram/X/YouTube glyphs. .65 was a touch too dim — bumped to .75. */
         .btn_foot_facebook, .btn_foot_instagram, .btn_foot_twitter,
         .btn_foot_youtube, .btn_foot_pinterest, .btn_foot_line {
-            filter: brightness(0) invert(1) opacity(.65) !important;
+            filter: brightness(0) invert(1) opacity(.75) !important;
         }
         .btn_foot_facebook:hover, .btn_foot_instagram:hover, .btn_foot_twitter:hover,
         .btn_foot_youtube:hover, .btn_foot_pinterest:hover, .btn_foot_line:hover {
-            filter: brightness(0) invert(1) opacity(.95) !important;
+            filter: brightness(0) invert(1) opacity(1) !important;
         }
 
         /* Footer language selector (English ▾ button + dropdown) */
@@ -482,13 +620,19 @@
             background: var(--wt-bg) !important;
             border-right-color: var(--wt-border) !important;
         }
-        /* Base CSS: .detail_body .detail_lst .subj span { color: #3d3d3d } —
-           higher specificity than our .subj rule, plus it targets the inner
-           <span>. Restate at matching specificity. */
+        /* Base CSS: .detail_body .detail_lst .subj span { color: #3d3d3d } and
+           .date { color: #b1b1b1 } — invisible on dark. Restate at matching
+           specificity, plus broader fallbacks to catch any internal element. */
+        .detail_body .detail_lst .subj,
         .detail_body .detail_lst .subj span,
-        .detail_lst .subj span,
-        .detail_lst li .subj { color: var(--wt-text) !important; }
-        .detail_lst li .date { color: var(--wt-text-dim) !important; }
+        .detail_lst .subj, .detail_lst .subj span,
+        .detail_lst li a, .detail_lst li a span:not(.date):not(.tx) {
+            color: var(--wt-text) !important;
+        }
+        .detail_body .detail_lst .date, .detail_lst .date,
+        .detail_body .detail_lst .tx, .detail_lst .tx {
+            color: var(--wt-text-dim) !important;
+        }
         .detail_other .lst_type1 li, .lst_type1 li {
             background: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
@@ -519,11 +663,13 @@
             filter: brightness(0) invert(1) opacity(.85) !important;
         }
 
-        /* Pagination row at the bottom of the episode list */
-        .paginate a, .paginate strong, .paginate span {
-            color: var(--wt-text-dim) !important;
+        /* Pagination row at the bottom of the episode list. Base CSS hard-codes
+           color:#070707 on both .paginate a and strong — invisible on dark. */
+        .paginate a, .paginate strong, .paginate span,
+        .paginate.v2 [class^="pg_"] {
+            color: var(--wt-text) !important;
         }
-        .paginate a:hover { color: var(--wt-text) !important; }
+        .paginate a:hover { color: var(--wt-accent) !important; }
         .paginate .on, .paginate [aria-current="true"] {
             color: var(--wt-text-on-accent) !important;
         }

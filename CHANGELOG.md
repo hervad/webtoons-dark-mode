@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2026-05-10
+
+### Fixed
+- **Comments still white / nicknames invisible** (this was the big one). Webtoons replaced the legacy Naver `u_cbox` comment widget with a new in-house **WCC** ("Webtoon Comment Component") served from `ssl.pstatic.net/static/wcc/gw/prod-1.0/index.js`. WCC uses CSS-Module class names of the form `wcc_<Component>__<element>` (e.g. `wcc_CommentHeader__name` for nicknames, `wcc_CommentBody__root` for body text, `wcc_SortOrderTab__active` for the active TOP/NEWEST tab). The previous `.u_cbox_*` selectors matched *nothing* on this widget. Added a full `[class*="wcc_..."]` block covering: comment items (cards), header (name/createdAt/creator badge), body, reactions, best/super-like badges, sort tabs, reply-fold toggles, "more comments" loaders, alert/report/option-menu popups, and empty state. Legacy `.u_cbox_*` rules retained as a fallback.
+- **Sub-nav underline broken / discontinuous** ("the line begins, disappears, and after the categories appears again"). Base CSS gives `.snb_wrap { border-bottom: .5px solid #e0e0e0 }` (invisible on dark). The scroll-arrow buttons (`.btn_snb_prev` / `.btn_snb_next`) had their own `border-bottom: .5px solid #e0e0e0` *plus* white background that broke the bottom edge into segments. Forced both to `--wt-border` so the line reads continuously across the strip.
+- **Pagination numbers (2 / 3 / … / 10) not visible.** Base CSS hard-codes `.paginate a, .paginate strong { color: #070707 }`. Bumped from `--wt-text-dim` (set in v1.0.6) to full `--wt-text` for clearly readable numbers; hover now uses accent green to match the active page indicator.
+- **Episode titles still dim grey** despite the v1.0.8 fix. Broadened the rule to also catch `.detail_lst li a` and any direct `<span>` children that aren't `.date`/`.tx`. Date column now uses `--wt-text-dim` instead of leaking the base `#b1b1b1`.
+- **Top-right "Log In" hover went near-white**, hiding the white-glyph icon. Base CSS sets `.header_right .link_login:hover { background: #e0e0e0 }`. Now uses `--wt-bg-hover` like the search button next to it.
+- **Footer Facebook icon "barely visible"** at v1.0.6's `opacity(.65)`. Bumped to `.75` (hover up to `1.0`) — readable while still even with the line-style Instagram/X/YouTube siblings.
+
 ## [1.0.8] - 2026-05-10
 
 ### Fixed
