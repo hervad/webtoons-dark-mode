@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.31
+// @version      1.0.32
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -23,8 +23,8 @@
     'use strict';
 
     const KEY_THEME = 'wt_dark_enabled';
-    const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.31';
+    const KEY_DIM = 'wt_reader_dim';
+    const VERSION = '1.0.32';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -81,7 +81,7 @@
         .gnb a, .lnb a {
             color: var(--wt-text) !important;
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif !important;
-            font-size: 15px !important;
+            font-size: 17px !important;
             font-weight: 600 !important;
             letter-spacing: .05em !important;
             padding: 5px 10px !important;
@@ -1000,7 +1000,7 @@
 
     // Cached state — avoids GM IPC calls in the hot MutationObserver path.
     let darkOn = GM_getValue(KEY_THEME, themeDefault);
-    let dimOn  = GM_getValue(KEY_DIM, false);
+    let dimOn = GM_getValue(KEY_DIM, false);
 
     applyTheme(darkOn);
     applyDim(dimOn);
@@ -1012,7 +1012,7 @@
         if (!document.head) return;
         new MutationObserver(() => {
             if (darkOn && !document.getElementById('wt-dark-style')) applyTheme(true);
-            if (dimOn  && !document.getElementById('wt-dim-style'))  applyDim(true);
+            if (dimOn && !document.getElementById('wt-dim-style')) applyDim(true);
         }).observe(document.head, { childList: true });
     }
     if (document.head) watchHead();
@@ -1033,7 +1033,7 @@
 
     if (typeof GM_registerMenuCommand === 'function') {
         GM_registerMenuCommand('Toggle Webtoons dark mode', toggleTheme);
-        GM_registerMenuCommand('Toggle reader dim',         toggleDim);
+        GM_registerMenuCommand('Toggle reader dim', toggleDim);
     }
 
     // Keyboard shortcuts. Multiple combos so the user can use whichever doesn't
@@ -1044,19 +1044,19 @@
     // trigger the input-language switcher, which can swallow Alt+Shift+T on
     // multi-language setups. The Ctrl+Alt+D backup avoids both.
     function matchCombo(e, want) {
-        if (!!e.altKey   !== want.alt)   return false;
+        if (!!e.altKey !== want.alt) return false;
         if (!!e.shiftKey !== want.shift) return false;
-        if (!!e.ctrlKey  !== want.ctrl)  return false;
-        if (e.metaKey)                    return false; // never with Cmd
+        if (!!e.ctrlKey !== want.ctrl) return false;
+        if (e.metaKey) return false; // never with Cmd
         const code = e.code;
         const key = (e.key || '').toUpperCase();
         return code === want.code || key === want.letter;
     }
     function handleKey(e) {
-        const themeAltShiftT = matchCombo(e, { alt:true,  shift:true,  ctrl:false, code:'KeyT', letter:'T' });
-        const themeCtrlAltD  = matchCombo(e, { alt:true,  shift:false, ctrl:true,  code:'KeyD', letter:'D' });
-        const dimAltShiftN   = matchCombo(e, { alt:true,  shift:true,  ctrl:false, code:'KeyN', letter:'N' });
-        const dimCtrlAltShD  = matchCombo(e, { alt:true,  shift:true,  ctrl:true,  code:'KeyD', letter:'D' });
+        const themeAltShiftT = matchCombo(e, { alt: true, shift: true, ctrl: false, code: 'KeyT', letter: 'T' });
+        const themeCtrlAltD = matchCombo(e, { alt: true, shift: false, ctrl: true, code: 'KeyD', letter: 'D' });
+        const dimAltShiftN = matchCombo(e, { alt: true, shift: true, ctrl: false, code: 'KeyN', letter: 'N' });
+        const dimCtrlAltShD = matchCombo(e, { alt: true, shift: true, ctrl: true, code: 'KeyD', letter: 'D' });
 
         let handled = false;
         try {
