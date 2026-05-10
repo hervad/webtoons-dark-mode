@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.49
+// @version      1.0.50
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.49';
+    const VERSION = '1.0.50';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -264,11 +264,73 @@
             border: 1px solid var(--wt-border) !important;
         }
 
-        /* List page section header: "143 series" + by Popularity / Likes / Date */
-        .webtoon_list_wrap, .section_header {
-            background-color: var(--wt-bg) !important;
+        /* === Homepage / listing pages: Option B elevation design ===
+           Three-level hierarchy: page (--wt-bg) → section card (--wt-bg-elev)
+           → comic card (--wt-bg-elev2 + shadow). */
+
+        /* Section containers become elevated cards with rounded corners.
+           .main_section = "Trending & Popular Series" carousel block.
+           .webtoon_list_wrap = "Popular Series by Category", "Newly Released", etc. */
+        .main_section, .webtoon_list_wrap {
+            background: var(--wt-bg-elev) !important;
+            border-radius: 16px !important;
+            padding: 24px 24px 28px !important;
+            box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 8px 32px rgba(0,0,0,.35) !important;
             color: var(--wt-text) !important;
         }
+        /* Faint accent line below each section header to anchor the title. */
+        .main_section .section_header,
+        .webtoon_list_wrap .section_header {
+            border-bottom: 1px solid rgba(0, 213, 100, .18) !important;
+            margin-bottom: 16px !important;
+        }
+        /* "View all ›" link in section header. */
+        .section_header .button_view_all { color: var(--wt-text-dim) !important; }
+        .section_header .button_view_all:hover { color: var(--wt-accent) !important; }
+
+        /* Comic cards within section containers: elevated above the section bg. */
+        .main_section .card_item,
+        .main_section .card_lst li,
+        .main_section .webtoon_list li,
+        .webtoon_list_wrap .card_item,
+        .webtoon_list_wrap .card_lst li,
+        .webtoon_list_wrap ._popularList li,
+        .webtoon_list_wrap ._dailyList li,
+        .webtoon_list_wrap .webtoon_list li {
+            background: var(--wt-bg-elev2) !important;
+            border-color: rgba(255,255,255,.06) !important;
+            border-radius: 10px !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.3) !important;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s !important;
+        }
+        .main_section .card_item:hover,
+        .main_section .card_lst li:hover,
+        .main_section .webtoon_list li:hover,
+        .webtoon_list_wrap .card_item:hover,
+        .webtoon_list_wrap .card_lst li:hover,
+        .webtoon_list_wrap ._popularList li:hover,
+        .webtoon_list_wrap ._dailyList li:hover,
+        .webtoon_list_wrap .webtoon_list li:hover {
+            transform: translateY(-6px) scale(1.02) !important;
+            background: #30363f !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 0 0 1px rgba(255,255,255,.15) !important;
+            border-color: rgba(255,255,255,.15) !important;
+        }
+        /* Card text area: more breathing room for title + view count. */
+        .webtoon_list .info_text {
+            margin-top: 10px !important;
+            padding: 0 4px !important;
+        }
+        .webtoon_list .view_count {
+            margin-top: 5px !important;
+            color: var(--wt-text-mute) !important;
+        }
+        .webtoon_list .title {
+            color: var(--wt-text) !important;
+        }
+
+        /* Section header text. */
+        .section_header { color: var(--wt-text) !important; }
         .series_count, .series_count .number, .series_count span {
             color: var(--wt-text-dim) !important;
         }
@@ -389,6 +451,8 @@
         .episode_area {
             background: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 4px 20px rgba(0,0,0,.4) !important;
         }
         .episode_lst { background: transparent !important; }
         /* Currently-viewing episode highlight in the thumbnail strip.
@@ -407,9 +471,18 @@
         /* Horizontal rules — base CSS leaves them with default browser styling. */
         hr { border-color: var(--wt-border) !important; background: var(--wt-border) !important; }
 
-        /* Right-side aside on viewer page ("Trending & Popular") */
-        .aside.viewer { background: transparent !important; }
-        .aside .ranking_lst.viewer { background: var(--wt-bg) !important; }
+        /* === Viewer page elevation ===
+           Three-level hierarchy: page (--wt-bg) → viewer sidebar card (--wt-bg-elev)
+           → ranking items (--wt-bg-elev2). */
+
+        /* Right-side aside: elevate from transparent into a card. */
+        .aside.viewer {
+            background: var(--wt-bg-elev) !important;
+            border-radius: 14px !important;
+            padding: 16px !important;
+            box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 8px 32px rgba(0,0,0,.35) !important;
+        }
+        .aside .ranking_lst.viewer { background: transparent !important; }
         .ranking_lst .title_area h2 a, .ranking_lst .title_area h2 span {
             color: var(--wt-text) !important;
         }
@@ -790,15 +863,29 @@
 
         /* ---------- Series detail page (e.g. /<lang>/<genre>/<slug>/list?title_no=...) ---------- */
 
-        /* The episode list and "You may also like" cards are explicitly white
-           in the base CSS — both follow our dark surface now. */
+        /* === Detail page elevation ===
+           Three-level hierarchy: page (--wt-bg) → episode list + sidebar cards
+           (--wt-bg-elev) → episode rows (--wt-bg-elev2). */
+
+        /* Episode list column — elevated card. */
+        .detail_lst_wrap {
+            background: var(--wt-bg-elev) !important;
+            border-radius: 16px !important;
+            padding: 16px !important;
+            box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 8px 32px rgba(0,0,0,.35) !important;
+        }
+        /* The episode list itself is transparent so the wrap card bg shows through. */
         .detail_lst, .detail_body .detail_lst {
-            background: var(--wt-bg) !important;
+            background: transparent !important;
             border-right: none !important;
         }
-        /* Right sidebar panel — base CSS: border-left: 2px solid #f5f5f5 (white divider). */
+        /* Right sidebar — its own elevated card; drop the hair-line border-left. */
         .aside.detail {
-            border-left: 1px solid rgba(255,255,255,.06) !important;
+            background: var(--wt-bg-elev) !important;
+            border-radius: 16px !important;
+            padding: 16px !important;
+            border-left: none !important;
+            box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 8px 32px rgba(0,0,0,.35) !important;
         }
         /* Sidebar CTA buttons (Continue reading / First episode). */
         .aside.detail .aside_btn .btn_type7 {
