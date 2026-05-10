@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2026-05-10
+
+### Fixed
+- **Search button (top-right of header) was nearly invisible.** Base CSS sets `.header_right .btn_search { background: #f3f3f3 }` (light grey). Now uses `--wt-bg-elev2` background with a `--wt-border` outline; the magnifying-glass `:before` sprite is forced to white via `filter: brightness(0) invert(1) opacity(.85)`.
+- **Search dropdown** (recent searches + autocomplete) was a white box. Targeted: `.search_cont`, `.search_area`, `._searchArea`, `.input_search`, `._txtKeyword`, `.ly_autocomplete`, `._searchLayer`, plus item hover state.
+- **Notice list page** (`/<lang>/notice/list`). Base CSS gives `.notice_area2 .tb_notice tbody tr { color: #000 }` and `tr.special { background: #f8f8f8 }` — invisible/jarring on dark. Now: dark page surface, `--wt-bg-elev2` table headers, `--wt-bg-elev` for the highlighted "special" row, `--wt-border` row dividers, `--wt-text` cell text.
+- **Terms and Privacy Policy pages** (`/<lang>/terms`, `/<lang>/terms/privacyPolicy`). Base CSS hard-codes `.terms_area { background: #fff; color: #858585 }`. Overridden along with `.terms_box`, `.terms_card`, `.terms_lang_area`, `.terms_lang_desc`, `.terms_list`. Headings (`h3`, `strong`) get full text color, dates get muted, links use the link blue.
+- **About / Contact / Feedback / and similar static pages.** These are rendered by a **separate Next.js subapp** (bundle from `/static/wec/.../next/...`) and use Tailwind utility classes (`text-black`, `bg-white`, `bg-gray-100`, …) that ignore the body color cascade. Added a scoped override block — anything inside `section[class*="layout_container"]` gets dark background + dark-mode text colors. Limited to that wrapper so it can't leak into the main linewebtoon-rendered pages.
+- **Facebook footer icon was visibly brighter than the other socials.** All the footer social icons go through `filter: brightness(0) invert(1)`, but the FB glyph fills more pixel area than the line-style Instagram / X / YouTube glyphs, so at high opacity it dominated the row. Lowered base opacity from `.85` to `.65` (hover from `1` to `.95`) to even out the visual weight.
+
+### Added
+- **Hover highlight on top-nav links** (Originals / Categories / Rankings / Canvas / Webtoon Shop / Creators 101). Were previously plain text with no hover affordance — now get an accent-green text + `--wt-bg-elev2` rounded background on hover. Same upgrade applied to sub-nav tabs (`.snb_item`, `.snb_tab`).
+
 ## [1.0.5] - 2026-05-10
 
 ### Fixed

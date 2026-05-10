@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.5
+// @version      1.0.6
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -73,8 +73,43 @@
             border-color: var(--wt-border) !important;
             box-shadow: var(--wt-shadow) !important;
         }
-        .gnb a, .lnb a            { color: var(--wt-text) !important; }
+        .gnb a, .lnb a            { color: var(--wt-text) !important; transition: color .15s, background-color .15s; }
         .gnb .on a, .lnb .on a    { color: var(--wt-accent) !important; }
+        /* Hover highlight on top-nav links (Originals / Categories / Rankings / Canvas / Webtoon Shop / Creators 101). */
+        .gnb a:hover, .lnb a:hover, .gnb .link:hover, .header .link_menu:hover {
+            color: var(--wt-accent) !important;
+            background-color: var(--wt-bg-elev2) !important;
+            border-radius: 4px;
+        }
+
+        /* Search button (top-right of header). Base CSS sets a light-grey
+           circle (#f3f3f3) which is nearly invisible on our dark header. */
+        .header_right .btn_search {
+            background: var(--wt-bg-elev2) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+        .header_right .btn_search:hover { background: var(--wt-bg-hover) !important; }
+        .header_right .btn_search:before { filter: brightness(0) invert(1) opacity(.85) !important; }
+
+        /* Search dropdown — recent searches + autocomplete shown when search is opened. */
+        .search_cont, .search_area, ._searchArea {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
+        }
+        .input_search, ._txtKeyword {
+            background: var(--wt-bg-input) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+        }
+        .ly_autocomplete, ._searchLayer {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 4px;
+        }
+        .ly_autocomplete li, ._searchLayer li { background: transparent !important; }
+        .ly_autocomplete li:hover, ._searchLayer li:hover { background: var(--wt-bg-elev2) !important; }
+        .ly_autocomplete a, ._searchLayer a { color: var(--wt-text) !important; }
 
         /* Cards / lists */
         .card_lst li, .card_item, .detail_lst li, .lst_area li,
@@ -131,7 +166,10 @@
             color: var(--wt-text-dim) !important;
             border-color: var(--wt-border) !important;
         }
-        .snb_item:hover .snb_tab, .snb_tab:hover { color: var(--wt-text) !important; }
+        .snb_item:hover .snb_tab, .snb_tab:hover {
+            color: var(--wt-text) !important;
+            background-color: var(--wt-bg-elev2) !important;
+        }
         .snb_item.is_selected .snb_tab,
         .snb_tab[aria-current="true"],
         .snb_tab[aria-current="page"] {
@@ -252,14 +290,17 @@
         }
         .footer a, #footer a { color: var(--wt-text-dim) !important; }
 
-        /* Footer social icons (sprite glyphs — invisible against dark bg). */
+        /* Footer social icons (sprite glyphs — invisible against dark bg).
+           Opacity .65 instead of .85 — softens the brighter glyphs (Facebook
+           especially fills more area than the line-style Instagram / X / YouTube
+           glyphs, so at high opacity it visibly dominated the row). */
         .btn_foot_facebook, .btn_foot_instagram, .btn_foot_twitter,
         .btn_foot_youtube, .btn_foot_pinterest, .btn_foot_line {
-            filter: brightness(0) invert(1) opacity(.85) !important;
+            filter: brightness(0) invert(1) opacity(.65) !important;
         }
         .btn_foot_facebook:hover, .btn_foot_instagram:hover, .btn_foot_twitter:hover,
         .btn_foot_youtube:hover, .btn_foot_pinterest:hover, .btn_foot_line:hover {
-            filter: brightness(0) invert(1) opacity(1) !important;
+            filter: brightness(0) invert(1) opacity(.95) !important;
         }
 
         /* Footer language selector (English ▾ button + dropdown) */
@@ -397,6 +438,66 @@
         .paginate a:hover { color: var(--wt-text) !important; }
         .paginate .on, .paginate [aria-current="true"] {
             color: var(--wt-text-on-accent) !important;
+        }
+
+        /* ---------- Static / policy pages ---------- */
+
+        /* Notice list page (/<lang>/notice/list) — table on white. */
+        .notice_area2 {
+            background: var(--wt-bg) !important;
+            color: var(--wt-text) !important;
+        }
+        .notice_area2 h3 { color: var(--wt-text) !important; }
+        .notice_area2 .tb_notice { background: var(--wt-bg) !important; }
+        .notice_area2 .tb_notice th {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text) !important;
+            border-color: var(--wt-border) !important;
+        }
+        .notice_area2 .tb_notice tbody tr           { color: var(--wt-text) !important; }
+        .notice_area2 .tb_notice tbody tr.special   { background: var(--wt-bg-elev) !important; }
+        .notice_area2 .tb_notice tbody td           { border-color: var(--wt-border) !important; }
+        .notice_area2 .tb_notice a                  { color: var(--wt-text) !important; }
+        .notice_area2 .tb_notice a:hover            { color: var(--wt-link) !important; }
+
+        /* Terms / Privacy Policy pages (/<lang>/terms*, /<lang>/terms/privacyPolicy).
+           Base CSS hard-codes background:#fff and color:#858585 on .terms_area. */
+        .terms_area, .terms_box, .terms_card,
+        .terms_lang_area, .terms_lang_desc, .terms_list {
+            background: var(--wt-bg) !important;
+            color: var(--wt-text) !important;
+        }
+        .terms_area h3, .terms_area strong { color: var(--wt-text) !important; }
+        .terms_area .date                  { color: var(--wt-text-mute) !important; }
+        .terms_area a                      { color: var(--wt-link) !important; }
+
+        /* Static Next.js subapp pages (About, Contact, Feedback, etc.).
+           These are rendered by a separate bundle from /static/wec/.../next/...
+           and use Tailwind utility classes (text-black, bg-white) that ignore
+           the body color cascade. Scope overrides to the Next.js layout
+           wrapper class so we don't catch other pages. */
+        section[class*="layout_container"],
+        section[class*="layout_container"] main {
+            background-color: var(--wt-bg) !important;
+            color: var(--wt-text) !important;
+        }
+        section[class*="layout_container"] .bg-white,
+        section[class*="layout_container"] [class*="bg-white"],
+        section[class*="layout_container"] [class*="bg-gray-50"],
+        section[class*="layout_container"] [class*="bg-gray-100"],
+        section[class*="layout_container"] [class*="bg-gray-200"] {
+            background-color: var(--wt-bg-elev) !important;
+        }
+        section[class*="layout_container"] .text-black,
+        section[class*="layout_container"] [class*="text-black"],
+        section[class*="layout_container"] [class*="text-gray-9"],
+        section[class*="layout_container"] [class*="text-gray-8"] {
+            color: var(--wt-text) !important;
+        }
+        section[class*="layout_container"] [class*="text-gray-5"],
+        section[class*="layout_container"] [class*="text-gray-6"],
+        section[class*="layout_container"] [class*="text-gray-7"] {
+            color: var(--wt-text-dim) !important;
         }
 
         /* Defensive catch-all for any other dialog Webtoons might add later. */
