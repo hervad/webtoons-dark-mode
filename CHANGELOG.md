@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.64] - 2026-05-10
+
+### Fixed
+- Viewer sidebar layout: `padding: 16px` on `.aside.viewer` expanded it from 330px to 362px (content-box), causing float overflow beyond the 1200px container → sidebar wrapped below comments. Fixed with `box-sizing: border-box; width: 330px` to keep padding inside the original footprint.
+- Viewer vignette: gradient edge color changed from `#0d1014` to `#020304` (near-black) for a visible depth effect on the sides.
+
 ## [1.0.63] - 2026-05-10
 
 ### Fixed
