@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.91] - 2026-05-11
+
+### Fixed
+
+- Removed white spread ring from comic panel shadow — it created visible white lines between adjacent panels; dark outer glow alone (`0 0 28px rgba(0,0,0,.8)`) provides depth without inter-panel artifacts
+
 ## [1.0.90] - 2026-05-11
 
 ### Changed
