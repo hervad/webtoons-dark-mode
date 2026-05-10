@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.74
+// @version      1.0.75
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.74';
+    const VERSION = '1.0.75';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -496,6 +496,32 @@
 
         /* Horizontal rules — base CSS leaves them with default browser styling. */
         hr { border-color: var(--wt-border) !important; background: var(--wt-border) !important; }
+
+        /* Viewer sub-sections below the comic panels. Base CSS leaves these with
+           white or transparent backgrounds that show through the dark page. */
+        .viewer_info_area, .viewer_ad_area, .viewer_patron_area,
+        ._patronArea, .viewer_dsc_area, .viewer_bnr {
+            background: transparent !important;
+            color: var(--wt-text) !important;
+        }
+        /* "Want more? Read more episodes" app download banner inside the viewer.
+           Base CSS has a light background — override to match our card surface. */
+        .viewer_lst .foot_app, .viewer_lst ._bannerArea, .viewer_lst .view_more_banner,
+        .viewer_lst [class*="banner"], .viewer_lst [class*="Banner"] {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 12px !important;
+            color: var(--wt-text) !important;
+        }
+        /* The visible "Want more?" section that appears between the episode strip
+           and the Creator/Comments area — it sits outside viewer_lst, in cont_box. */
+        #_viewerBox > .foot_app, .cont_box .foot_app {
+            background: var(--wt-bg-elev) !important;
+            border: none !important;
+            border-top: 1px solid var(--wt-border) !important;
+            border-bottom: 1px solid var(--wt-border) !important;
+            border-radius: 0 !important;
+        }
 
         /* === Viewer page elevation ===
            Cards are injected by buildViewerCards() in JS — CSS only provides the
