@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.65] - 2026-05-10
+
+### Fixed
+- Viewer sidebar: ranking list items inside `.aside.viewer` were getting the generic `.ranking_lst li { background: --wt-bg-elev; border-radius: 6px }` rule, making them appear as nested cards-on-card. Reset to transparent + no border-radius within the sidebar.
+- Viewer vignette: gradient edge changed from `#020304` to pure `#000000`, transition zone narrowed from 28% to 14% — creates a clearly visible dark border at screen edges.
+
 ## [1.0.64] - 2026-05-10
 
 ### Fixed
