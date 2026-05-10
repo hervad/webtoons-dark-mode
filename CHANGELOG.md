@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.89] - 2026-05-11
+
+### Fixed
+
+- Comic panel shadow is now symmetric (`0 0 28px` instead of `0 6px 28px`) so it appears on all sides, not just below; removed `display:block` override that was left-shifting panels out of their centered container
+
 ## [1.0.88] - 2026-05-11
 
 ### Added
