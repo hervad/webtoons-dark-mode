@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.50] - 2026-05-10
+
+### Added
+- Homepage card hover: Material Design white-overlay elevation — surface lightens to `#30363f` + inset rim-light + thin white outline; removed `filter: brightness` which was tinting comic artwork
+- Detail page elevation: episode list column and sidebar become separate elevated cards (`--wt-bg-elev`) above the page background, matching the homepage section hierarchy
+- Viewer page elevation: episode thumbnail strip gets border-radius + shadow; ranking sidebar becomes an elevated card
+
+## [1.0.49] - 2026-05-10
+
+### Added
+- Homepage "Option B" three-level elevation design: page → section cards → comic cards with shadows and transitions
+- Heart icon in Like/Subscribe viewer pills tinted red via CSS filter
+- Episode list hover: accent border via `::after` pseudo-element, date/like count turn green, `.subj` width capped at 385px to prevent episode-number overflow
+- Sidebar CTA buttons (Continue reading / First episode) with green ring hover
+- Search Creators section: dark hover background
+- Multiple white/light border fixes: sidebar `border-left`, CANVAS Weekly top separator, viewer/comment section dividers
+
 ## [1.0.48] - 2026-05-10
 
 ### Added
