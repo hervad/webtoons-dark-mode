@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.66] - 2026-05-10
+
+### Fixed
+- Viewer vignette: gradient now also driven by JS `body.wt-viewer` class (hooks `pushState`/`replaceState`/`popstate`) so it survives SPA episode navigation. CSS `:has()` kept as fallback.
+- Viewer sidebar: `overflow: hidden` clips the "THRILLER ✓" filter button overflow at the `border-radius: 14px` boundary (`box-shadow` is unaffected by overflow clipping). Ranking list items now also have `border: none` to remove separator lines at card edges.
+
 ## [1.0.65] - 2026-05-10
 
 ### Fixed
