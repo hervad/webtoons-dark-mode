@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-05-10
+
+### Fixed
+- **Search dropdown "still white" after v1.0.6.** v1.0.6 covered `.search_area` (outer panel) and `.input_search` (transparent `<input>`) but missed the *middle* layer: `.search_area .input_box` is the rounded grey pill that wraps the input (`background:#f3f3f3` in base CSS). Now styled with `--wt-bg-input` so the pill is dark; the inner `<input>` is forced transparent so the pill bg shows through. Also added `.ly_autocomplete .title` and `.autocomplete_foot` text colors and item hover state.
+- **Episode titles "Episode 26 / 25 / 24" almost invisible.** Base CSS hard-codes `.detail_body .detail_lst .subj span { color: #3d3d3d }` — high specificity (3 classes + element) targeting the *inner* span. Our previous `.subj` rule only colored the outer span; the inner one inherited the dark grey from the more specific rule. Added matching-specificity overrides for `.detail_body .detail_lst .subj span` plus the date column.
+- **Terms / Policy language pills** (English / Français / Indonesia / 中文 / ภาษาไทย at the top of `/<lang>/terms*`). Base: inactive `#f3f3f3` bg + `#666` text (invisible on dark); active `#000` bg + `#fff` text (off-theme). Now: inactive uses `--wt-bg-elev2` + `--wt-text-dim`; active uses `--wt-accent` + `--wt-text-on-accent`; inactive hover uses `--wt-bg-hover` + `--wt-text`.
+- **White-circle social icons in title banner** (FB / X / Tumblr / Reddit / Copy / RSS next to the Subscribe button). v1.0.5 applied `filter: brightness(0) invert(1)` to all `.ico_*` selectors, but the sprite at those positions includes brand-colored disc backgrounds — the filter bleached the whole disc to a solid white circle, hiding the glyph. Filter is now scoped to **stats glyphs only** (`.ico_subscribe`, `.ico_view`, `.ico_view2`, `.ico_grade`, `.ico_grade2`). Brand social icons render in their native colors (FB blue, X dark, Tumblr indigo, Reddit orange, RSS orange) — visible on dark.
+- The viewer-context filter override added in v1.0.7 is now redundant and removed — social icons are no longer filtered anywhere, and the viewer's `.ico_favorites` / `.ico_like2` / `.ico_plus3` were never affected by the v1.0.5 rule.
+
+### Changed
+- **Skin image less dimmed.** v1.0.5 used `filter: brightness(.55)` on `.detail_bg`, which made per-series artwork (sky/clouds for Best Teacher Baek, red cracks for A Cadet Becomes a Prophet) too dark on the sides. Bumped to `.7` — still tames the bright artwork next to dark chrome, but keeps the artist's image readable.
+- **Sub-nav hover now uses accent green** instead of plain white. `.snb_item:hover .snb_tab` color changed from `--wt-text` to `--wt-accent` so hover affordance matches the active-tab indicator.
+
 ## [1.0.7] - 2026-05-10
 
 ### Fixed
