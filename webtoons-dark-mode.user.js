@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.87
+// @version      1.0.88
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.87';
+    const VERSION = '1.0.88';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -479,8 +479,17 @@
             background-color: transparent !important;
             color: var(--wt-text) !important;
         }
-        /* Never touch comic panels */
+        /* Never touch comic panels — filter:none preserves original colors. */
         .viewer_lst img, ._images, ._images img, .viewer_img img { filter: none !important; }
+        /* Lift each panel off the dark background with a drop shadow + hairline
+           edge. box-shadow is purely decorative and doesn't alter image colors. */
+        img._images {
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,.07),
+                0 6px 28px rgba(0,0,0,.7) !important;
+            border-radius: 2px !important;
+            display: block !important;
+        }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
         .tool_area {
