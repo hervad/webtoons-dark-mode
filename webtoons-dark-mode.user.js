@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.28
+// @version      1.0.29
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM   = 'wt_reader_dim';
-    const VERSION   = '1.0.28';
+    const VERSION   = '1.0.29';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -68,11 +68,15 @@
         a:hover      { color: var(--wt-link) !important; }
         .NPI a, .lk_link, .more, .btn_link { color: var(--wt-link) !important; }
 
-        /* Header / global nav */
-        #header, .header, .gnb_wrap, #gnbWrap, .gnb, .lnb, .header_bn {
+        /* Header / global nav — border-color and box-shadow only on the outer
+           header shell, NOT on .gnb/.lnb nav lists (causes nav item artifacts). */
+        #header, .header, .gnb_wrap, #gnbWrap, .header_bn {
             background-color: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
             box-shadow: var(--wt-shadow) !important;
+        }
+        .gnb, .lnb {
+            background-color: var(--wt-bg-elev) !important;
         }
         .gnb a, .lnb a            { color: var(--wt-text) !important; transition: color .15s, background-color .15s; }
         .gnb .on a, .lnb .on a    { color: var(--wt-accent) !important; }
