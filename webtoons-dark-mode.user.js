@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.57
+// @version      1.0.58
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.57';
+    const VERSION = '1.0.58';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -194,12 +194,12 @@
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
         }
-        /* detail_body background matches the card colour so rounded corners
-           blend seamlessly — the artwork behind bleeds through corner cutouts
-           otherwise. Cards are still visually distinct via their inset shadow. */
+        /* detail_body background must cover the artwork that bleeds through
+           rounded card corners, but must match the page bg so the container
+           rectangle isn't visible below the shorter sidebar card. */
         .detail_body {
             overflow: visible !important;
-            background: var(--wt-bg-elev) !important;
+            background: var(--wt-bg) !important;
         }
         .detail_header { color: var(--wt-text) !important; }
 
