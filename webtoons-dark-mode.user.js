@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.0.61
+// @version      1.0.62
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.0.61';
+    const VERSION = '1.0.62';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -440,9 +440,13 @@
             border-bottom: 1px solid var(--wt-border) !important;
         }
 
-        /* Viewer (reading page). */
+        /* Viewer (reading page) — depth via a short ellipse (25% height) so the
+           gradient fades fully before reaching the like/subscribe area or the
+           thumbnail strip. #content.viewer outspecifies the general #content rule
+           so this wins. #_viewerArea kept as fallback for older markup. */
+        #content.viewer,
         #_viewerArea {
-            background: radial-gradient(ellipse 55% 80% at center top, #1d2026 0%, var(--wt-bg) 65%) !important;
+            background: radial-gradient(ellipse 55% 25% at 50% 0%, #1d2228 0%, var(--wt-bg) 100%) !important;
             color: var(--wt-text) !important;
         }
         .viewer_lst, .viewer_lst .on, .viewer_header,
