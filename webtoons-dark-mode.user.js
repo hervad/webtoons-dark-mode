@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.4
+// @version      1.1.6
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,18 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.4';
+    const VERSION = '1.1.6';
+
+    // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
+    // banner cleanup, panel glow). Webtoons renders the new page asynchronously
+    // after pushState; one delay never fits all subapps, so we sample three
+    // times spanning fast → slow bundles.
+    const SPA_RETRY_DELAYS = [200, 800, 2000];
+
+    // Log the startup banner as the FIRST runtime statement so that if anything
+    // below throws, the console still proves the script loaded and which
+    // version Tampermonkey is serving.
+    console.info(`[webtoons-dark-mode] v${VERSION} starting`);
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -225,21 +236,10 @@
             box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
         }
 
-        /* Tone down marketing banners */
-        .header_bn, .bnr_area, .ad_bnr, ._bannerArea, .promotion_bnr {
+        /* Tone down the top marketing banner */
+        .header_bn {
             background: var(--wt-bg-elev) !important;
             filter: brightness(.85);
-        }
-
-        /* Tabs (older markup) */
-        .tab_lst li, .tab_lst a, .sub_tab li, .sub_tab a {
-            background-color: var(--wt-bg-elev) !important;
-            color: var(--wt-text-dim) !important;
-            border-color: var(--wt-border) !important;
-        }
-        .tab_lst li.on, .tab_lst li.on a, .sub_tab li.on, .sub_tab li.on a {
-            background-color: var(--wt-bg-elev2) !important;
-            color: var(--wt-accent) !important;
         }
 
         /* Sub-nav (snb): day-of-week picker AND genre tabs share this component */
@@ -473,7 +473,6 @@
         body.wt-viewer .comment_area {
             background-color: transparent !important;
         }
-        #_viewerArea { background-color: transparent !important; }
         .viewer_lst, .viewer_lst .on, .viewer_header,
         .viewer_footer, ._toolBox, .ly_episode {
             background-color: transparent !important;
@@ -522,9 +521,10 @@
             background: var(--wt-bg) !important;
             color: var(--wt-text) !important;
         }
-        /* "Want more?" app download banner (foot_app inside viewer or cont_box).
-           Native background is a medium gray — override to elevated dark. */
-        .foot_app, .foot_cont, .foot_down_msg, .footapp_icon_cont,
+        /* "Want more?" app download banner inside the viewer column — covers
+           variants Webtoons may inject under nonstandard class names.
+           Footer .foot_app/.foot_cont/.foot_down_msg/.footapp_icon_cont are
+           already dark from the footer block above. */
         #_viewerBox .foot_app, .viewer_lst .foot_app,
         [class*="dsc_down"], [class*="DownApp"], [class*="download_app"] {
             background: var(--wt-bg-elev) !important;
@@ -1369,8 +1369,7 @@
 
     /* Optional: dim panels in the viewer for late-night reading. */
     const dimCss = `
-        .viewer_lst img, ._images img, .viewer_img img,
-        ._mobile_viewer img, ._scroll_view img {
+        .viewer_lst img, ._images img, .viewer_img img {
             filter: brightness(.78) !important;
         }
     `;
@@ -1505,7 +1504,7 @@
     syncBodyClasses();
     document.addEventListener('DOMContentLoaded', syncBodyClasses);
     function scheduleViewerSync() {
-        [100, 600, 1500].forEach(d => setTimeout(syncBodyClasses, d));
+        SPA_RETRY_DELAYS.forEach(d => setTimeout(syncBodyClasses, d));
     }
     ['pushState', 'replaceState'].forEach(fn => {
         const orig = history[fn];
@@ -1560,7 +1559,7 @@
         }
     }
     function scheduleViewerBanners() {
-        [400, 1000, 2200].forEach(d => setTimeout(fixViewerBanners, d));
+        SPA_RETRY_DELAYS.forEach(d => setTimeout(fixViewerBanners, d));
     }
     document.addEventListener('DOMContentLoaded', fixViewerBanners);
     scheduleViewerBanners();
@@ -1568,6 +1567,8 @@
     // Inject card wrappers into the viewer sidebar. CSS selectors for inner
     // sections are unreliable (class names vary); JS groups children of
     // .ranking_lst by "non-UL header + following UL" and wraps each pair.
+    // Idempotent via `aside.dataset.wtCards` — repeat schedule calls early-out
+    // once the wrapping has succeeded.
     function buildViewerCards() {
         const aside = document.querySelector('.aside.viewer');
         if (!aside || aside.dataset.wtCards) return;
@@ -1605,18 +1606,8 @@
         });
     }
     function scheduleViewerCards() {
-        aside_cards_done = false;
-        [300, 900, 2000].forEach(d => setTimeout(() => {
-            if (!aside_cards_done) buildViewerCards();
-        }, d));
+        SPA_RETRY_DELAYS.forEach(d => setTimeout(buildViewerCards, d));
     }
-    let aside_cards_done = false;
-    // Override buildViewerCards to track completion.
-    const _bvc = buildViewerCards;
-    buildViewerCards = function () {
-        _bvc();
-        if (document.querySelector('.aside.viewer[data-wt-cards]')) aside_cards_done = true;
-    };
     document.addEventListener('DOMContentLoaded', buildViewerCards);
     scheduleViewerCards();
 
@@ -1643,15 +1634,17 @@
         const imgRect = img.getBoundingClientRect();
         if (imgRect.width < 50) return;
 
-        const base = 'position:fixed;width:40px;pointer-events:none;z-index:100;';
+        const GLOW_WIDTH = 30;
+        const GLOW_RGBA = 'rgba(255,255,255,.07)';
+        const base = `position:fixed;width:${GLOW_WIDTH}px;pointer-events:none;z-index:100;`;
         const l = document.createElement('div');
         l.id = 'wt-glow-l';
-        l.style.cssText = base + `left:${imgRect.left - 40}px;` +
-            'background:linear-gradient(to right,transparent,rgba(255,255,255,.12));';
+        l.style.cssText = base + `left:${imgRect.left - GLOW_WIDTH}px;` +
+            `background:linear-gradient(to right,transparent,${GLOW_RGBA});`;
         const r = document.createElement('div');
         r.id = 'wt-glow-r';
         r.style.cssText = base + `left:${imgRect.right}px;` +
-            'background:linear-gradient(to left,transparent,rgba(255,255,255,.12));';
+            `background:linear-gradient(to left,transparent,${GLOW_RGBA});`;
         document.body.appendChild(l);
         document.body.appendChild(r);
 
@@ -1670,11 +1663,11 @@
         window.addEventListener('scroll', updateBounds, { passive: true });
     }
     function schedulePanelGlow() {
-        [300, 900, 2000].forEach(d => setTimeout(applyPanelGlow, d));
+        SPA_RETRY_DELAYS.forEach(d => setTimeout(applyPanelGlow, d));
     }
     window.addEventListener('resize', applyPanelGlow);
     document.addEventListener('DOMContentLoaded', schedulePanelGlow);
     schedulePanelGlow();
 
-    console.info(`[webtoons-dark-mode] v${VERSION} ready — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
+    console.info(`[webtoons-dark-mode] v${VERSION} fully loaded — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
 })();

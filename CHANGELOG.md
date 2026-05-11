@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2026-05-11
+
+### Changed
+
+- Panel-edge glow softened: width 40 → 30 px, opacity .12 → .07. Still adds depth at the reading-column edges but no longer draws the eye away from the comic.
+
+## [1.1.5] - 2026-05-11
+
+### Changed
+
+- Startup banner moved to first runtime statement in the IIFE so it logs before any code that could throw — end-of-IIFE banner now says "fully loaded" to distinguish "started but errored" from "ready" (the v1.0.16 intent, restored)
+- Unified three SPA-navigation retry cohorts (`[100,600,1500]` / `[300,900,2000]` / `[400,1000,2200]`) into a single `SPA_RETRY_DELAYS = [200, 800, 2000]` constant — easier to tune, no unexplained variance
+- `buildViewerCards` completion tracking inlined via the existing `aside.dataset.wtCards` flag; removed the `_bvc` wrapper and the `let aside_cards_done` declaration that sat below its use site (latent TDZ footgun on any reorder)
+
+### Removed
+
+- Dead selectors confirmed absent from the current Webtoons bundle: `#_viewerArea` (replaced by `body.wt-viewer` rules in v1.0.85), `.tab_lst` / `.sub_tab` (older markup), `.bnr_area` / `.ad_bnr` / `._bannerArea` / `.promotion_bnr` (speculative banners), and `._mobile_viewer` / `._scroll_view` from `dimCss` (legacy mobile selectors)
+- Duplicate `.foot_app, .foot_cont, .foot_down_msg, .footapp_icon_cont` block — the second copy in the viewer section now only carries the viewer-scoped extras (`#_viewerBox .foot_app`, `[class*="dsc_down"]` …); the footer-block rule above already covers the base selectors
+
 ## [1.1.4] - 2026-05-11
 
 ### Fixed
