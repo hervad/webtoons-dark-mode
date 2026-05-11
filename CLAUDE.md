@@ -22,13 +22,10 @@ webtoons-dark-mode.user.js
 ├── matchCombo/handleKey    keyboard shortcut dispatch
 ├── window keydown          single capture-phase listener
 ├── syncBodyClasses()       sets wt-viewer / wt-detail / wt-home on body
-├── scheduleViewerSync()    deferred syncBodyClasses after SPA nav
+├── _navGen + scheduleSpa() generation-token-gated SPA retry helper
+├── onSpaNav()              pushState/replaceState/popstate dispatcher
 ├── fixViewerBanners()      clears rogue backgrounds inside #_viewerBox
-├── buildViewerCards()      wraps sidebar sections in elevated card divs
-└── applyPanelGlow()        DISABLED (PANEL_GLOW_JS_ENABLED = false).
-                            Panel elevation now done via container box-shadow
-                            on .viewer_img._img_viewer_area in CSS. Function
-                            body retained for quick rollback.
+└── buildViewerCards()      wraps sidebar sections in elevated card divs
 ```
 
 Key invariants:
@@ -43,7 +40,8 @@ Key invariants:
 - **Strip container needs `width: fit-content` + `margin: 0 auto`** — parent wrappers default to full-width, which lands the shadow far from the actual image edge. `fit-content` shrinks the container to the image width (~800px); `margin: 0 auto` re-centers the now-shrunken container in the column.
 - **`font-size: 0` / `line-height: 0` on the strip container** — sibling `<img class="_images">` elements have text nodes between them; without zeroing text metrics those nodes reserve baseline whitespace and create visible gaps between stacked panels. Pair with `display: block; vertical-align: top` on `img._images`.
 - **`overflow: visible` must cascade up** — the container shadow needs `.viewer_lst`, `.cont_box`, and `body.wt-viewer #content` all set to `overflow: visible` or the halo gets clipped by parent wrappers.
-- **`PANEL_GLOW_JS_ENABLED = false` keeps the legacy JS glow dormant** — the `applyPanelGlow()` function body and SPA scheduling are retained for quick rollback but early-return when the flag is false. Do not delete the function until the CSS approach has shipped for several versions without regressions.
+- **SPA-deferred work runs through `scheduleSpa(fn)`** — every `pushState` / `replaceState` / `popstate` increments `_navGen`, and timers from previous routes early-out when they fire. Do not call `setTimeout` directly for navigation work; route it through `scheduleSpa` so rapid back-to-back nav doesn't queue stale DOM mutations.
+- **`onSpaNav()` clears `aside.dataset.wtCards`** — the viewer sidebar DOM node sometimes survives viewer-to-viewer navigation; without clearing the idempotency flag the new chapter's sidebar would never be re-wrapped.
 
 ## Diagnosing a broken selector
 

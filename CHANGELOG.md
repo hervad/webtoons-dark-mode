@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.23] - 2026-05-11
+
+### Changed
+
+- Deduplicated `.viewer_lst img, ._images, ._images img, .viewer_img img { filter: none }` to just `._images` — the descendant selector covered itself and all child `<img>` already.
+- Removed `._episodeItem` from the `._listInfo, .episode_lst, ._episodeItem` background rule. The element was set to `--wt-bg` in that block and immediately overridden to `--wt-bg-elev` two lines later; the first declaration was always wasted.
+- Tightened the viewer-column reset: `.viewer_lst .on` was matching any active tab, sort pill, or nav item that happened to render inside the viewer column. Replaced with the explicit list of viewer-only surfaces.
+- Removed `.search_area` from the input-block search rule — already covered by the dedicated search-dropdown rule earlier in the file (only `.search_box, ._searchBox` remain).
+- Stripped redundant `!important` from `.ranking_number_N:before { content }` declarations — generated `content` has no competing source.
+- Moved `.detail_bg + .cont_box { background-color: transparent }` from the generic Sections block into the Detail-page elevation block so the rule lives with the rest of the detail-page artwork handling.
+
+## [1.1.22] - 2026-05-11
+
+### Fixed
+
+- `buildViewerCards` grouping: a leading `<ul>` (with no preceding header) was silently dropped from the groups list, leaving the first ranking section unwrapped. Grouping logic now starts a fresh group for an orphan leading UL and keeps subsequent ULs attached to the most recent header.
+- SPA navigation now calls `scheduleViewerBanners()` (previously only invoked on `popstate` and initial load) so rogue light banners no longer leak into the viewer after listing→viewer `pushState` nav.
+- `aside.dataset.wtCards` is now cleared on every SPA navigation. The viewer sidebar DOM node can survive viewer-to-viewer routes; without clearing the flag the new chapter's sidebar would never be re-wrapped into elevated cards.
+
+### Changed
+
+- All SPA-deferred work routed through a new `scheduleSpa(fn)` helper gated by a `_navGen` generation token. Rapid back-to-back navigation no longer queues stale DOM mutations from previous routes.
+- `pushState`, `replaceState`, and `popstate` consolidated into a single `onSpaNav()` dispatcher.
+
+### Removed
+
+- Dead `applyPanelGlow` / `schedulePanelGlow` block, the `PANEL_GLOW_JS_ENABLED` flag, the unused `_panelGlowScroll` listener wiring (which also had a latent add/remove capture-flag mismatch), and the resize listener bound to it. Panel elevation has been pure CSS since v1.1.7 — the rollback fallback is no longer needed.
+- Unread `box.dataset.wtBanners` flag from `fixViewerBanners` — set but never checked.
+
 ## [1.1.21] - 2026-05-11
 
 ### Changed

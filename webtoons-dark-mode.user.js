@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.21
+// @version      1.1.23
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.21';
+    const VERSION = '1.1.23';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -204,13 +204,6 @@
         #content, #container, .cont_area, .cont_box, .detail_body {
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
-        }
-        /* On the detail page, .cont_box is a sibling of .detail_bg and sits
-           on top of the artwork div. Making it transparent lets the artwork
-           show through the detail_header area. .detail_body has its own
-           explicit background so the episode list area stays correctly dark. */
-        .detail_bg + .cont_box {
-            background-color: transparent !important;
         }
         /* detail_body children are floated, so detail_body collapses to height 0
            and its background paints nothing — artwork bleeds through card corners.
@@ -433,13 +426,13 @@
             caret-color: var(--wt-text) !important;
         }
         input::placeholder, textarea::placeholder { color: var(--wt-text-mute) !important; }
-        .search_area, .search_box, ._searchBox {
+        .search_box, ._searchBox {
             background-color: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
         }
 
         /* Episode list */
-        ._listInfo, .episode_lst, ._episodeItem {
+        ._listInfo, .episode_lst {
             background-color: var(--wt-bg) !important;
         }
         .detail_lst li, ._episodeItem {
@@ -473,13 +466,13 @@
         body.wt-viewer .comment_area {
             background-color: transparent !important;
         }
-        .viewer_lst, .viewer_lst .on, .viewer_header,
+        .viewer_lst, .viewer_header,
         .viewer_footer, ._toolBox, .ly_episode {
             background-color: transparent !important;
             color: var(--wt-text) !important;
         }
         /* Never touch comic panels — filter:none preserves original colors. */
-        .viewer_lst img, ._images, ._images img, .viewer_img img { filter: none !important; }
+        ._images { filter: none !important; }
 
         /* Panel-strip as one "card": no shadows. Rounded corners on the
            container + overflow:hidden clip the first/last panel corners into
@@ -1001,6 +994,15 @@
            Three-level hierarchy: page (--wt-bg) → episode list + sidebar cards
            (--wt-bg-elev) → episode rows (--wt-bg-elev2). */
 
+        /* .cont_box is a sibling of .detail_bg and sits on top of the artwork
+           div. Transparent here lets the artwork show through the detail_header
+           area (.detail_body has its own explicit dark background, so the
+           episode list area stays correctly dark). Scoped via adjacent-sibling
+           so the general .cont_box dark background still applies elsewhere. */
+        .detail_bg + .cont_box {
+            background-color: transparent !important;
+        }
+
         /* Episode list column — .detail_body .detail_lst is float:left, 761px wide.
            No border-top: it connects to the app-download banner above.
            No overflow:hidden: the pagination is position:absolute at the bottom
@@ -1272,16 +1274,16 @@
             vertical-align: bottom !important;
             line-height: 1 !important;
         }
-        .webtoon_list .ranking_number_1:before  { content: "1"  !important; }
-        .webtoon_list .ranking_number_2:before  { content: "2"  !important; }
-        .webtoon_list .ranking_number_3:before  { content: "3"  !important; }
-        .webtoon_list .ranking_number_4:before  { content: "4"  !important; }
-        .webtoon_list .ranking_number_5:before  { content: "5"  !important; }
-        .webtoon_list .ranking_number_6:before  { content: "6"  !important; }
-        .webtoon_list .ranking_number_7:before  { content: "7"  !important; }
-        .webtoon_list .ranking_number_8:before  { content: "8"  !important; }
-        .webtoon_list .ranking_number_9:before  { content: "9"  !important; }
-        .webtoon_list .ranking_number_10:before { content: "10" !important; }
+        .webtoon_list .ranking_number_1:before  { content: "1";  }
+        .webtoon_list .ranking_number_2:before  { content: "2";  }
+        .webtoon_list .ranking_number_3:before  { content: "3";  }
+        .webtoon_list .ranking_number_4:before  { content: "4";  }
+        .webtoon_list .ranking_number_5:before  { content: "5";  }
+        .webtoon_list .ranking_number_6:before  { content: "6";  }
+        .webtoon_list .ranking_number_7:before  { content: "7";  }
+        .webtoon_list .ranking_number_8:before  { content: "8";  }
+        .webtoon_list .ranking_number_9:before  { content: "9";  }
+        .webtoon_list .ranking_number_10:before { content: "10"; }
         /* Homepage "Trending" / "Popular" tab pills — base CSS uses
            #f3f3f3 (inactive) and #000 (active). Our generic button rule
            targets the <button> element, not <div class="button">. */
@@ -1544,25 +1546,41 @@
     }
     syncBodyClasses();
     document.addEventListener('DOMContentLoaded', syncBodyClasses);
-    function scheduleViewerSync() {
-        SPA_RETRY_DELAYS.forEach(d => setTimeout(syncBodyClasses, d));
+
+    // SPA generation token: every navigation bumps _navGen so that timers
+    // scheduled for the previous route early-out instead of mutating DOM that
+    // belongs to a page the user already navigated away from.
+    let _navGen = 0;
+    function scheduleSpa(fn) {
+        const gen = _navGen;
+        SPA_RETRY_DELAYS.forEach(d => setTimeout(() => {
+            if (gen !== _navGen) return;
+            fn();
+        }, d));
+    }
+    function scheduleViewerSync()    { scheduleSpa(syncBodyClasses); }
+    function scheduleViewerCards()   { scheduleSpa(buildViewerCards); }
+    function scheduleViewerBanners() { scheduleSpa(fixViewerBanners); }
+
+    function onSpaNav() {
+        _navGen++;
+        if (document.body) document.body.classList.remove('wt-viewer', 'wt-detail', 'wt-home');
+        // Clear idempotency flag so the new page's sidebar gets re-wrapped.
+        // The aside DOM node sometimes persists across viewer-to-viewer nav.
+        const aside = document.querySelector('.aside.viewer');
+        if (aside) delete aside.dataset.wtCards;
+        scheduleViewerSync();
+        scheduleViewerCards();
+        scheduleViewerBanners();
     }
     ['pushState', 'replaceState'].forEach(fn => {
         const orig = history[fn];
         history[fn] = function () {
             orig.apply(this, arguments);
-            // Optimistically clear all page classes — the new page's DOM hasn't
-            // rendered yet so querySelector would still see the old page content.
-            if (document.body) document.body.classList.remove('wt-viewer', 'wt-detail', 'wt-home');
-            scheduleViewerSync();
-            scheduleViewerCards();
-            schedulePanelGlow();
+            onSpaNav();
         };
     });
-    window.addEventListener('popstate', () => {
-        if (document.body) document.body.classList.remove('wt-viewer', 'wt-detail', 'wt-home');
-        scheduleViewerSync(); scheduleViewerCards(); scheduleViewerBanners(); schedulePanelGlow();
-    });
+    window.addEventListener('popstate', onSpaNav);
 
     // Force uniform background throughout the viewer area. All blocks inside
     // #_viewerBox use var(--wt-bg) so there are no rogue gray/brownish strips.
@@ -1570,7 +1588,6 @@
     function fixViewerBanners() {
         const box = document.querySelector('#_viewerBox');
         if (!box) return;
-        box.dataset.wtBanners = '1';
 
         const clearBg = (el) => {
             el.style.setProperty('background-color', 'transparent', 'important');
@@ -1599,17 +1616,14 @@
             }
         }
     }
-    function scheduleViewerBanners() {
-        SPA_RETRY_DELAYS.forEach(d => setTimeout(fixViewerBanners, d));
-    }
     document.addEventListener('DOMContentLoaded', fixViewerBanners);
     scheduleViewerBanners();
 
     // Inject card wrappers into the viewer sidebar. CSS selectors for inner
     // sections are unreliable (class names vary); JS groups children of
-    // .ranking_lst by "non-UL header + following UL" and wraps each pair.
-    // Idempotent via `aside.dataset.wtCards` — repeat schedule calls early-out
-    // once the wrapping has succeeded.
+    // .ranking_lst into "header + following ULs until the next header" runs
+    // and wraps each run in a card div. Idempotent via aside.dataset.wtCards;
+    // the SPA nav handler clears that flag so each new page re-wraps.
     function buildViewerCards() {
         const aside = document.querySelector('.aside.viewer');
         if (!aside || aside.dataset.wtCards) return;
@@ -1619,12 +1633,17 @@
         const children = Array.from(lst.children);
         if (!children.length) return;
 
-        // Group children: whenever we hit a non-UL element, start a new section.
+        // A new group starts on each non-UL header; ULs belong to the current
+        // group. A leading UL with no preceding header gets its own group so
+        // it isn't silently dropped.
         const groups = [];
         let cur = null;
         for (const el of children) {
-            if (el.tagName !== 'UL') { cur = []; groups.push(cur); }
-            if (cur) cur.push(el);
+            if (el.tagName !== 'UL' || !cur) {
+                cur = [];
+                groups.push(cur);
+            }
+            cur.push(el);
         }
 
         aside.dataset.wtCards = '1';
@@ -1646,68 +1665,8 @@
             lst.appendChild(card);
         });
     }
-    function scheduleViewerCards() {
-        SPA_RETRY_DELAYS.forEach(d => setTimeout(buildViewerCards, d));
-    }
     document.addEventListener('DOMContentLoaded', buildViewerCards);
     scheduleViewerCards();
-
-    // Panel-edge glow: disabled in v1.1.7+ — replaced with per-image CSS
-    // box-shadow (spread = -blur cancels y-bleed → no inter-panel seams).
-    // Function body retained for quick rollback.
-    const PANEL_GLOW_JS_ENABLED = false;
-    let _panelGlowScroll = null;
-    function applyPanelGlow() {
-        if (!PANEL_GLOW_JS_ENABLED) return;
-        ['wt-glow-l', 'wt-glow-r'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        });
-        if (_panelGlowScroll) {
-            window.removeEventListener('scroll', _panelGlowScroll, true);
-            _panelGlowScroll = null;
-        }
-        if (!document.body || !document.body.classList.contains('wt-viewer')) return;
-        // Horizontal position from the first image (container div is full-width).
-        const img = document.querySelector('img._images');
-        if (!img) return;
-        const imgRect = img.getBoundingClientRect();
-        if (imgRect.width < 50) return;
-
-        const GLOW_WIDTH = 30;
-        const GLOW_RGBA = 'rgba(255,255,255,.07)';
-        const base = `position:fixed;width:${GLOW_WIDTH}px;pointer-events:none;z-index:100;`;
-        const l = document.createElement('div');
-        l.id = 'wt-glow-l';
-        l.style.cssText = base + `left:${imgRect.left - GLOW_WIDTH}px;` +
-            `background:linear-gradient(to right,transparent,${GLOW_RGBA});`;
-        const r = document.createElement('div');
-        r.id = 'wt-glow-r';
-        r.style.cssText = base + `left:${imgRect.right}px;` +
-            `background:linear-gradient(to left,transparent,${GLOW_RGBA});`;
-        document.body.appendChild(l);
-        document.body.appendChild(r);
-
-        // Vertical extent: clamp to the visible portion of the panel container.
-        function updateBounds() {
-            const c = document.querySelector('#_imageList, .viewer_img._img_viewer_area');
-            if (!c) return;
-            const cr = c.getBoundingClientRect();
-            const top = Math.max(0, cr.top);
-            const height = Math.max(0, Math.min(window.innerHeight, cr.bottom) - top);
-            l.style.top = r.style.top = top + 'px';
-            l.style.height = r.style.height = height + 'px';
-        }
-        updateBounds();
-        _panelGlowScroll = updateBounds;
-        window.addEventListener('scroll', updateBounds, { passive: true });
-    }
-    function schedulePanelGlow() {
-        SPA_RETRY_DELAYS.forEach(d => setTimeout(applyPanelGlow, d));
-    }
-    window.addEventListener('resize', applyPanelGlow);
-    document.addEventListener('DOMContentLoaded', schedulePanelGlow);
-    schedulePanelGlow();
 
     console.info(`[webtoons-dark-mode] v${VERSION} fully loaded — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
 })();
