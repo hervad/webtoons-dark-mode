@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.3
+// @version      1.1.4
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.3';
+    const VERSION = '1.1.4';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -1623,39 +1623,51 @@
     // Panel-edge glow: two position:fixed divs placed exactly at the reading
     // column edges. CSS box-shadow on individual images creates gaps at panel
     // junctions; fixed-position elements are immune to overflow:hidden, don't
-    // interact with per-image boundaries, and run full viewport height.
+    // interact with per-image boundaries, and produce a continuous glow.
+    // A scroll listener keeps the glow clipped to the panel container bounds
+    // so it disappears when scrolled below the comic panels.
+    let _panelGlowScroll = null;
     function applyPanelGlow() {
         ['wt-glow-l', 'wt-glow-r'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.remove();
         });
+        if (_panelGlowScroll) {
+            window.removeEventListener('scroll', _panelGlowScroll, true);
+            _panelGlowScroll = null;
+        }
         if (!document.body || !document.body.classList.contains('wt-viewer')) return;
-        // Measure the first rendered panel image — the container div is full-width,
-        // but the images inside are the actual reading column width we need.
+        // Horizontal position from the first image (container div is full-width).
         const img = document.querySelector('img._images');
         if (!img) return;
-        const rect = img.getBoundingClientRect();
-        if (rect.width < 50) return; // not yet rendered
+        const imgRect = img.getBoundingClientRect();
+        if (imgRect.width < 50) return;
 
-        const base = [
-            'position:fixed', 'top:0', 'bottom:0', 'width:40px',
-            'pointer-events:none', 'z-index:100',
-        ].join(';') + ';';
-
+        const base = 'position:fixed;width:40px;pointer-events:none;z-index:100;';
         const l = document.createElement('div');
         l.id = 'wt-glow-l';
-        l.style.cssText = base +
-            `left:${rect.left - 40}px;` +
-            'background:linear-gradient(to right,transparent,rgba(255,255,255,.18));';
-
+        l.style.cssText = base + `left:${imgRect.left - 40}px;` +
+            'background:linear-gradient(to right,transparent,rgba(255,255,255,.12));';
         const r = document.createElement('div');
         r.id = 'wt-glow-r';
-        r.style.cssText = base +
-            `left:${rect.right}px;` +
-            'background:linear-gradient(to left,transparent,rgba(255,255,255,.18));';
-
+        r.style.cssText = base + `left:${imgRect.right}px;` +
+            'background:linear-gradient(to left,transparent,rgba(255,255,255,.12));';
         document.body.appendChild(l);
         document.body.appendChild(r);
+
+        // Vertical extent: clamp to the visible portion of the panel container.
+        function updateBounds() {
+            const c = document.querySelector('#_imageList, .viewer_img._img_viewer_area');
+            if (!c) return;
+            const cr = c.getBoundingClientRect();
+            const top = Math.max(0, cr.top);
+            const height = Math.max(0, Math.min(window.innerHeight, cr.bottom) - top);
+            l.style.top = r.style.top = top + 'px';
+            l.style.height = r.style.height = height + 'px';
+        }
+        updateBounds();
+        _panelGlowScroll = updateBounds;
+        window.addEventListener('scroll', updateBounds, { passive: true });
     }
     function schedulePanelGlow() {
         [300, 900, 2000].forEach(d => setTimeout(applyPanelGlow, d));
