@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.1
+// @version      1.1.2
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.1';
+    const VERSION = '1.1.2';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -479,23 +479,9 @@
             background-color: transparent !important;
             color: var(--wt-text) !important;
         }
-        /* Base CSS: .cont_box .viewer_lst { overflow:hidden } clips shadows from
-           children. Allow them to escape onto the dark page background. */
-        .viewer_lst { overflow: visible !important; }
         /* Never touch comic panels — filter:none preserves original colors. */
         .viewer_lst img, ._images, ._images img, .viewer_img img { filter: none !important; }
-        /* Left/right edge glow on each panel image.
-           spread (-25px) > blur (20px): the shadow source starts fully INSIDE the
-           image boundary, so Gaussian falloff reaches genuine zero at the image's
-           top and bottom edges — zero top/bottom bleed → no horizontal line
-           artifacts at panel junctions. The glow extends ~15px outside each
-           panel edge into the dark background, appearing at the correct location. */
-        img._images {
-            border-radius: 0 !important;
-            box-shadow:
-                -20px 0 20px -25px rgba(255,255,255,.55),
-                 20px 0 20px -25px rgba(255,255,255,.55) !important;
-        }
+        img._images { border-radius: 0 !important; }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
         .tool_area {
@@ -1530,11 +1516,12 @@
             if (document.body) document.body.classList.remove('wt-viewer', 'wt-detail', 'wt-home');
             scheduleViewerSync();
             scheduleViewerCards();
+            schedulePanelGlow();
         };
     });
     window.addEventListener('popstate', () => {
         if (document.body) document.body.classList.remove('wt-viewer', 'wt-detail', 'wt-home');
-        scheduleViewerSync(); scheduleViewerCards(); scheduleViewerBanners();
+        scheduleViewerSync(); scheduleViewerCards(); scheduleViewerBanners(); schedulePanelGlow();
     });
 
     // Force uniform background throughout the viewer area. All blocks inside
@@ -1632,6 +1619,48 @@
     };
     document.addEventListener('DOMContentLoaded', buildViewerCards);
     scheduleViewerCards();
+
+    // Panel-edge glow: two position:fixed divs placed exactly at the reading
+    // column edges. CSS box-shadow on individual images creates gaps at panel
+    // junctions; fixed-position elements are immune to overflow:hidden, don't
+    // interact with per-image boundaries, and run full viewport height.
+    function applyPanelGlow() {
+        ['wt-glow-l', 'wt-glow-r'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        });
+        if (!document.body || !document.body.classList.contains('wt-viewer')) return;
+        const container = document.querySelector('#_imageList, .viewer_img._img_viewer_area');
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        if (rect.width < 50) return; // not yet rendered
+
+        const base = [
+            'position:fixed', 'top:0', 'bottom:0', 'width:40px',
+            'pointer-events:none', 'z-index:100',
+        ].join(';') + ';';
+
+        const l = document.createElement('div');
+        l.id = 'wt-glow-l';
+        l.style.cssText = base +
+            `left:${rect.left - 40}px;` +
+            'background:linear-gradient(to right,transparent,rgba(255,255,255,.18));';
+
+        const r = document.createElement('div');
+        r.id = 'wt-glow-r';
+        r.style.cssText = base +
+            `left:${rect.right}px;` +
+            'background:linear-gradient(to left,transparent,rgba(255,255,255,.18));';
+
+        document.body.appendChild(l);
+        document.body.appendChild(r);
+    }
+    function schedulePanelGlow() {
+        [300, 900, 2000].forEach(d => setTimeout(applyPanelGlow, d));
+    }
+    window.addEventListener('resize', applyPanelGlow);
+    document.addEventListener('DOMContentLoaded', schedulePanelGlow);
+    schedulePanelGlow();
 
     console.info(`[webtoons-dark-mode] v${VERSION} ready — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
 })();
