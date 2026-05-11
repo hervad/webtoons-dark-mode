@@ -10,17 +10,24 @@ ships directly to users via `@updateURL` / `@downloadURL`.
 
 ```
 webtoons-dark-mode.user.js
-├── Metadata block        @match, @grant, @run-at, @updateURL …
-├── Constants             KEY_THEME, KEY_DIM, VERSION
-├── CSS strings           palette (CSS vars) + theme (rules) + dimCss
-├── ensureStyle()         inject/remove a <style> by id
-├── applyTheme/applyDim   thin wrappers over ensureStyle
-├── State                 darkOn / dimOn (cached from GM_getValue)
-├── watchHead()           MutationObserver — re-injects style after SPA nav
-├── toggleTheme/Dim()     flip state, persist, apply, log
+├── Metadata block          @match, @grant, @run-at, @updateURL …
+├── Constants               KEY_THEME, KEY_DIM, VERSION
+├── CSS strings             palette (CSS vars) + theme (rules) + dimCss
+├── ensureStyle()           inject/remove a <style> by id
+├── applyTheme/applyDim     thin wrappers over ensureStyle
+├── State                   darkOn / dimOn (cached from GM_getValue)
+│                           _panelGlowScroll (scroll listener ref for cleanup)
+├── watchHead()             MutationObserver — re-injects style after SPA nav
+├── toggleTheme/Dim()       flip state, persist, apply, log
 ├── GM_registerMenuCommand  extension popup menu entries
-├── matchCombo/handleKey  keyboard shortcut dispatch
-└── window keydown        single capture-phase listener
+├── matchCombo/handleKey    keyboard shortcut dispatch
+├── window keydown          single capture-phase listener
+├── syncBodyClasses()       sets wt-viewer / wt-detail / wt-home on body
+├── scheduleViewerSync()    deferred syncBodyClasses after SPA nav
+├── fixViewerBanners()      clears rogue backgrounds inside #_viewerBox
+├── buildViewerCards()      wraps sidebar sections in elevated card divs
+├── applyPanelGlow()        creates/removes position:fixed side-glow divs
+└── schedulePanelGlow()     deferred applyPanelGlow after nav / load
 ```
 
 Key invariants:
@@ -31,6 +38,8 @@ Key invariants:
 - **`watchHead` MutationObserver must NOT call `syncViewerClass()`** — head mutations fire during SPA stylesheet swaps while the old page's DOM is still present. Calling `syncViewerClass()` there will re-add `wt-viewer` to body right after `pushState` removed it.
 - **No `body:has(#content.viewer)` CSS fallback** — Webtoons briefly assigns class `viewer` to `#content` during SPA transitions, causing false positive matches on non-viewer pages. `body.wt-viewer` (set/cleared by JS) is the only gate for viewer-scoped rules.
 - **`.detail_bg + .cont_box` must be transparent** — the general `.cont_box { background-color: var(--wt-bg) }` rule would hide the detail page artwork. The adjacent-sibling selector scopes the transparency override to detail pages only.
+- **Panel glow must be JS, not CSS** — `box-shadow` on individual `img._images` creates dark gaps at panel junctions (each shadow fades to zero at the image boundary). `position:fixed` divs measured from `img._images` (not the container, which is full-width) produce a continuous glow. The scroll listener in `applyPanelGlow()` clamps the glow height to the visible portion of the panel container so it disappears below the comic panels.
+- **`_panelGlowScroll` must be cleaned up** — `applyPanelGlow()` always removes the previous scroll listener before adding a new one. It is called on every SPA navigation so glows are removed when leaving the viewer.
 
 ## Diagnosing a broken selector
 
@@ -118,6 +127,9 @@ There is no automated test suite — this is a DOM-manipulation script. Manual t
 - [ ] Reader dim toggle (`Alt+Shift+N`) dims comic panels only
 - [ ] Navigate to a chapter (SPA route change) — theme stays applied
 - [ ] Comic panel images have no color shift
+- [ ] Viewer: soft white glow visible at left and right edges of the reading column, no gaps between panels
+- [ ] Viewer: glow disappears when scrolled below the last panel (episode info / share buttons / comments)
+- [ ] Viewer: glow absent on non-viewer pages (detail, home)
 
 ## Custom slash commands (local only)
 
