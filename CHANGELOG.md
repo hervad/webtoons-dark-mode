@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-05-11
+
+### Changed
+
+- Panel edge glow reimplemented in JavaScript: two `position:fixed` divs measured from the actual panel container position replace per-image CSS `box-shadow`; fixed elements are immune to `overflow:hidden` clipping, don't interact with per-image boundaries, and produce a continuous glow with no gaps at panel junctions and no horizontal line artifacts
+
 ## [1.1.1] - 2026-05-11
 
 ### Fixed
