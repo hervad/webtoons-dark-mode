@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.6
+// @version      1.1.16
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.6';
+    const VERSION = '1.1.16';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -480,7 +480,37 @@
         }
         /* Never touch comic panels — filter:none preserves original colors. */
         .viewer_lst img, ._images, ._images img, .viewer_img img { filter: none !important; }
-        img._images { border-radius: 0 !important; }
+
+        /* Panel-strip "volume": dark side shadow on img._images directly.
+           img._images is the only DOM node exactly image-width (parent wrappers
+           are full-width). spread = -blur EXACTLY cancels the vertical bleed
+           (any difference creates a horizontal seam between stacked panels), so
+           shadow appears only on left/right edges. No white glow. */
+        img._images {
+            border-radius: 0 !important;
+            /* display:block packs stacked images flush — default inline leaves
+               a baseline whitespace gap between siblings (the text nodes between
+               <img>s create it), which shows the page bg through as a faint
+               horizontal line.
+               margin:0 auto re-centers in the column (block elements don't
+               inherit text-align centering from the parent). */
+            display: block !important;
+            margin: 0 auto !important;
+            box-shadow:
+                -22px 0 28px -28px rgba(0,0,0,.95),
+                 22px 0 28px -28px rgba(0,0,0,.95) !important;
+        }
+        /* overflow:visible lets the side shadow render past the strip wrapper.
+           font-size:0 / line-height:0 on the image container kills any
+           text-baseline whitespace that would otherwise show as a gap between
+           stacked panels (the text nodes between sibling <img>s inherit a
+           line-height that reserves vertical space). */
+        .viewer_lst, .viewer_img._img_viewer_area { overflow: visible !important; }
+        .viewer_img._img_viewer_area, #_imageList {
+            font-size: 0 !important;
+            line-height: 0 !important;
+        }
+        img._images { vertical-align: top !important; }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
         .tool_area {
@@ -586,10 +616,17 @@
             border-top-color: var(--wt-border) !important;
             border-bottom-color: var(--wt-border) !important;
         }
-        /* Viewer info / ad / patron section top separators. */
+        /* Viewer info / ad / patron section top separators — hidden entirely
+           so the column under the panels reads as one continuous dark surface
+           (no faint horizontal lines below the comic). */
         .viewer_lst .viewer_info_area,
-        .viewer_lst .viewer_ad_area { border-top-color: var(--wt-border) !important; }
-        .viewer_patron_area { border-top-color: var(--wt-border) !important; }
+        .viewer_lst .viewer_ad_area,
+        .viewer_patron_area,
+        .viewer_lst .viewer_dsc_area,
+        .viewer_lst .viewer_bnr {
+            border-top: none !important;
+            border-bottom: none !important;
+        }
         /* WCC comment sort tabs bottom border. */
         [class*="wcc_SortOrderTabs__root"] { border-bottom-color: var(--wt-border) !important; }
         /* Sidebar patron/section separator inside .aside.detail. */
@@ -1611,14 +1648,13 @@
     document.addEventListener('DOMContentLoaded', buildViewerCards);
     scheduleViewerCards();
 
-    // Panel-edge glow: two position:fixed divs placed exactly at the reading
-    // column edges. CSS box-shadow on individual images creates gaps at panel
-    // junctions; fixed-position elements are immune to overflow:hidden, don't
-    // interact with per-image boundaries, and produce a continuous glow.
-    // A scroll listener keeps the glow clipped to the panel container bounds
-    // so it disappears when scrolled below the comic panels.
+    // Panel-edge glow: disabled in v1.1.7+ — replaced with per-image CSS
+    // box-shadow (spread = -blur cancels y-bleed → no inter-panel seams).
+    // Function body retained for quick rollback.
+    const PANEL_GLOW_JS_ENABLED = false;
     let _panelGlowScroll = null;
     function applyPanelGlow() {
+        if (!PANEL_GLOW_JS_ENABLED) return;
         ['wt-glow-l', 'wt-glow-r'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.remove();
