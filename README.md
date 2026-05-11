@@ -12,6 +12,8 @@ A targeted dark theme for [Webtoons](https://www.webtoons.com) — desktop and m
 
 Applies a dark theme to Webtoons by overriding background, text, border, and surface colors on the actual containers the site uses (header, cards, episode lists, viewer, comments, footer, popups, inputs). Built around a small CSS-variable palette so the whole look can be re-skinned by editing a handful of values.
 
+On the viewer page, the comic panel strip is wrapped as a single elevated card — rounded corners, hairline outline, soft halo on all sides — without inserting any extra DOM elements (one container box-shadow does the lift). Homepage and detail pages get matching three-level elevation (page → section card → comic card).
+
 It also ships an optional **reader dim** mode that lowers comic-panel brightness for late-night reading without affecting the rest of the page.
 
 ## Why not just use [a global `filter: invert()` userstyle](https://en.wikipedia.org/wiki/Filter_(higher-order_function))?
@@ -50,9 +52,9 @@ State persists across pages and reloads via `GM_setValue`.
 
 ## How it works
 
-A single `<style>` element is injected at `document-start` (before paint, so no flash of light theme). The CSS targets the actual container classes Webtoons uses — `.gnb`, `.detail_lst`, `#_viewerArea`, `.u_cbox_*`, etc. — and overrides background, color, and border properties. Comic panels (`.viewer_lst img`, `._images img`) are explicitly excluded with `filter: none`, so they render exactly as the artist intended.
+A single `<style>` element is injected at `document-start` (before paint, so no flash of light theme). The CSS targets the actual container classes Webtoons uses — `.gnb`, `.detail_lst`, `.viewer_lst`, the WCC comment widget (`[class*="wcc_*"]`), etc. — and overrides background, color, and border properties. Comic panels (`img._images`) are explicitly excluded with `filter: none`, so they render exactly as the artist intended.
 
-There is no `MutationObserver` and no scroll/route observer. SPA navigation between chapters works "for free" because CSS persists across same-origin in-place navigation. The only JavaScript that runs after init is the keydown listener (early-exits on non-modifier keys) and the optional menu-command handlers.
+A small amount of JavaScript runs to handle Webtoons' SPA navigation: a `<head>` `MutationObserver` re-injects the `<style>` if Webtoons swaps stylesheets, `pushState` / `popstate` hooks sync three body classes (`wt-viewer`, `wt-detail`, `wt-home`) that scope page-specific CSS, and `fixViewerBanners()` clears rogue background colors that Webtoons sets via JS inside the viewer column. All listeners are bounded — no `requestAnimationFrame` loops, no per-frame work.
 
 The script uses three Greasemonkey grants (`GM_getValue`, `GM_setValue`, `GM_registerMenuCommand`) for persistence and the toggle menu — nothing network-facing, nothing that could exfiltrate data.
 
@@ -62,20 +64,23 @@ The palette is the first block in the script. Edit any of these CSS variables to
 
 ```css
 :root {
-    --wt-bg:        #15171a;  /* page background */
-    --wt-bg-elev:   #1e2125;  /* cards, header */
-    --wt-bg-elev2:  #262a30;  /* hover, active */
-    --wt-bg-input:  #2a2e35;  /* form fields */
-    --wt-border:    #2c3036;
-    --wt-text:      #e6e6e6;
-    --wt-text-dim:  #a0a4ab;  /* metadata, dates */
-    --wt-text-mute: #6b7079;  /* placeholders */
-    --wt-link:      #7cb6ff;
-    --wt-accent:    #00d564;  /* Webtoons brand green */
+    --wt-bg:             #15171a;  /* page background */
+    --wt-bg-elev:        #1e2125;  /* cards, header */
+    --wt-bg-elev2:       #262a30;  /* secondary cards, hover */
+    --wt-bg-hover:       #30353c;  /* interactive hover surface */
+    --wt-bg-input:       #2a2e35;  /* form fields */
+    --wt-border:         #363b44;
+    --wt-text:           #e6e6e6;
+    --wt-text-dim:       #a0a4ab;  /* metadata, dates */
+    --wt-text-mute:      #7b828d;  /* placeholders */
+    --wt-text-on-accent: #0a0a0a;  /* text on accent-colored surfaces */
+    --wt-link:           #7cb6ff;
+    --wt-accent:         #00d564;  /* Webtoons brand green */
+    --wt-shadow:         0 1px 2px rgba(0,0,0,.6);
 }
 ```
 
-To change the keybindings, edit the `keydown` listener at the bottom — the `e.code === 'KeyT'` and `e.code === 'KeyN'` lines.
+To change the keybindings, edit the `handleKey` function. The script accepts both `Alt+Shift+T` / `Alt+Shift+N` and `Ctrl+Alt+D` / `Ctrl+Alt+Shift+D` as backup combos (the Alt+Shift family conflicts with the Windows input-language switcher on multi-keyboard setups).
 
 ## Compatibility
 
@@ -87,18 +92,20 @@ To change the keybindings, edit the `keydown` listener at the bottom — the `e.
 
 ## Performance
 
-The script is essentially zero-overhead at runtime:
+The script keeps runtime cost low:
 
-- One `<style>` element insert at `document-start` (~5 KB of CSS, parsed once).
-- One global `keydown` listener that early-exits on non-Alt-Shift keys.
-- No `MutationObserver`, no scroll handlers, no `requestAnimationFrame` loops.
+- One `<style>` element insert at `document-start` (~60 KB of CSS, parsed once).
+- One global `keydown` listener (capture phase) that early-exits on non-modifier keys.
+- A `<head>` `MutationObserver` watching only direct `childList` changes — fires when Webtoons swaps stylesheets and re-injects the theme if it's been removed. No work on attribute or text changes.
+- SPA-navigation hooks on `history.pushState` / `replaceState` / `popstate` schedule three short callbacks (sync body classes, wrap viewer sidebar sections, normalize viewer banners) on a `[200, 800, 2000]ms` retry cohort, then go idle until the next navigation.
+- No `requestAnimationFrame` loops, no scroll handlers on the comic strip.
 - No global CSS transitions (an earlier draft used `body * { transition: ... }` — removed because it makes the browser track transitions on every descendant of `<body>`, including comic panels).
 - `@noframes` set, so the script doesn't re-run inside ad iframes or embedded frames.
 
 ## Known issues
 
 - **Selector drift.** Webtoons occasionally renames classes when they redesign sections. If a panel goes white again, please open an issue with the URL and a screenshot — the fix is usually a one-line selector add.
-- **Naver `u_cbox` comments widget** is shared across Naver properties; if Naver pushes an update, comment styles may need a refresh.
+- **WCC comment widget** (Webtoon Comment Component) uses CSS-module class names of the form `wcc_<Component>__<element>` that occasionally gain hashes. Wildcard attribute selectors are used (`[class*="wcc_CommentItem__root"]`) to survive minor renames, but a major widget refactor will need follow-up.
 
 ## Contributing
 
