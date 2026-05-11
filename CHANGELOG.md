@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.21] - 2026-05-11
+
+### Changed
+
+- Brought drop shadow back, on the container only: `0 0 60px rgba(0,0,0,.9)` (symmetric halo all sides) + `0 16px 40px rgba(0,0,0,.7)` (downward grounding). Safe to use here because shadow is on a single container element — no per-image boundaries means no internal seams possible.
+- Extended `overflow: visible` to `.cont_box` and `body.wt-viewer #content` so the halo isn't clipped by parent wrappers.
+
+## [1.1.20] - 2026-05-11
+
+### Changed
+
+- Stronger card lift via rim lighting (no drop shadows): brighter top-edge inset highlight (`inset 0 1px 0 rgba(255,255,255,.28)`) catches "light from above" at the panel strip's top edge, plus a thicker hairline outline (.14 opacity, was .1). Reads as a lifted card edge without using any directional shadow.
+
+## [1.1.19] - 2026-05-11
+
+### Changed
+
+- Replaced container shadow with the homepage-card idiom: `border-radius: 16px` + `overflow: hidden` on the strip wrapper clips the first/last panel corners into a card shape, and a 1px white inset hairline outline defines the boundary. No drop shadows anywhere — the lift comes from corner rounding + edge highlight against the dark page bg.
+
+## [1.1.18] - 2026-05-11
+
+### Changed
+
+- Moved panel shadow from per-image to the strip container (`.viewer_img._img_viewer_area` / `#_imageList`). All panels now render as ONE lifted card — no inter-panel seams possible because there's only one shadowed element. `width: fit-content` shrinks the container to image width so the shadow lands at the actual panel edge; `margin: 0 auto` re-centers.
+- Shadow: 1px hairline outline + soft outer drop shadow on all sides (`0 24px 60px` + `0 8px 20px`, like the homepage cards).
+
+## [1.1.17] - 2026-05-11
+
+### Changed
+
+- Widened panel side shadow: `±22 0 28 -28` → `±42 0 50 -50` so the falloff extends ~40px into the side margins instead of cutting off at 22px. Still single-layer with `spread = -blur` exactly — no inter-panel seams.
+
 ## [1.1.16] - 2026-05-11
 
 ### Fixed
