@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.2
+// @version      1.1.3
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.2';
+    const VERSION = '1.1.3';
 
     /* ---------- palette (one place to retheme everything) ---------- */
     const palette = `
@@ -1630,9 +1630,11 @@
             if (el) el.remove();
         });
         if (!document.body || !document.body.classList.contains('wt-viewer')) return;
-        const container = document.querySelector('#_imageList, .viewer_img._img_viewer_area');
-        if (!container) return;
-        const rect = container.getBoundingClientRect();
+        // Measure the first rendered panel image — the container div is full-width,
+        // but the images inside are the actual reading column width we need.
+        const img = document.querySelector('img._images');
+        if (!img) return;
+        const rect = img.getBoundingClientRect();
         if (rect.width < 50) return; // not yet rendered
 
         const base = [
