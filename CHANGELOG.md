@@ -5,6 +5,73 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.16] - 2026-05-11
+
+### Fixed
+
+- Still-visible inter-panel gaps after v1.1.14: zero out `font-size` and `line-height` on the panel container (`#_imageList`, `.viewer_img._img_viewer_area`) and set `vertical-align: top` on the images. Kills any leftover text-baseline whitespace that the inherited line-height was reserving between siblings.
+
+## [1.1.15] - 2026-05-11
+
+### Fixed
+
+- `display: block` from v1.1.14 broke the inline auto-centering — comic panels shifted left of the column center. Restored centering with `margin: 0 auto`.
+- Bumped shadow opacity to .95 and blur to 28 (spread=-28, still `spread = -blur` so no seams) to restore the depth that v1.1.12 had before the seam fix tightened it.
+
+## [1.1.14] - 2026-05-11
+
+### Fixed
+
+- Inter-panel horizontal lines were actually inline whitespace gaps, not shadow bleed: the DOM has `<img class="_images">` siblings with text nodes between them, and default inline images sit on a baseline with a few px of gap below — page bg shows through there as a faint line. `display: block` on `img._images` packs them flush, eliminating the gap.
+
+## [1.1.13] - 2026-05-11
+
+### Fixed
+
+- Hide horizontal separator lines below the comic strip: `.viewer_info_area`, `.viewer_ad_area`, `.viewer_patron_area`, `.viewer_dsc_area`, `.viewer_bnr` previously had their `border-top` tinted to `--wt-border` (visible faint lines). Switched to `border: none` so the viewer column reads as one continuous dark surface.
+
+## [1.1.12] - 2026-05-11
+
+### Fixed
+
+- Truly eliminate inter-panel horizontal seams: v1.1.11 used `spread=-18, blur=22` which left a 4px y-bleed (visible as a faint line between stacked panels). Changed to `spread=-22` so `spread = -blur` exactly — vertical bleed is now zero, only side shadows render.
+
+### Recovered
+
+- v1.1.7→v1.1.11 changes (shadow refinement chain, JS panel-glow disable) were re-applied after the userscript file was truncated to 0 bytes by an external save.
+
+## [1.1.11] - 2026-05-11
+
+### Changed
+
+- Replaced white side glow with dark side drop shadow on `img._images` (only DOM node that's exactly image-width). spread=-blur formula on left/right cancels y-axis bleed → shadow appears at the actual panel edge with no inter-panel seams. Reads as "the artwork edge darkens into the page" — card-lifted feel without any white glow.
+
+## [1.1.10] - 2026-05-11
+
+### Changed
+
+- Moved panel shadow from the wrapper container (which was wider than the image, so the shadow landed far from the panel edge) back to `img._images` directly. Combined: 1px white hairline outline + side-only glow using spread=-blur (vertical bleed cancels → no inter-panel seams).
+
+## [1.1.9] - 2026-05-11
+
+### Changed
+
+- Panel-strip shadow tightened to hug the edge: replaced `0 24px 60px -8px` with the homepage-card formula (`0 4px 16px` + `0 1px 4px`). Reads as elevation without bleeding far out into the side margins.
+
+## [1.1.8] - 2026-05-11
+
+### Changed (experimental)
+
+- Replaced per-image white side glow with container-level "card volume": `.viewer_img._img_viewer_area` / `#_imageList` get `display: inline-block` so the box matches image width, plus a 1px white hairline outline and a large soft dark drop shadow underneath. Treats the whole comic strip as one lifted card — no white side glow, no inter-panel seam artifacts.
+
+## [1.1.7] - 2026-05-11
+
+### Changed (experimental — testing shadow approach for panel elevation)
+
+- Comic panels now use per-image CSS `box-shadow` for edge elevation, replacing the JS fixed-position glow divs. Formula: `±22px 0 22px -22px` (spread = -blur) cancels y-axis bleed entirely, so stacked panels show no horizontal lines at panel-to-panel boundaries (the v1.0.97 trick). Adds a subtle white side-glow plus a soft bottom drop shadow that matches the homepage card treatment.
+- `.viewer_lst` and `.viewer_img._img_viewer_area` set to `overflow: visible` so the shadow renders past the image bounds (was clipped by default).
+- JS `applyPanelGlow()` disabled via `PANEL_GLOW_JS_ENABLED = false` constant; function body retained for quick rollback.
+
 ## [1.1.6] - 2026-05-11
 
 ### Changed
