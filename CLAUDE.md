@@ -16,7 +16,6 @@ webtoons-dark-mode.user.js
 ├── ensureStyle()           inject/remove a <style> by id
 ├── applyTheme/applyDim     thin wrappers over ensureStyle
 ├── State                   darkOn / dimOn (cached from GM_getValue)
-│                           _panelGlowScroll (scroll listener ref for cleanup)
 ├── watchHead()             MutationObserver — re-injects style after SPA nav
 ├── toggleTheme/Dim()       flip state, persist, apply, log
 ├── GM_registerMenuCommand  extension popup menu entries
@@ -26,8 +25,10 @@ webtoons-dark-mode.user.js
 ├── scheduleViewerSync()    deferred syncBodyClasses after SPA nav
 ├── fixViewerBanners()      clears rogue backgrounds inside #_viewerBox
 ├── buildViewerCards()      wraps sidebar sections in elevated card divs
-├── applyPanelGlow()        creates/removes position:fixed side-glow divs
-└── schedulePanelGlow()     deferred applyPanelGlow after nav / load
+└── applyPanelGlow()        DISABLED (PANEL_GLOW_JS_ENABLED = false).
+                            Panel elevation now done via container box-shadow
+                            on .viewer_img._img_viewer_area in CSS. Function
+                            body retained for quick rollback.
 ```
 
 Key invariants:
@@ -38,8 +39,11 @@ Key invariants:
 - **`watchHead` MutationObserver must NOT call `syncViewerClass()`** — head mutations fire during SPA stylesheet swaps while the old page's DOM is still present. Calling `syncViewerClass()` there will re-add `wt-viewer` to body right after `pushState` removed it.
 - **No `body:has(#content.viewer)` CSS fallback** — Webtoons briefly assigns class `viewer` to `#content` during SPA transitions, causing false positive matches on non-viewer pages. `body.wt-viewer` (set/cleared by JS) is the only gate for viewer-scoped rules.
 - **`.detail_bg + .cont_box` must be transparent** — the general `.cont_box { background-color: var(--wt-bg) }` rule would hide the detail page artwork. The adjacent-sibling selector scopes the transparency override to detail pages only.
-- **Panel glow must be JS, not CSS** — `box-shadow` on individual `img._images` creates dark gaps at panel junctions (each shadow fades to zero at the image boundary). `position:fixed` divs measured from `img._images` (not the container, which is full-width) produce a continuous glow. The scroll listener in `applyPanelGlow()` clamps the glow height to the visible portion of the panel container so it disappears below the comic panels.
-- **`_panelGlowScroll` must be cleaned up** — `applyPanelGlow()` always removes the previous scroll listener before adding a new one. It is called on every SPA navigation so glows are removed when leaving the viewer.
+- **Panel elevation is ONE shadow on the strip container** — `box-shadow` on `.viewer_img._img_viewer_area` / `#_imageList`, NOT per-image. Per-image shadows create a hard step at every panel boundary because each shadow's blur falloff stops at its own image y-edge — even with `spread = -blur` cancelling vertical bleed, sub-pixel rendering still leaves a faint horizontal seam. One container = one continuous shadow = no internal seam possible.
+- **Strip container needs `width: fit-content` + `margin: 0 auto`** — parent wrappers default to full-width, which lands the shadow far from the actual image edge. `fit-content` shrinks the container to the image width (~800px); `margin: 0 auto` re-centers the now-shrunken container in the column.
+- **`font-size: 0` / `line-height: 0` on the strip container** — sibling `<img class="_images">` elements have text nodes between them; without zeroing text metrics those nodes reserve baseline whitespace and create visible gaps between stacked panels. Pair with `display: block; vertical-align: top` on `img._images`.
+- **`overflow: visible` must cascade up** — the container shadow needs `.viewer_lst`, `.cont_box`, and `body.wt-viewer #content` all set to `overflow: visible` or the halo gets clipped by parent wrappers.
+- **`PANEL_GLOW_JS_ENABLED = false` keeps the legacy JS glow dormant** — the `applyPanelGlow()` function body and SPA scheduling are retained for quick rollback but early-return when the flag is false. Do not delete the function until the CSS approach has shipped for several versions without regressions.
 
 ## Diagnosing a broken selector
 
@@ -127,9 +131,10 @@ There is no automated test suite — this is a DOM-manipulation script. Manual t
 - [ ] Reader dim toggle (`Alt+Shift+N`) dims comic panels only
 - [ ] Navigate to a chapter (SPA route change) — theme stays applied
 - [ ] Comic panel images have no color shift
-- [ ] Viewer: soft white glow visible at left and right edges of the reading column, no gaps between panels
-- [ ] Viewer: glow disappears when scrolled below the last panel (episode info / share buttons / comments)
-- [ ] Viewer: glow absent on non-viewer pages (detail, home)
+- [ ] Viewer: comic panel strip reads as one lifted card — rounded corners at top/bottom of the strip, hairline outline visible, dark halo on all sides
+- [ ] Viewer: no horizontal seams between stacked panels (single container shadow, not per-image)
+- [ ] Viewer: card halo not clipped by parent wrappers (`.cont_box`, `#content`, `.viewer_lst` all `overflow: visible`)
+- [ ] Viewer: panel strip stays centered in the column after `width: fit-content` shrink
 
 ## Custom slash commands (local only)
 

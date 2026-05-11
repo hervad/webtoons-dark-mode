@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.16
+// @version      1.1.21
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.16';
+    const VERSION = '1.1.21';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -481,36 +481,40 @@
         /* Never touch comic panels — filter:none preserves original colors. */
         .viewer_lst img, ._images, ._images img, .viewer_img img { filter: none !important; }
 
-        /* Panel-strip "volume": dark side shadow on img._images directly.
-           img._images is the only DOM node exactly image-width (parent wrappers
-           are full-width). spread = -blur EXACTLY cancels the vertical bleed
-           (any difference creates a horizontal seam between stacked panels), so
-           shadow appears only on left/right edges. No white glow. */
+        /* Panel-strip as one "card": no shadows. Rounded corners on the
+           container + overflow:hidden clip the first/last panel corners into
+           the card shape, and a 1px white hairline outline (via box-shadow
+           inset) defines the card boundary — same idiom as the homepage cards,
+           but on the comic strip wrapper.
+           - width: fit-content shrinks the container to match the actual image
+             width (parent wrappers are full-width by default).
+           - margin: 0 auto re-centers the shrunken container.
+           - font-size:0 / line-height:0 packs stacked panels flush by killing
+             text-baseline whitespace between sibling <img>s. */
         img._images {
             border-radius: 0 !important;
-            /* display:block packs stacked images flush — default inline leaves
-               a baseline whitespace gap between siblings (the text nodes between
-               <img>s create it), which shows the page bg through as a faint
-               horizontal line.
-               margin:0 auto re-centers in the column (block elements don't
-               inherit text-align centering from the parent). */
             display: block !important;
-            margin: 0 auto !important;
-            box-shadow:
-                -22px 0 28px -28px rgba(0,0,0,.95),
-                 22px 0 28px -28px rgba(0,0,0,.95) !important;
+            vertical-align: top !important;
+            box-shadow: none !important;
         }
-        /* overflow:visible lets the side shadow render past the strip wrapper.
-           font-size:0 / line-height:0 on the image container kills any
-           text-baseline whitespace that would otherwise show as a gap between
-           stacked panels (the text nodes between sibling <img>s inherit a
-           line-height that reserves vertical space). */
-        .viewer_lst, .viewer_img._img_viewer_area { overflow: visible !important; }
         .viewer_img._img_viewer_area, #_imageList {
+            width: fit-content !important;
+            margin: 0 auto !important;
             font-size: 0 !important;
             line-height: 0 !important;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+            /* One container = one shadow = no internal seams possible (unlike
+               per-image shadows). Combines a rim highlight (top edge), hairline
+               outline (full perimeter), and a soft outer halo shadow on all
+               sides for the lifted-card read. */
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,.28),
+                inset 0 0 0 1px rgba(255,255,255,.14),
+                0 0 60px rgba(0,0,0,.9),
+                0 16px 40px rgba(0,0,0,.7) !important;
         }
-        img._images { vertical-align: top !important; }
+        .viewer_lst, .cont_box, body.wt-viewer #content { overflow: visible !important; }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
         .tool_area {
