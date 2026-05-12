@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.28] - 2026-05-12
+
+### Fixed
+
+- Sub-nav bottom separator now draws as one continuous 1 px line across the full viewport width. `snb_inner` (centred, 1200 px) has `position: relative` which paints above its parent's `border-bottom`, hiding the line in the middle section. Replaced the border with a full-width `snb_wrap::after` pseudo-element at `z-index: 10`.
+- Active GNB link now shows accent-green text. The site sets `aria-current="true"` on the `<a>` (not `.on` on the `<li>`), so the previous `.gnb .on a` rule never fired. Switched to `[aria-current="true"]` with `#header`/`#gnbWrap` ID prefixes to beat the site's own colour rule by specificity.
+- Active GNB link text no longer shrinks. Each GNB `<a>` wraps its label in an `<h1>`; our blanket `h1 { color: var(--wt-text) !important }` was overriding the inherited accent colour. Added `#header a[aria-current="true"] h1` with `font-size: inherit` and `font-weight: inherit`.
+- Active SNB tab text no longer shrinks on selection. `font-size: inherit !important` was inheriting 12 px from the parent `<li>` instead of keeping the base 16 px on the `<a>` — removed it.
+- Header, GNB, and sub-nav now appear above the page vignette gradient. `z-index: 10000` on `#header`/`.gnb_wrap` and `.snb_wrap` lifts them above the `body::before` vignette at `z-index: 9999`, which was dimming right-side sub-nav tabs.
+
+### Changed
+
+- Inactive SNB tab text changed from `--wt-text-dim` to `--wt-text` — all genre/category tabs are now fully white; the active tab is distinguished by accent green alone.
+
 ## [1.1.27] - 2026-05-12
 
 ### Fixed
