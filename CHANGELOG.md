@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.27] - 2026-05-12
+
+### Fixed
+
+- Carousel arrows on `/canvas` now centered in their circles — switched from unicode glyph `❮` (uneven em-square whitespace caused optical misalignment even with flexbox centering) to an inline SVG chevron which is always pixel-perfect.
+- `font-size: 0 !important` on the carousel button was cascading into the injected `<span>`, collapsing the glyph. Fixed by using `element.style.setProperty('font-size', '44px', 'important')` which creates an inline `!important` declaration that wins the cascade.
+
+### Changed
+
+- Carousel button circle opacity lowered from `0.7` to `0.35` (more transparent, lets cover art show through).
+- Carousel arrow SVG size increased from `28 px` to `40 px`.
+- Carousel button vertical position changed from `top: 50%` to `top: calc(50% + 35px)` — the `.paging` container spans the full `.discover_spot` block including the section header, so plain `50%` landed above the card midpoint.
+- Carousel button hover state: green tint background, green border, and soft green glow matching the site accent colour.
+
+## [1.1.26] - 2026-05-12
+
+### Changed
+
+- Increased snb scroll arrow font-size from 24 px to 40 px and switched glyph from thin guillemets `‹›` to heavy angle quotation marks `❮❯` for better readability. Button surface now uses `--wt-bg-elev` (was `--wt-bg`) with a subtle inset highlight so it stands out from the page.
+- Increased CANVAS recommended-series carousel arrow font-size from 28 px to 42 px; switched to the same heavy `❮❯` glyphs.
+- Darkened the CANVAS creator-dashboard banner image filter from `brightness(.7) saturate(.85)` to `brightness(.35) saturate(.45)` so the mint-green PNG actually blends into the dark page rather than glowing through. Hover lightens to `brightness(.55) saturate(.65)`.
+
 ## [1.1.23] - 2026-05-11
 
 ### Changed

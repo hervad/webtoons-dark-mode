@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.23
+// @version      1.1.27
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.23';
+    const VERSION = '1.1.27';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -192,6 +192,33 @@
             background-color: var(--wt-bg-elev2) !important;
         }
 
+        /* /canvas "Weekly HOT" and "Popular By Category" grids. Each card is
+           <a class="discover_item"> inside <li>; base CSS paints the link with
+           a white background that broke through under the dark theme. */
+        .discover_lst li, .discover_lst .discover_item,
+        a.discover_item {
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
+            border-color: var(--wt-border) !important;
+        }
+        a.discover_item:hover {
+            background: var(--wt-bg-elev2) !important;
+        }
+        .discover_lst .info { background: transparent !important; }
+        .discover_lst .subj { color: var(--wt-text) !important; }
+        .discover_lst .grade_num { color: var(--wt-text-dim) !important; }
+        .discover_lst .grade_area { color: var(--wt-text-dim) !important; }
+        /* Subscriber-count badge overlaid on each carousel card thumbnail.
+           DOM: <span class="badge_discover num">7K</span> inside .discover_badge_area */
+        .badge_discover {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-accent) !important;
+            border: 1px solid rgba(0,213,100,.35) !important;
+            border-radius: 9999px !important;
+        }
+
         /* Sections — #content and #container are the actual IDs in the DOM.
            #wrap wraps the entire page including header so excluded here —
            html/body already covers the page background.
@@ -235,6 +262,26 @@
             filter: brightness(.85);
         }
 
+        /* Promotional banner on /canvas ("Try the New CANVAS Creator Dashboard!").
+           Ships as <a class="contest_banner" style="background-color: #bdffdb">
+           with an inline mint-green PNG inside. Override the inline style with
+           !important and tone the embedded image down so it blends with dark. */
+        .contest_banner, a.contest_banner {
+            background-color: var(--wt-bg-elev) !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
+        }
+        /* Aggressive darkening so the mint-green PNG image actually blends into
+           the dark page — the background-color override only affects areas the
+           image doesn't cover; the image itself must be filtered dark. */
+        .contest_banner img {
+            filter: brightness(.35) saturate(.45) !important;
+            transition: filter .2s !important;
+        }
+        .contest_banner:hover img {
+            filter: brightness(.55) saturate(.65) !important;
+        }
+
         /* Sub-nav (snb): day-of-week picker AND genre tabs share this component */
         .snb_wrap, .snb_inner, .snb {
             background-color: var(--wt-bg) !important;
@@ -245,16 +292,47 @@
         .snb_wrap, .snb_wrap.type_sub {
             border-bottom: 1px solid var(--wt-border) !important;
         }
-        /* Snb scroll arrow buttons (← / → on long tab strips). Base CSS
-           background is #fff with light hover — break the underline. */
+        /* Snb scroll arrow buttons (← / → on long tab strips, e.g. /canvas
+           genre row that runs past HORROR). Base CSS draws the arrow as a
+           dark sprite (background-image) on a #fff button — invisible on
+           dark. Strip the sprite and draw a white unicode chevron via a
+           pseudo-element so the glyph is always readable. */
         .snb_inner .btn_snb_prev, .snb_inner .btn_snb_next {
-            background-color: var(--wt-bg) !important;
+            background-color: var(--wt-bg-elev) !important;
+            background-image: none !important;
             border-bottom: 1px solid var(--wt-border) !important;
             border-right-color: var(--wt-border) !important;
             border-left-color: var(--wt-border) !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.07) !important;
         }
+        /* Suppress the base sprite that's drawn via ::before — without this we
+           render both the dark sprite AND our white chevron (doubled arrow). */
+        .snb_inner .btn_snb_prev::before, .snb_inner .btn_snb_next::before {
+            content: none !important;
+            background-image: none !important;
+            background: none !important;
+        }
+        /* Heavy guillemets (❮ ❯) at large size for clear readability. */
+        .snb_inner .btn_snb_prev::after, .snb_inner .btn_snb_next::after {
+            position: absolute !important;
+            inset: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: var(--wt-text) !important;
+            font-size: 40px !important;
+            line-height: 1 !important;
+            font-weight: 300 !important;
+            pointer-events: none !important;
+        }
+        .snb_inner .btn_snb_prev::after { content: '\\276E' !important; }
+        .snb_inner .btn_snb_next::after { content: '\\276F' !important; }
         .snb_inner .btn_snb_prev:hover, .snb_inner .btn_snb_next:hover {
             background-color: var(--wt-bg-hover) !important;
+        }
+        .snb_inner .btn_snb_prev:hover::after,
+        .snb_inner .btn_snb_next:hover::after {
+            color: var(--wt-accent) !important;
         }
         .snb_item, .snb_tab, ._snb_tab_a {
             background-color: transparent !important;
@@ -412,10 +490,90 @@
         .carousel_wrap .carousel_paging .prev:before {
             filter: brightness(0) invert(1) opacity(.9) !important;
         }
-        /* discover_spot arrows are sprite elements — invert to white on dark bg */
+        /* /canvas RECOMMENDED SERIES carousel paging arrows + dot indicators.
+           Buttons (.btn_prev / .btn_next inside .discover_spot .paging) had no
+           visible glyph after our generic button rule painted them with
+           --wt-bg-elev2 (which then turned solid-white under a brightness(0)
+           invert(1) filter — the small white squares).  Strip the inherited
+           button styling, hide the screen-reader text, and draw a white
+           unicode chevron via ::after. The page-indicator dots (.ico_discover_pg)
+           are sprite-based pills — restyle as flat circles. */
+        /* Strip the inherited button styling (our generic rule paints it
+           --wt-bg-elev2 which then turns solid-white under brightness(0)invert(1)).
+           Keep transparent — the native button has its own positioned dimensions;
+           we just draw a unicode chevron on top via ::after. */
         .discover_spot .paging .btn_next,
         .discover_spot .paging .btn_prev {
-            filter: brightness(0) invert(1) opacity(.8) !important;
+            position: absolute !important;
+            background-color: rgba(15,17,20,.35) !important;
+            background-image: none !important;
+            border: 1px solid rgba(255,255,255,.2) !important;
+            border-radius: 50% !important;
+            font-size: 0 !important;
+            color: transparent !important;
+            filter: none !important;
+            width: 64px !important;
+            height: 64px !important;
+            z-index: 10 !important;
+            top: calc(50% + 35px) !important;
+            transform: translateY(-50%) !important;
+        }
+        .discover_spot .paging {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 100% !important;
+            pointer-events: none !important;
+        }
+        .discover_spot .paging .btn_prev,
+        .discover_spot .paging .btn_next { pointer-events: all !important; }
+        .discover_spot .paging .btn_prev { left: 8px !important; }
+        /* scaleX(-1) on the button mirrors the whole element including ::after,
+           so ❮ inside renders as ❯ — no transform conflict on the ::after. */
+        .discover_spot .paging .btn_next {
+            right: 8px !important;
+            transform: translateY(-50%) scaleX(-1) !important;
+        }
+        .discover_spot .paging .btn_prev,
+        .discover_spot .paging .btn_next {
+            transition: background-color .2s, border-color .2s, box-shadow .2s !important;
+        }
+        .discover_spot .paging .btn_prev:hover,
+        .discover_spot .paging .btn_next:hover {
+            background-color: rgba(0,213,100,.25) !important;
+            border-color: rgba(0,213,100,.6) !important;
+            box-shadow: 0 0 16px rgba(0,213,100,.35) !important;
+        }
+        .discover_spot .paging .btn_next::before,
+        .discover_spot .paging .btn_prev::before {
+            content: none !important;
+            background-image: none !important;
+            background: none !important;
+        }
+        /* Glyph is injected as a real <span> by styleCarouselArrows() in JS —
+           inline styles can't be beaten by any stylesheet cascade. Suppress any
+           native ::after so we don't get a double glyph. */
+        .discover_spot .paging .btn_next::after,
+        .discover_spot .paging .btn_prev::after {
+            content: none !important;
+            display: none !important;
+        }
+        .discover_spot .paging .btn_next::before,
+        .discover_spot .paging .btn_prev::before {
+            content: none !important;
+            display: none !important;
+        }
+        .discover_spot .paging .ico_discover_pg {
+            background: var(--wt-bg-elev2) !important;
+            background-image: none !important;
+            border-radius: 50% !important;
+            opacity: .8 !important;
+        }
+        .discover_spot .paging .ico_discover_pg.on,
+        .discover_spot .paging .ico_discover_pg[aria-current="true"] {
+            background: var(--wt-accent) !important;
+            opacity: 1 !important;
         }
 
         /* Inputs */
@@ -1542,7 +1700,7 @@
         const isHome = !isViewer && !isDetail && !!document.querySelector('.main_section, .webtoon_list_wrap');
         document.body.classList.toggle('wt-viewer', isViewer);
         document.body.classList.toggle('wt-detail', isDetail);
-        document.body.classList.toggle('wt-home',   isHome);
+        document.body.classList.toggle('wt-home', isHome);
     }
     syncBodyClasses();
     document.addEventListener('DOMContentLoaded', syncBodyClasses);
@@ -1558,9 +1716,10 @@
             fn();
         }, d));
     }
-    function scheduleViewerSync()    { scheduleSpa(syncBodyClasses); }
-    function scheduleViewerCards()   { scheduleSpa(buildViewerCards); }
+    function scheduleViewerSync() { scheduleSpa(syncBodyClasses); }
+    function scheduleViewerCards() { scheduleSpa(buildViewerCards); }
     function scheduleViewerBanners() { scheduleSpa(fixViewerBanners); }
+    function scheduleCarouselArrows() { scheduleSpa(styleCarouselArrows); }
 
     function onSpaNav() {
         _navGen++;
@@ -1572,6 +1731,7 @@
         scheduleViewerSync();
         scheduleViewerCards();
         scheduleViewerBanners();
+        scheduleCarouselArrows();
     }
     ['pushState', 'replaceState'].forEach(fn => {
         const orig = history[fn];
@@ -1581,6 +1741,36 @@
         };
     });
     window.addEventListener('popstate', onSpaNav);
+
+    // Inject centered chevron spans into the carousel prev/next buttons.
+    // CSS pseudo-elements proved impossible to center reliably due to Webtoons'
+    // own !important rules winning; inline styles on a real DOM node cannot be
+    // overridden by any stylesheet.
+    function styleCarouselArrows() {
+        document.querySelectorAll(
+            '.discover_spot .paging .btn_prev, .discover_spot .paging .btn_next'
+        ).forEach(btn => {
+            if (btn.dataset.wtArrow) return;
+            btn.dataset.wtArrow = '1';
+            const span = document.createElement('span');
+            span.setAttribute('aria-hidden', 'true');
+            span.style.cssText =
+                'position:absolute;top:0;left:0;right:0;bottom:0;' +
+                'display:flex;align-items:center;justify-content:center;' +
+                'pointer-events:none;';
+            // SVG chevron: pixel-perfect centering independent of font metrics.
+            // btn_next has scaleX(-1) on the button which mirrors the SVG to face right.
+            span.innerHTML =
+                '<svg width="40" height="40" viewBox="0 0 24 24" fill="none"' +
+                ' stroke="#e6e6e6" stroke-width="2.5"' +
+                ' stroke-linecap="round" stroke-linejoin="round"' +
+                ' style="display:block;filter:drop-shadow(0 0 6px rgba(255,255,255,.7))">' +
+                '<polyline points="15,18 9,12 15,6"/></svg>';
+            btn.appendChild(span);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', styleCarouselArrows);
+    scheduleCarouselArrows();
 
     // Force uniform background throughout the viewer area. All blocks inside
     // #_viewerBox use var(--wt-bg) so there are no rogue gray/brownish strips.
