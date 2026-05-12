@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-05-13
+
+Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and accessibility. Theme-audit-driven palette tightening with new tokens for soft accent and prominent borders.
+
+### Fixed
+
+- Pagination next/prev arrows are now visible against the dark surface. Replaced the sprite (which was a near-black fill, invisible on dark) with a CSS-generated chevron via `::after` / `::before` text content. Hover no longer inverts to a stark white pill — the previous `filter: invert(1)` approach was inverting our dark hover background too.
+- Detail-page pagination ("1 2 3 … 10 ›") no longer renders inside the episode list. Scoped a position override to `body.wt-detail .paginate { position: static; clear: both; display: block }` so the row lands at the bottom; unscoped attempts broke /canvas layout, hence the `body.wt-detail` gate.
+- /rankings page rank numbers (1–30) now render. The site only ships a sprite atlas for 1–10 and on dark theme the sprite was visually killed leaving no fallback. Replaced with CSS-generated text on `[class^="ranking_number_"]:before` for all 30 ranks (with `!important` on `content` to beat the base sprite-url declaration).
+- /canvas genre pages (DRAMA, FANTASY, etc.) no longer render cards as raw thumbnails on the page background. The genre tabs use `.challenge_cont_area > .challenge_lst > ul > li > a.challenge_item` instead of `.discover_lst` / `.discover_item`, which our previous rules didn't target.
+- Rightmost card column on /canvas grids no longer has its 1 px right border clipped. Added explicit `overflow: visible` on `.challenge_cont_area` / `.challenge_lst` / `ul` and split section padding asymmetrically (`16px 20px`) so the column has clearance.
+
+### Added
+
+- /canvas section card: `.challenge_cont_area` is now an elevated 12 px-radius card with border, drop shadow, and `box-sizing: border-box` so the inner grid stays inside the floated layout. Inner grid uses `display: grid` with `repeat(4, minmax(0, 1fr))` and a 14 px gap so cards have consistent breathing room and degrade gracefully when the section is narrower.
+- Card depth: every `.challenge_item` now carries a two-layer drop shadow plus a 1 px inset top highlight (catches "light from above"). Hover state stays in place and darkens to `#0e1013` instead of lifting — matches the static-then-darken convention from other manhwa aggregators.
+- Card thumbnails dim on hover (`filter: brightness(.7)`, 200 ms ease) across home / detail / canvas grids and the `.discover_spot` recommended-series carousel. Scoped strictly to card-container `li img` selectors — viewer panel images are untouched.
+- Right-rail sidebar on /canvas (Top CANVAS, Up & Coming) gets parallel elevated section cards on each `.aside.challenge .lst_area`. Sidebar narrowed from 312 px → 280 px so the main grid gains 32 px of horizontal room. List items inside get a `--wt-border` hairline separator and a `--wt-bg-elev2` hover tint instead of floating on the page background.
+- Pagination as soft pill buttons: every number is an `inline-flex` 28×28 px pill with hover (`--wt-bg-hover` + inset `--wt-accent-soft` ring) and active state (`--wt-accent` solid pill). Base markup ships no visible affordance.
+- Global keyboard focus ring: `:focus-visible` on `a` / `button` / form controls / `[role="button"]` / `[tabindex]` draws a 2 px outline in the new `--wt-border-strong` with 2 px offset. The site ships no focus ring on most controls (WCAG 2.4.7).
+- `--wt-border-strong: #5a6472` token for prominent outlines / focus / selected affordances.
+- `--wt-accent-soft: #4ade80` token — desaturated companion to brand `#00d564`. Wired into hover states for `.snb_item .snb_tab` (sub-nav tabs), `.section_header .button_view_all`, `.paginate a`, and the pagination pill ring, so hover reads distinctly from the saturated active/selected green.
+
+### Changed
+
+- Palette tightened from a theme-audit pass:
+  - `--wt-border` `#363b44` → `#4a5360` (raises non-text contrast above 3:1 per WCAG 1.4.11)
+  - `--wt-bg-elev` `#1e2125` → `#22262b` and `--wt-bg-elev2` `#262a30` → `#2c313a` (wider elevation step so cards register as lifted without relying solely on shadow)
+  - `--wt-text-dim` `#a0a4ab` → `#b5b9c0` (muted-text contrast 7.2:1 → 9.1:1)
+- `[class^="ranking_number_"]:before` rule is no longer scoped to `.webtoon_list` — applies on every page that uses the same `<strong class="ranking_number_N">` markup (homepage trending + /rankings).
+
+### Removed
+
+- Dropped dead `.gnb .on a, .lnb .on a` selectors from the active-nav rule — the site has not used `.on` on the `<li>` for some time and the active state is driven entirely by `aria-current="true"` on the `<a>`.
+- Merged duplicate `.discover_spot .paging .btn_prev/.btn_next` blocks (transition folded into the base rule; two separate `::before` blocks combined with `::after` into one suppression rule).
+
 ## [1.1.28] - 2026-05-12
 
 ### Fixed

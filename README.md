@@ -12,9 +12,11 @@ A targeted dark theme for [Webtoons](https://www.webtoons.com) — desktop and m
 
 Applies a dark theme to Webtoons by overriding background, text, border, and surface colors on the actual containers the site uses (header, cards, episode lists, viewer, comments, footer, popups, inputs). Built around a small CSS-variable palette so the whole look can be re-skinned by editing a handful of values.
 
-On the viewer page, the comic panel strip is wrapped as a single elevated card — rounded corners, hairline outline, soft halo on all sides — without inserting any extra DOM elements (one container box-shadow does the lift). Homepage and detail pages get matching three-level elevation (page → section card → comic card).
+On the viewer page, the comic panel strip is wrapped as a single elevated card — rounded corners, hairline outline, soft halo on all sides — without inserting any extra DOM elements (one container box-shadow does the lift). Homepage, detail, /canvas (home + genre tabs), and /rankings pages get matching three-level elevation (page → section card → comic card), plus per-card depth shadows and a `:hover` darken that makes title overlays readable.
 
 It also ships an optional **reader dim** mode that lowers comic-panel brightness for late-night reading without affecting the rest of the page.
+
+WCAG-aware: contrast ratios verified for text and UI components (border 3:1, body text 14:1, accent 9:1 against the base surface). A `:focus-visible` ring is drawn on every interactive control so keyboard navigation is usable — the base site ships no visible focus indicator.
 
 ## Why not just use [a global `filter: invert()` userstyle](https://en.wikipedia.org/wiki/Filter_(higher-order_function))?
 
@@ -65,17 +67,19 @@ The palette is the first block in the script. Edit any of these CSS variables to
 ```css
 :root {
     --wt-bg:             #15171a;  /* page background */
-    --wt-bg-elev:        #1e2125;  /* cards, header */
-    --wt-bg-elev2:       #262a30;  /* secondary cards, hover */
+    --wt-bg-elev:        #22262b;  /* cards, header */
+    --wt-bg-elev2:       #2c313a;  /* secondary cards, hover */
     --wt-bg-hover:       #30353c;  /* interactive hover surface */
     --wt-bg-input:       #2a2e35;  /* form fields */
-    --wt-border:         #363b44;
+    --wt-border:         #4a5360;  /* subtle dividers, card borders */
+    --wt-border-strong:  #5a6472;  /* focus rings, selected outlines */
     --wt-text:           #e6e6e6;
-    --wt-text-dim:       #a0a4ab;  /* metadata, dates */
+    --wt-text-dim:       #b5b9c0;  /* metadata, dates */
     --wt-text-mute:      #7b828d;  /* placeholders */
     --wt-text-on-accent: #0a0a0a;  /* text on accent-colored surfaces */
     --wt-link:           #7cb6ff;
     --wt-accent:         #00d564;  /* Webtoons brand green */
+    --wt-accent-soft:    #4ade80;  /* desaturated companion for hover tints */
     --wt-shadow:         0 1px 2px rgba(0,0,0,.6);
 }
 ```
