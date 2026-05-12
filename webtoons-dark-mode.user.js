@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.27
+// @version      1.1.28
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.27';
+    const VERSION = '1.1.28';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -85,6 +85,7 @@
             background-color: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
             box-shadow: var(--wt-shadow) !important;
+            z-index: 10000 !important;
         }
         .gnb, .lnb {
             background-color: var(--wt-bg-elev) !important;
@@ -101,10 +102,28 @@
         }
         /* Active page link — accent green + inset underline (box-shadow avoids
            clipping, works even when the parent has overflow:hidden). */
-        .gnb .on a, .lnb .on a {
+        /* Active GNB link: .on li is legacy — site now sets aria-current="true"
+           on the <a> itself. ID prefixes (#header / #gnbWrap) boost specificity
+           above the site's own color rule which wins at 0,2,1 or lower. */
+        #header .gnb a[aria-current="true"], #gnbWrap .gnb a[aria-current="true"],
+        #header .lnb a[aria-current="true"], #gnbWrap .lnb a[aria-current="true"],
+        .gnb .on a, .lnb .on a,
+        .gnb a[aria-current="true"], .lnb a[aria-current="true"] {
             color: var(--wt-accent) !important;
             box-shadow: inset 0 -2px 0 var(--wt-accent) !important;
             border-radius: 6px 6px 0 0 !important;
+        }
+        /* GNB links wrap their text in <h1> — our blanket h1 rule sets
+           color:--wt-text !important which beats the inherited accent color.
+           Scope the override directly under #header so it wins by ID specificity. */
+        #header a[aria-current="true"] h1,
+        #header a[aria-current="true"] h2,
+        #header a[aria-current="true"] h3,
+        #gnbWrap a[aria-current="true"] h1,
+        #gnbWrap a[aria-current="true"] h2 {
+            color: var(--wt-accent) !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
         }
         /* Hover — rounded dark pill + accent text. */
         .gnb a:hover, .lnb a:hover, .gnb .link:hover, .header .link_menu:hover {
@@ -288,9 +307,27 @@
             border-color: var(--wt-border) !important;
         }
         /* Force the bottom underline color so the strip reads continuously
-           on dark — base CSS uses .5px solid #e0e0e0 which is invisible. */
+           on dark — base CSS uses .5px solid #e0e0e0 which is invisible.
+           padding-bottom:0 removes the height gap between snb_inner and
+           snb_wrap. border-bottom alone gets covered by snb_inner
+           (position:relative paints above its parent's border), so we draw
+           the line via ::after with z-index:10 to paint over snb_inner. */
         .snb_wrap, .snb_wrap.type_sub {
-            border-bottom: 1px solid var(--wt-border) !important;
+            padding-bottom: 0 !important;
+            position: relative !important;
+            border-bottom: none !important;
+            z-index: 10000 !important;
+        }
+        .snb_wrap::after {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 1px !important;
+            background-color: var(--wt-border) !important;
+            z-index: 10 !important;
+            pointer-events: none !important;
         }
         /* Snb scroll arrow buttons (← / → on long tab strips, e.g. /canvas
            genre row that runs past HORROR). Base CSS draws the arrow as a
@@ -336,7 +373,7 @@
         }
         .snb_item, .snb_tab, ._snb_tab_a {
             background-color: transparent !important;
-            color: var(--wt-text-dim) !important;
+            color: var(--wt-text) !important;
             border-color: var(--wt-border) !important;
         }
         .snb_item:hover .snb_tab, .snb_tab:hover {
@@ -347,6 +384,7 @@
         .snb_tab[aria-current="true"],
         .snb_tab[aria-current="page"] {
             color: var(--wt-accent) !important;
+            transform: none !important;
         }
         .btn_snb_prev, .btn_snb_next {
             background-color: var(--wt-bg-elev) !important;
