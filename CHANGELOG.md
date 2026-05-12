@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-05-13
+
+### Fixed
+
+- Age-verification screen (`.age_gate_container`) now fully dark-themed:
+  - Month dropdown trigger (`.lk_month` / `._selectedMonth`) styled as a dark input matching the DD / YYYY fields — was rendering with a white background.
+  - Open month list (`._month .link`) renders dark with `--wt-bg-elev` background and a `--wt-bg-hover` hover tint.
+  - Continue button (`.btn_type9._btn_enter` inside `.btnarea`) renders as a centred green pill (`inline-flex` centring + `min-width: 160px`) with bold near-black text at idle (~9:1 contrast vs `#00d564`) and a smooth fade to white text + darker green + soft glow on hover.
+  - "I'll stick with limited access" (`.lk_continue._skipAgeGate`) renders as plain white underlined text on transparent — previously was inheriting the global `a:hover → --wt-link` blue.
+  - Privacy Policy inline link (`.dsc_terms a`) uses `--wt-link` with underline.
+  - `::selection` inside the age gate uses `--wt-bg-hover` instead of brand green so text-selecting the limited-access link doesn't render as a green pill.
+- Global `a:hover { color: var(--wt-link) }` no longer bleeds into button-styled anchors (`.btn_*`, `a[role="button"]`, `[class*="cta"]`, etc.) — those keep their own text color on hover instead of turning bright blue.
+
 ## [1.2.0] - 2026-05-13
 
 Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and accessibility. Theme-audit-driven palette tightening with new tokens for soft accent and prominent borders.

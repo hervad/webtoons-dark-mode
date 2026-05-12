@@ -52,6 +52,8 @@ Key invariants:
 - **Rank-number badges (`[class^="ranking_number_"]`) need text content for 1–30** — the site ships a sprite atlas that covers only 1–10. On /rankings (which goes to 30), ranks 11+ are blank with no fallback. Generate the digit via `::before { content: "N" !important }` for every number 1–30, and keep the rule unscoped (do NOT prefix with `.webtoon_list`) so both homepage trending and /rankings render. `content` must use `!important` because the base CSS sets `content: url(sprite)` at the same specificity.
 - **`.paginate .pg_next` / `.pg_prev` arrows: text chevron, not filter** — a previous attempt used `filter: invert(1)` on the link itself to recolour the sprite, but the filter also inverted the hover background, producing a stark white pill. Replace the sprite with `::after { content: '›' }` and kill `background-image` + `text-indent` on the link instead.
 - **Detail-page pagination needs `position: static; clear: both` scoped to `body.wt-detail`** — base CSS places `.paginate` inside the floated `.detail_lst` column at a position the floats paint around, so the row renders between episode rows. Force normal flow on detail pages only. An unscoped attempt broke /canvas layout where pagination was already correct, hence the body-class gate.
+- **Age-verification screen (`.age_gate_container > .age_gate_area`) uses anchors-as-buttons, not `<button>`** — the Continue CTA is `<a class="btn_type9 v2 _btn_enter">` inside `<div class="btnarea">`, the secondary action is `<a class="lk_continue _skipAgeGate">` ("I'll stick with limited access"), the month picker is `<a class="lk_month _selectedMonth">` (not a native `<select>`), and the dropdown items are `<a class="link">` inside `<li class="item _month">`. Style them by exact class, not by `<button>` / position selectors — `:first-of-type` matches the month picker, not Continue, and `[class*="continue" i]` matches `.lk_continue` (the secondary "skip" link), not the Continue button. The Continue pill needs `display: inline-flex; align-items: center; justify-content: center` plus `min-width: 160px` for visually-centred text; idle text is `#0a0a0a` (~9:1 on `#00d564`), hover fades to `#ffffff` on a darker `#00b855` ground.
+- **Button-styled anchors must be excluded from the global `a:hover { color: var(--wt-link) }`** — any CTA implemented as `<a>` (Continue, "First episode", etc.) inherits the link-blue on hover, which clashes with green/coloured button backgrounds. Add an override on `a.btn:hover, a[class*="btn_" i]:hover, a[role="button"]:hover, [class*="cta" i]:hover, a[class*="primary" i]:hover { color: inherit !important }` so buttons keep their own text colour.
 
 ## Diagnosing a broken selector
 
@@ -89,6 +91,7 @@ The DevTools **Computed** tab shows which rule wins — useful when `!important`
 | `.challenge_*` | /canvas genre-filtered tabs — `challenge_cont_area` (section), `challenge_lst` (grid wrapper), `challenge_item` (card), `aside.challenge` (right sidebar) |
 | `ranking_number_N` | Rank badge sprite class (1–30). Used on homepage trending and /rankings |
 | `.lst_type1`, `.lst_area` | Generic list/section wrappers used by sidebars on /canvas and /rankings |
+| `.age_gate_*` | Age verification gate (logged-out, first visit). `.btn_type9._btn_enter` (Continue), `.lk_continue._skipAgeGate` (limited access), `.lk_month._selectedMonth` (month picker trigger), `._month .link` (month items) |
 | `[class*="wcc_"]` | WCC comment widget (CSS-module hashed names) |
 | `.u_cbox_*` | Legacy Naver comment widget (fallback) |
 | `._loginLayer`, `._loginDimLayer` | Login modal (injected by gnb bundle) |
@@ -162,6 +165,7 @@ There is no automated test suite — this is a DOM-manipulation script. Manual t
 - [ ] `/rankings` page shows all 30 rank numbers as bold dark-mode text (no missing ranks 11–30, no need to toggle the theme to reveal them)
 - [ ] Tab-key navigation shows a 2 px `--wt-border-strong` focus ring with 2 px offset on links / buttons / form fields
 - [ ] Hovering a sub-nav day/genre tab tints it soft accent (`--wt-accent-soft`); the active tab remains brand green (`--wt-accent`) — hover and active are visually distinct
+- [ ] Age-verification screen (logged-out, first visit): month dropdown trigger + DD/YYYY inputs are dark; Continue is a centred green pill with near-black text that fades to white on hover; "I'll stick with limited access" is plain white underlined text (not blue, not green-pilled)
 
 ## Custom slash commands (local only)
 

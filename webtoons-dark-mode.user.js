@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.2.0
+// @version      1.2.1
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.2.0';
+    const VERSION = '1.2.1';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -79,6 +79,20 @@
         /* Links */
         a, a:visited { color: var(--wt-text) !important; }
         a:hover      { color: var(--wt-link) !important; }
+
+        /* Exclude button-styled anchors from the global a:hover blue. CTA
+           buttons (e.g. age-verification "Continue", "First episode") use
+           <a> or <button> with a green background; inheriting --wt-link
+           turns their text bright blue on hover which looks broken. Keep
+           the button's own text color on hover. */
+        a.btn:hover, a[class*="btn_" i]:hover,
+        a[class*="button" i]:hover, a[class*="Button" i]:hover,
+        a[role="button"]:hover, button a:hover,
+        [class*="cta" i]:hover, [class*="CTA"]:hover,
+        a[class*="primary" i]:hover, a[class*="Primary"]:hover,
+        a[class*="Continue" i]:hover {
+            color: inherit !important;
+        }
 
         /* Keyboard focus ring — site has none of its own on most controls,
            which fails WCAG 2.4.7. A 2 px outline in --wt-border-strong with
@@ -790,6 +804,154 @@
             caret-color: var(--wt-text) !important;
         }
         input::placeholder, textarea::placeholder { color: var(--wt-text-mute) !important; }
+        /* Native <select> dropdown items — the age-verification month picker
+           renders its options on a system-painted listbox that ignored our
+           select bg/color rule. Style <option> explicitly. */
+        select option {
+            background-color: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+        }
+        /* Age-verification screen (.age_gate_container > .age_gate_area).
+           The month picker is a custom <span class="month _monthSelect">
+           with a chevron, not a native <select>; the day/year are plain
+           inputs. Style the whole form area so nothing renders on white. */
+        .age_gate_container,
+        .age_gate_area, .age_gate_area .form_area {
+            background: transparent !important;
+            color: var(--wt-text) !important;
+        }
+        .age_gate_area .month, .age_gate_area ._monthSelect,
+        .age_gate_area .month *, .age_gate_area input {
+            background-color: var(--wt-bg-input) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 6px !important;
+        }
+        .age_gate_area .month::after,
+        .age_gate_area ._monthSelect::after { color: var(--wt-text) !important; }
+        /* Continue CTA — explicit hover state so it actually reacts to the
+           cursor. The button uses brand green at idle; darken on hover with
+           a subtle shadow lift instead of falling back to plain inheritance. */
+        /* Continue button: brand green pill with near-black bold text. Black
+           reads ~9:1 against #00d564 (vs ~3.5:1 for white) and matches the
+           Webtoons brand pattern of dark text on green CTAs elsewhere on
+           the site. Forced via -webkit-text-fill-color on the button AND
+           every descendant so an inner <span> can't override it. */
+        .age_gate_area button {
+            background-color: var(--wt-accent) !important;
+            color: #0a0a0a !important;
+            -webkit-text-fill-color: #0a0a0a !important;
+            font-weight: 700 !important;
+            border: none !important;
+            transition: background-color .15s ease, box-shadow .15s ease, transform .1s ease !important;
+        }
+        .age_gate_area button * {
+            color: #0a0a0a !important;
+            -webkit-text-fill-color: #0a0a0a !important;
+            background: transparent !important;
+        }
+        .age_gate_area button:hover {
+            background-color: #00b855 !important;
+            box-shadow: 0 4px 12px rgba(0,213,100,.35) !important;
+        }
+        .age_gate_area button:hover, .age_gate_area button:hover * {
+            color: #0a0a0a !important;
+            -webkit-text-fill-color: #0a0a0a !important;
+        }
+        .age_gate_area button:active { transform: translateY(1px) !important; }
+        /* Continue button: <a class="btn_type9 v2 _btn_enter"> inside
+           <div class="btnarea">. Brand green pill, dark text (9:1 contrast). */
+        .age_gate_area .btn_type9,
+        .age_gate_area ._btn_enter,
+        .age_gate_area .btnarea a {
+            background-color: var(--wt-accent) !important;
+            color: #0a0a0a !important;
+            -webkit-text-fill-color: #0a0a0a !important;
+            font-weight: 700 !important;
+            text-decoration: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            line-height: 1 !important;
+            padding: 14px 36px !important;
+            min-width: 160px !important;
+            border-radius: 999px !important;
+            border: none !important;
+            box-sizing: border-box !important;
+            transition: background-color .15s ease, color .15s ease, box-shadow .15s ease, transform .1s ease !important;
+        }
+        .age_gate_area .btn_type9 *,
+        .age_gate_area ._btn_enter *,
+        .age_gate_area .btnarea a * {
+            color: #0a0a0a !important;
+            -webkit-text-fill-color: #0a0a0a !important;
+            background: transparent !important;
+            text-decoration: none !important;
+            transition: color .15s ease !important;
+        }
+        .age_gate_area .btn_type9:hover,
+        .age_gate_area ._btn_enter:hover,
+        .age_gate_area .btnarea a:hover {
+            background-color: #00b855 !important;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(0,213,100,.35) !important;
+        }
+        .age_gate_area .btn_type9:hover *,
+        .age_gate_area ._btn_enter:hover *,
+        .age_gate_area .btnarea a:hover * {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+        }
+        .age_gate_area .btn_type9:active,
+        .age_gate_area ._btn_enter:active { transform: translateY(1px) !important; }
+
+        /* "I'll stick with limited access": <a class="lk_continue _skipAgeGate">.
+           Plain white underlined text on transparent. */
+        .age_gate_area .lk_continue,
+        .age_gate_area ._skipAgeGate {
+            background: transparent !important;
+            color: var(--wt-text) !important;
+            -webkit-text-fill-color: var(--wt-text) !important;
+            text-decoration: underline !important;
+            padding: 0 !important;
+            border: none !important;
+            font-weight: normal !important;
+        }
+        .age_gate_area .lk_continue:hover,
+        .age_gate_area ._skipAgeGate:hover { opacity: .8 !important; }
+
+        /* Month dropdown trigger + list items — keep them dark, NOT green. */
+        .age_gate_area .lk_month,
+        .age_gate_area ._selectedMonth {
+            background-color: var(--wt-bg-input) !important;
+            color: var(--wt-text) !important;
+            -webkit-text-fill-color: var(--wt-text) !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 6px !important;
+            text-decoration: none !important;
+            font-weight: normal !important;
+        }
+        .age_gate_area ._month .link {
+            background-color: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            -webkit-text-fill-color: var(--wt-text) !important;
+            text-decoration: none !important;
+            font-weight: normal !important;
+        }
+        .age_gate_area ._month .link:hover {
+            background-color: var(--wt-bg-hover) !important;
+            color: var(--wt-text) !important;
+        }
+
+        /* Privacy Policy inline link inside .dsc_terms — soft accent link. */
+        .age_gate_area .dsc_terms a {
+            color: var(--wt-link) !important;
+            -webkit-text-fill-color: var(--wt-link) !important;
+            text-decoration: underline !important;
+        }
+        .age_gate_area ::selection { background: var(--wt-bg-hover) !important; color: var(--wt-text) !important; }
         .search_box, ._searchBox {
             background-color: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
