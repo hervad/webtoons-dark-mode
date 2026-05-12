@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.1.28
+// @version      1.2.0
 // @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.1.28';
+    const VERSION = '1.2.0';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -41,17 +41,19 @@
     const palette = `
         :root {
             --wt-bg:              #15171a;
-            --wt-bg-elev:         #1e2125;
-            --wt-bg-elev2:        #262a30;
+            --wt-bg-elev:         #22262b;
+            --wt-bg-elev2:        #2c313a;
             --wt-bg-hover:        #30353c;
             --wt-bg-input:        #2a2e35;
-            --wt-border:          #363b44;
+            --wt-border:          #4a5360;
+            --wt-border-strong:   #5a6472;
             --wt-text:            #e6e6e6;
-            --wt-text-dim:        #a0a4ab;
+            --wt-text-dim:        #b5b9c0;
             --wt-text-mute:       #7b828d;
             --wt-text-on-accent:  #0a0a0a;
             --wt-link:            #7cb6ff;
             --wt-accent:          #00d564;
+            --wt-accent-soft:     #4ade80;
             --wt-shadow:          0 1px 2px rgba(0,0,0,.6);
         }
     `;
@@ -77,6 +79,17 @@
         /* Links */
         a, a:visited { color: var(--wt-text) !important; }
         a:hover      { color: var(--wt-link) !important; }
+
+        /* Keyboard focus ring — site has none of its own on most controls,
+           which fails WCAG 2.4.7. A 2 px outline in --wt-border-strong with
+           a 2 px offset reads clearly on every elevation level without
+           clipping. :focus-visible so it only appears for keyboard nav. */
+        a:focus-visible, button:focus-visible,
+        input:focus-visible, textarea:focus-visible, select:focus-visible,
+        [role="button"]:focus-visible, [tabindex]:focus-visible {
+            outline: 2px solid var(--wt-border-strong) !important;
+            outline-offset: 2px !important;
+        }
         .NPI a, .lk_link, .more, .btn_link { color: var(--wt-link) !important; }
 
         /* Header / global nav — border-color and box-shadow only on the outer
@@ -102,12 +115,11 @@
         }
         /* Active page link — accent green + inset underline (box-shadow avoids
            clipping, works even when the parent has overflow:hidden). */
-        /* Active GNB link: .on li is legacy — site now sets aria-current="true"
-           on the <a> itself. ID prefixes (#header / #gnbWrap) boost specificity
-           above the site's own color rule which wins at 0,2,1 or lower. */
+        /* Active GNB link: site sets aria-current="true" on the <a> itself.
+           ID prefixes (#header / #gnbWrap) boost specificity above the site's
+           own color rule which wins at 0,2,1 or lower. */
         #header .gnb a[aria-current="true"], #gnbWrap .gnb a[aria-current="true"],
         #header .lnb a[aria-current="true"], #gnbWrap .lnb a[aria-current="true"],
-        .gnb .on a, .lnb .on a,
         .gnb a[aria-current="true"], .lnb a[aria-current="true"] {
             color: var(--wt-accent) !important;
             box-shadow: inset 0 -2px 0 var(--wt-accent) !important;
@@ -225,10 +237,176 @@
         a.discover_item:hover {
             background: var(--wt-bg-elev2) !important;
         }
+
+        /* Hover darken: when the cursor lands on a card thumbnail, dim the
+           artwork so the title/genre overlay (which sits on top of the image
+           as the card's only label) becomes readable. Scoped strictly to card
+           containers to avoid touching viewer panel images, which must stay
+           pristine. transition lives on the img so the dim eases in/out. */
+        .card_lst li img, .card_item img, .detail_lst li img,
+        .discover_lst li img, a.discover_item img,
+        .daily_lst li img, ._dailyList li img, ._popularList li img,
+        .webtoon_list li img, .webtoon_list_wrap li img,
+        .main_section .card_item img,
+        .discover_spot li img, .spot_lst li img {
+            transition: filter .2s ease !important;
+        }
+        .card_lst li:hover img, .card_item:hover img, .detail_lst li:hover img,
+        .discover_lst li:hover img, a.discover_item:hover img,
+        .daily_lst li:hover img, ._dailyList li:hover img, ._popularList li:hover img,
+        .webtoon_list li:hover img, .webtoon_list_wrap li:hover img,
+        .main_section .card_item:hover img,
+        .discover_spot li:hover img, .spot_lst li:hover img {
+            filter: brightness(.7) !important;
+        }
         .discover_lst .info { background: transparent !important; }
         .discover_lst .subj { color: var(--wt-text) !important; }
         .discover_lst .grade_num { color: var(--wt-text-dim) !important; }
         .discover_lst .grade_area { color: var(--wt-text-dim) !important; }
+
+        /* /canvas genre-filtered pages (DRAMA, FANTASY, …) use a different DOM:
+           .challenge_cont_area > .challenge_lst > ul > li > a.challenge_item
+           instead of .discover_lst / .discover_item. Without parallel rules the
+           cards render as raw thumbnails on the page background — no card
+           container, no border, no rounded corners. Mirror the .discover_item
+           treatment so /canvas/{genre} matches /canvas home visually. */
+        a.challenge_item {
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            border-radius: 10px !important;
+            overflow: hidden !important;
+            border: 1px solid var(--wt-border) !important;
+            display: block !important;
+            /* Depth: a soft drop shadow plus a 1 px inset hairline highlight
+               at the top makes each card read as a lifted tile rather than a
+               flat rectangle. The inset highlight catches "light from above". */
+            box-shadow:
+                0 2px 6px rgba(0,0,0,.45),
+                0 8px 20px rgba(0,0,0,.35),
+                inset 0 1px 0 rgba(255,255,255,.06) !important;
+            transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease !important;
+        }
+        /* Hover: stay in place (no transform / no shadow upgrade) and just
+           darken the card. Movement / scaling on hover feels noisy when
+           browsing a dense grid — the static darken matches conventions
+           on other manhwa aggregator sites. */
+        a.challenge_item:hover {
+            background: #0e1013 !important;
+            border-color: #2a2f37 !important;
+        }
+        .challenge_item img { transition: filter .2s ease !important; }
+        a.challenge_item:hover img { filter: brightness(.7) !important; }
+        .challenge_item .info,
+        .challenge_item .info_area,
+        .challenge_item .area_genre { background: transparent !important; }
+        .challenge_item .subj,
+        .challenge_item .title { color: var(--wt-text) !important; }
+        .challenge_item .area_genre,
+        .challenge_item .genre,
+        .challenge_item .author,
+        .challenge_item .grade_num { color: var(--wt-text-dim) !important; }
+        /* Wrap the whole canvas grid in one elevated section card to match
+           how other listing pages group their content. box-sizing:border-box
+           is critical — without it, the 24 px padding adds outside the
+           computed width and pushes the .aside.challenge float (Top CANVAS
+           / Up & Coming) down below the grid instead of beside it. */
+        .challenge_cont_area {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 12px !important;
+            padding: 16px 20px !important;
+            box-sizing: border-box !important;
+            overflow: visible !important;
+            box-shadow: var(--wt-shadow) !important;
+        }
+        /* Ensure no ancestor clips the rightmost card's 1 px border. */
+        .challenge_cont_area .challenge_lst,
+        .challenge_cont_area .challenge_lst > ul { overflow: visible !important; }
+        .challenge_lst,
+        .challenge_lst > ul,
+        .challenge_lst > ul > li { background: transparent !important; }
+        /* Grid layout with explicit gap — the base CSS lays cards out with
+           no breathing room, leaving them edge-to-edge. Fixed 4 columns with
+           minmax(0, 1fr) so a card's intrinsic min-width (cover image) can't
+           force the column wider than the available track, which would
+           otherwise push the rightmost card out of view or drop the row. */
+        .challenge_lst > ul {
+            display: grid !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: 14px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .challenge_lst > ul > li {
+            width: auto !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            float: none !important;
+        }
+        a.challenge_item img,
+        .challenge_item .thmb,
+        .challenge_item .thmb img {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            display: block !important;
+        }
+        a.challenge_item { min-width: 0 !important; max-width: 100% !important; }
+        /* Base CSS draws a 1 px light separator at the bottom of multiple
+           levels in the challenge_* tree. Cast a wider net to kill it. */
+        .challenge_cont_area,
+        .challenge_cont_area *,
+        .challenge_lst,
+        .challenge_lst > ul,
+        .challenge_lst > ul > li {
+            border-bottom: 0 !important;
+        }
+        .challenge_cont_area::after,
+        .challenge_lst::after,
+        .challenge_lst > ul::after {
+            display: none !important;
+            content: none !important;
+            border: 0 !important;
+        }
+
+        /* Right-rail sidebar on /canvas (Top CANVAS, Up & Coming). Each is
+           a separate .lst_area inside .aside.challenge .ranking_lst.viewer
+           (a flex column). Card each .lst_area individually so the two
+           sections render as two distinct stacked cards, not one big block. */
+        /* Shrink the floated sidebar slightly so the grid section gets more
+           horizontal room (the rightmost card column was being shaved). */
+        .aside.challenge { width: 280px !important; }
+        .aside.challenge .lst_area {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 12px !important;
+            padding: 14px !important;
+            box-sizing: border-box !important;
+            box-shadow:
+                0 2px 6px rgba(0,0,0,.45),
+                0 8px 20px rgba(0,0,0,.35),
+                inset 0 1px 0 rgba(255,255,255,.06) !important;
+            margin: 0 !important;
+        }
+        /* Tight stacking: kill the flex column gap entirely and zero any
+           top margin on the second .lst_area so Up & Coming sits directly
+           under Top CANVAS with only a hairline gap. */
+        .aside.challenge .ranking_lst {
+            gap: 0 !important;
+            row-gap: 0 !important;
+        }
+        .aside.challenge .lst_area + .lst_area { margin-top: 8px !important; }
+        .aside.challenge .lst_type1 { border-bottom: none !important; }
+        .aside.challenge .lst_type1 > li {
+            background: transparent !important;
+            border-bottom: 1px solid var(--wt-border) !important;
+            padding: 8px 0 !important;
+        }
+        .aside.challenge .lst_type1 > li:last-child { border-bottom: none !important; }
+        .aside.challenge .lst_type1 > li:hover { background: var(--wt-bg-elev2) !important; }
+        .aside.challenge h2, .aside.challenge h3,
+        .aside.challenge .title_area { color: var(--wt-text) !important; }
         /* Subscriber-count badge overlaid on each carousel card thumbnail.
            DOM: <span class="badge_discover num">7K</span> inside .discover_badge_area */
         .badge_discover {
@@ -377,7 +555,7 @@
             border-color: var(--wt-border) !important;
         }
         .snb_item:hover .snb_tab, .snb_tab:hover {
-            color: var(--wt-accent) !important;
+            color: var(--wt-accent-soft) !important;
             background-color: var(--wt-bg-elev2) !important;
         }
         .snb_item.is_selected .snb_tab,
@@ -414,7 +592,7 @@
         }
         /* "View all ›" link in section header. */
         .section_header .button_view_all { color: var(--wt-text-dim) !important; }
-        .section_header .button_view_all:hover { color: var(--wt-accent) !important; }
+        .section_header .button_view_all:hover { color: var(--wt-accent-soft) !important; }
 
         /* Comic cards within section containers: elevated above the section bg. */
         .main_section .card_item,
@@ -555,6 +733,7 @@
             z-index: 10 !important;
             top: calc(50% + 35px) !important;
             transform: translateY(-50%) !important;
+            transition: background-color .2s, border-color .2s, box-shadow .2s !important;
         }
         .discover_spot .paging {
             position: absolute !important;
@@ -573,34 +752,23 @@
             right: 8px !important;
             transform: translateY(-50%) scaleX(-1) !important;
         }
-        .discover_spot .paging .btn_prev,
-        .discover_spot .paging .btn_next {
-            transition: background-color .2s, border-color .2s, box-shadow .2s !important;
-        }
         .discover_spot .paging .btn_prev:hover,
         .discover_spot .paging .btn_next:hover {
             background-color: rgba(0,213,100,.25) !important;
             border-color: rgba(0,213,100,.6) !important;
             box-shadow: 0 0 16px rgba(0,213,100,.35) !important;
         }
-        .discover_spot .paging .btn_next::before,
-        .discover_spot .paging .btn_prev::before {
-            content: none !important;
-            background-image: none !important;
-            background: none !important;
-        }
         /* Glyph is injected as a real <span> by styleCarouselArrows() in JS —
-           inline styles can't be beaten by any stylesheet cascade. Suppress any
-           native ::after so we don't get a double glyph. */
+           inline styles can't be beaten by any stylesheet cascade. Suppress
+           native ::before (sprite) and ::after so we don't get a double glyph. */
+        .discover_spot .paging .btn_next::before,
+        .discover_spot .paging .btn_prev::before,
         .discover_spot .paging .btn_next::after,
         .discover_spot .paging .btn_prev::after {
             content: none !important;
             display: none !important;
-        }
-        .discover_spot .paging .btn_next::before,
-        .discover_spot .paging .btn_prev::before {
-            content: none !important;
-            display: none !important;
+            background: none !important;
+            background-image: none !important;
         }
         .discover_spot .paging .ico_discover_pg {
             background: var(--wt-bg-elev2) !important;
@@ -1452,11 +1620,15 @@
         .ico_n6, .ico_n7, .ico_n8, .ico_n9, .ico_n10 {
             filter: brightness(0) invert(1) opacity(.85) !important;
         }
-        /* Homepage trending card badges (.ranking_number_X:before) — the SVG
-           sprite bakes in a white rectangle. Replace the sprite entirely with
-           CSS-generated text: clear background-image, set content per number,
-           and override the text-indent/overflow that the sprite class hides. */
-        .webtoon_list [class^="ranking_number_"]:before {
+        /* Rank-number badges (.ranking_number_X) on homepage trending cards
+           AND the /rankings listing page. The base markup is the same
+           (<strong class="ranking_number_N"> with a sprite background +
+           <span class="blind"> for screen readers), but the parent class
+           differs per page: .webtoon_list on homepage, .ranking_text on
+           /rankings. Match the sprite class globally so both render. The
+           native sprite atlas covers 1–10, so /rankings 11–30 stayed blank;
+           draw all 30 via ::before with content per number. */
+        [class^="ranking_number_"]:before {
             background-image: none !important;
             text-indent: 0 !important;
             overflow: visible !important;
@@ -1469,17 +1641,38 @@
             white-space: normal !important;
             vertical-align: bottom !important;
             line-height: 1 !important;
+            display: inline-block !important;
         }
-        .webtoon_list .ranking_number_1:before  { content: "1";  }
-        .webtoon_list .ranking_number_2:before  { content: "2";  }
-        .webtoon_list .ranking_number_3:before  { content: "3";  }
-        .webtoon_list .ranking_number_4:before  { content: "4";  }
-        .webtoon_list .ranking_number_5:before  { content: "5";  }
-        .webtoon_list .ranking_number_6:before  { content: "6";  }
-        .webtoon_list .ranking_number_7:before  { content: "7";  }
-        .webtoon_list .ranking_number_8:before  { content: "8";  }
-        .webtoon_list .ranking_number_9:before  { content: "9";  }
-        .webtoon_list .ranking_number_10:before { content: "10"; }
+        .ranking_number_1:before  { content: "1" !important; }
+        .ranking_number_2:before  { content: "2" !important; }
+        .ranking_number_3:before  { content: "3" !important; }
+        .ranking_number_4:before  { content: "4" !important; }
+        .ranking_number_5:before  { content: "5" !important; }
+        .ranking_number_6:before  { content: "6" !important; }
+        .ranking_number_7:before  { content: "7" !important; }
+        .ranking_number_8:before  { content: "8" !important; }
+        .ranking_number_9:before  { content: "9" !important; }
+        .ranking_number_10:before { content: "10" !important; }
+        .ranking_number_11:before { content: "11" !important; }
+        .ranking_number_12:before { content: "12" !important; }
+        .ranking_number_13:before { content: "13" !important; }
+        .ranking_number_14:before { content: "14" !important; }
+        .ranking_number_15:before { content: "15" !important; }
+        .ranking_number_16:before { content: "16" !important; }
+        .ranking_number_17:before { content: "17" !important; }
+        .ranking_number_18:before { content: "18" !important; }
+        .ranking_number_19:before { content: "19" !important; }
+        .ranking_number_20:before { content: "20" !important; }
+        .ranking_number_21:before { content: "21" !important; }
+        .ranking_number_22:before { content: "22" !important; }
+        .ranking_number_23:before { content: "23" !important; }
+        .ranking_number_24:before { content: "24" !important; }
+        .ranking_number_25:before { content: "25" !important; }
+        .ranking_number_26:before { content: "26" !important; }
+        .ranking_number_27:before { content: "27" !important; }
+        .ranking_number_28:before { content: "28" !important; }
+        .ranking_number_29:before { content: "29" !important; }
+        .ranking_number_30:before { content: "30" !important; }
         /* Homepage "Trending" / "Popular" tab pills — base CSS uses
            #f3f3f3 (inactive) and #000 (active). Our generic button rule
            targets the <button> element, not <div class="button">. */
@@ -1505,15 +1698,77 @@
            Brand green renders fine against our dark surface as-is. */
 
         /* Pagination row at the bottom of the episode list. Base CSS hard-codes
-           color:#070707 on both .paginate a and strong — invisible on dark. */
+           color:#070707 on both .paginate a and strong — invisible on dark.
+           On the detail page (body.wt-detail) the .paginate row also renders
+           between episode rows because the base places it inside the floated
+           .detail_lst column at a position the floated children paint around.
+           Force it to a normal-flow block at the bottom of the list. Scoped
+           to wt-detail so /canvas pagination (already in normal flow) is
+           untouched — a previous unscoped attempt broke /canvas layout. */
+        body.wt-detail .paginate {
+            position: static !important;
+            display: block !important;
+            clear: both !important;
+            text-align: center !important;
+            margin: 24px 0 8px !important;
+        }
         .paginate a, .paginate strong, .paginate span,
         .paginate.v2 [class^="pg_"] {
             color: var(--wt-text) !important;
         }
-        .paginate a:hover { color: var(--wt-accent) !important; }
-        .paginate .on, .paginate [aria-current="true"] {
-            color: var(--wt-text-on-accent) !important;
+        /* Pagination pills: explicit centered dimensions so both the link
+           and the active <strong> render as the same shape. The base CSS
+           sizes .paginate .on with a sprite background and fixed width
+           which, when combined with naive padding, produces a giant green
+           box with a tiny clipped "1". inline-flex with min-width + height
+           gives a consistent pill regardless of base markup. */
+        .paginate a,
+        .paginate strong,
+        .paginate .on,
+        .paginate [aria-current="true"] {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-width: 28px !important;
+            height: 28px !important;
+            padding: 0 8px !important;
+            margin: 0 2px !important;
+            border-radius: 6px !important;
+            box-sizing: border-box !important;
+            background: none !important;
+            background-image: none !important;
+            text-indent: 0 !important;
+            line-height: 1 !important;
+            transition: background-color .15s ease, color .15s ease, box-shadow .15s ease !important;
         }
+        .paginate a:hover {
+            color: var(--wt-text) !important;
+            background-color: var(--wt-bg-hover) !important;
+            box-shadow: inset 0 0 0 1px var(--wt-accent-soft) !important;
+        }
+        .paginate .on,
+        .paginate [aria-current="true"],
+        .paginate strong {
+            color: var(--wt-text-on-accent) !important;
+            background-color: var(--wt-accent) !important;
+        }
+        /* The next/prev arrows are sprite-backed with a dark fill that
+           disappears on the dark surface. Instead of filter-inverting (which
+           also inverts the hover background, producing a stark white pill),
+           kill the sprite and draw the chevron with text content. The inner
+           icon span is hidden so we don't get a double glyph. */
+        .paginate .pg_next, .paginate .pg_prev,
+        .paginate a[class*="next"], .paginate a[class*="prev"] {
+            background-image: none !important;
+            text-indent: 0 !important;
+            color: var(--wt-text) !important;
+        }
+        .paginate .pg_next > *, .paginate .pg_prev > *,
+        .paginate [class*="ico_arr"] {
+            display: none !important;
+        }
+        .paginate .pg_next::after, .paginate a[class*="next"]::after { content: '›' !important; font-size: 18px !important; line-height: 1 !important; }
+        .paginate .pg_prev::before, .paginate a[class*="prev"]::before { content: '‹' !important; font-size: 18px !important; line-height: 1 !important; }
 
         /* ---------- Static / policy pages ---------- */
 

@@ -47,6 +47,11 @@ Key invariants:
 - **GNB links wrap their text in `<h1>`** — our blanket `h1 { color: var(--wt-text) !important }` rule sets heading colour explicitly, overriding the accent colour inherited from the `<a>`. Always add `#header a[aria-current="true"] h1` alongside the link rule, with `font-size: inherit` and `font-weight: inherit` to prevent the site's UA/base heading styles from shrinking the text.
 - **Do not use `font-size: inherit` on SNB active tabs** — the parent `<li>` computes to 12 px while the base `<a>` tab uses 16 px. `font-size: inherit` on the `<a>` would shrink the active tab. Leave font-size unset on the active rule so the base 16 px is used.
 - **Header and sub-nav need `z-index: 10000`** — the page vignette gradient (`body::before`) uses `z-index: 9999` and `position: fixed; inset: 0`, which covers the right portion of the sub-nav, dimming tabs near the edge. Set `z-index: 10000` on `#header`, `.gnb_wrap`, and `.snb_wrap` so they paint above the gradient.
+- **/canvas genre tabs use `.challenge_cont_area` / `.challenge_item`, NOT `.discover_lst` / `.discover_item`** — the /canvas home tab uses the discover_* family but every genre filter (DRAMA, FANTASY, …) renders cards via `.challenge_cont_area > .challenge_lst > ul > li > a.challenge_item`. Both DOMs need parallel rule sets. The right-rail sidebar (Top CANVAS, Up & Coming) is `.aside.challenge .ranking_lst.viewer > .lst_area` (flex column of two `.lst_area` cards).
+- **`.challenge_cont_area` needs `box-sizing: border-box` + `overflow: visible`** — without `border-box` the section's padding adds outside its computed width and pushes the floated `.aside.challenge` (Top CANVAS / Up & Coming) down below the grid. Without `overflow: visible` on the section, `.challenge_lst`, and the inner `<ul>`, the 1 px right border of the rightmost grid column gets clipped.
+- **Rank-number badges (`[class^="ranking_number_"]`) need text content for 1–30** — the site ships a sprite atlas that covers only 1–10. On /rankings (which goes to 30), ranks 11+ are blank with no fallback. Generate the digit via `::before { content: "N" !important }` for every number 1–30, and keep the rule unscoped (do NOT prefix with `.webtoon_list`) so both homepage trending and /rankings render. `content` must use `!important` because the base CSS sets `content: url(sprite)` at the same specificity.
+- **`.paginate .pg_next` / `.pg_prev` arrows: text chevron, not filter** — a previous attempt used `filter: invert(1)` on the link itself to recolour the sprite, but the filter also inverted the hover background, producing a stark white pill. Replace the sprite with `::after { content: '›' }` and kill `background-image` + `text-indent` on the link instead.
+- **Detail-page pagination needs `position: static; clear: both` scoped to `body.wt-detail`** — base CSS places `.paginate` inside the floated `.detail_lst` column at a position the floats paint around, so the row renders between episode rows. Force normal flow on detail pages only. An unscoped attempt broke /canvas layout where pagination was already correct, hence the body-class gate.
 
 ## Diagnosing a broken selector
 
@@ -80,6 +85,10 @@ The DevTools **Computed** tab shows which rule wins — useful when `!important`
 | `.snb_*` | Sub-nav (day picker, genre tabs) |
 | `.detail_*` | Series detail page |
 | `._listInfo`, `._episodeItem` | Episode list (prefixed = JS-targeted) |
+| `.discover_*` | /canvas home tab — `discover_lst` (grid), `discover_item` (card), `discover_spot` (Recommended Series carousel) |
+| `.challenge_*` | /canvas genre-filtered tabs — `challenge_cont_area` (section), `challenge_lst` (grid wrapper), `challenge_item` (card), `aside.challenge` (right sidebar) |
+| `ranking_number_N` | Rank badge sprite class (1–30). Used on homepage trending and /rankings |
+| `.lst_type1`, `.lst_area` | Generic list/section wrappers used by sidebars on /canvas and /rankings |
 | `[class*="wcc_"]` | WCC comment widget (CSS-module hashed names) |
 | `.u_cbox_*` | Legacy Naver comment widget (fallback) |
 | `._loginLayer`, `._loginDimLayer` | Login modal (injected by gnb bundle) |
@@ -138,6 +147,21 @@ There is no automated test suite — this is a DOM-manipulation script. Manual t
 - [ ] Viewer: no horizontal seams between stacked panels (single container shadow, not per-image)
 - [ ] Viewer: card halo not clipped by parent wrappers (`.cont_box`, `#content`, `.viewer_lst` all `overflow: visible`)
 - [ ] Viewer: panel strip stays centered in the column after `width: fit-content` shrink
+- [ ] Sub-nav bottom separator draws as one continuous line across the full viewport on `/originals`, `/canvas`, `/genre` — no gap in the centered region
+- [ ] Active GNB tab (e.g. RANKINGS, ORIGINALS) renders in accent green at the base font size — text is not shrunken
+- [ ] Active SNB day-of-week / genre tab stays at base 16 px font-size when selected — no shrink to 12 px
+- [ ] Sub-nav tabs near the right viewport edge are bright — not dimmed by the page vignette (`body::before`)
+- [ ] `/canvas` carousel arrows are centered in their dark circles and gain a green tint + glow on hover
+- [ ] Subscriber-count badges on carousel cards render as green-text pills
+- [ ] Viewer aside cards (ranking, info, ad, patron sections) re-wrap correctly after viewer→viewer SPA navigation
+- [ ] `/canvas/genre/*` (DRAMA, FANTASY, …) renders cards inside one elevated section card with 4 columns, ~14 px gap, and the rightmost card's right border visible (not clipped)
+- [ ] `/canvas` right rail shows **Top CANVAS** and **Up & Coming** as two separate stacked elevated cards with 8 px gap between, sidebar 280 px wide
+- [ ] Pagination numbers render as 28 px pills with a visible hover state (`--wt-bg-hover` background + soft-accent ring); active page is a brand-green pill
+- [ ] Pagination next/prev chevrons (`›` / `‹`) render as text on a dark pill; hovering does NOT produce a white background
+- [ ] Detail-page pagination row lands at the bottom of the episode list, not interleaved between rows
+- [ ] `/rankings` page shows all 30 rank numbers as bold dark-mode text (no missing ranks 11–30, no need to toggle the theme to reveal them)
+- [ ] Tab-key navigation shows a 2 px `--wt-border-strong` focus ring with 2 px offset on links / buttons / form fields
+- [ ] Hovering a sub-nav day/genre tab tints it soft accent (`--wt-accent-soft`); the active tab remains brand green (`--wt-accent`) — hover and active are visually distinct
 
 ## Custom slash commands (local only)
 
