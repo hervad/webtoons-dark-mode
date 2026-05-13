@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.2.2
+// @version      1.2.3
 // @description  Scoped dark theme for Webtoons (desktop + mobile) — comic panels render untouched. Elevated viewer card, accent-green active nav, WCAG-tuned contrast, optional reader dim. OS preference on first install; persistent toggle (Alt+Shift+T).
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.2.2';
+    const VERSION = '1.2.3';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -273,6 +273,17 @@
         .discover_spot li:hover img, .spot_lst li:hover img {
             filter: brightness(.7) !important;
         }
+        /* Hover darken extended to: viewer bottom episode strip + viewer sidebar
+           "Trending & Popular" / "Top Originals" rankings. */
+        .episode_lst li .thmb img, .episode_lst li img,
+        .ranking_lst li img, .aside .ranking_lst li img {
+            transition: filter .2s ease !important;
+        }
+        .episode_lst li:hover .thmb img, .episode_lst li:hover img,
+        .ranking_lst li:hover img, .aside .ranking_lst li:hover img {
+            filter: brightness(.7) !important;
+        }
+
         .discover_lst .info { background: transparent !important; }
         .discover_lst .subj { color: var(--wt-text) !important; }
         .discover_lst .grade_num { color: var(--wt-text-dim) !important; }
@@ -1063,6 +1074,55 @@
             color: var(--wt-accent) !important;
             font-weight: 700 !important;
         }
+        /* Episode-strip scroll arrows. Base sprite is dark glyphs on white
+           that disappear into our dark surface; our generic button rule
+           then paints them as small mis-aligned chips. Replace with heavy
+           chevrons at thumbnail height, vertically centered against the
+           87px tall thumbnail row. Scoped to .episode_lst so nothing else
+           is touched even if the class names differ. */
+        .episode_lst .pg_prev, .episode_lst .pg_next {
+            background: rgba(15,17,20,.6) !important;
+            background-image: none !important;
+            border: 1px solid var(--wt-border) !important;
+            border-radius: 6px !important;
+            width: 40px !important;
+            height: 87px !important;
+            top: 12px !important;
+            transform: none !important;
+            font-size: 0 !important;
+            color: transparent !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,.6) !important;
+            transition: background-color .15s, border-color .15s, box-shadow .15s !important;
+        }
+        .episode_lst .pg_prev:hover, .episode_lst .pg_next:hover {
+            background: rgba(0,213,100,.18) !important;
+            border-color: rgba(0,213,100,.6) !important;
+            box-shadow: 0 0 16px rgba(0,213,100,.35) !important;
+        }
+        /* Hide the inner <em> label so it doesn't show alongside the chevron. */
+        .episode_lst .pg_prev > em, .episode_lst .pg_next > em {
+            display: none !important;
+        }
+        /* Heavy chevron drawn via pseudo-element, absolutely positioned + flex
+           centered so the glyph sits dead-center in the button. */
+        .episode_lst .pg_prev::before, .episode_lst .pg_next::after {
+            position: absolute !important;
+            inset: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: var(--wt-text) !important;
+            font-size: 36px !important;
+            line-height: 1 !important;
+            font-weight: normal !important;
+            pointer-events: none !important;
+        }
+        .episode_lst .pg_prev::before { content: '\\276E' !important; }
+        .episode_lst .pg_next::after  { content: '\\276F' !important; }
+        .episode_lst .pg_prev:hover::before,
+        .episode_lst .pg_next:hover::after {
+            color: var(--wt-accent) !important;
+        }
 
         /* Horizontal rules — base CSS leaves them with default browser styling. */
         hr { border-color: var(--wt-border) !important; background: var(--wt-border) !important; }
@@ -1242,6 +1302,27 @@
         }
         [class*="wcc_Editor__editor"] {
             caret-color: var(--wt-text) !important;
+        }
+        /* Comment editor toolbar action icons. The current WCC ships them as
+           inline SVGs with stroke="currentColor" and fill="currentColor"
+           under a TextEditor_* CSS-module class family (not wcc_Editor__).
+           So setting color on the button is enough — no filters needed
+           (filters were flattening the icons to solid white blobs). */
+        [class*="wcc_Editor__actionBar"] button,
+        [class*="wcc_Editor__toolbar"] button,
+        [class*="wcc_Editor__bottomLeftCornerIcon"],
+        [class*="wcc_Editor__bottomLeftCornerIcon"] button,
+        [class*="TextEditor_"] button,
+        [class*="TextEditor_"] [role="button"] {
+            color: var(--wt-text-dim) !important;
+            opacity: 1 !important;
+        }
+        [class*="wcc_Editor__actionBar"] button:hover,
+        [class*="wcc_Editor__toolbar"] button:hover,
+        [class*="wcc_Editor__bottomLeftCornerIcon"] button:hover,
+        [class*="TextEditor_"] button:hover,
+        [class*="TextEditor_"] [role="button"]:hover {
+            color: var(--wt-text) !important;
         }
         /* Spoiler toggle inside the comment editor */
         [class*="wcc_Spoiler__root"], [class*="wcc_Spoiler__text"] {
