@@ -10,13 +10,13 @@ A targeted dark theme for [Webtoons](https://www.webtoons.com) — desktop and m
 
 ## What it does
 
-Applies a dark theme to Webtoons by overriding background, text, border, and surface colors on the actual containers the site uses (header, cards, episode lists, viewer, comments, footer, popups, inputs). Built around a small CSS-variable palette so the whole look can be re-skinned by editing a handful of values.
+Applies a dark theme to Webtoons by overriding background, text, border, and surface colors on the actual containers the site uses — header, sub-nav, cards, episode lists, viewer, carousel arrows, comments, footer, popups, inputs. Built around a small CSS-variable palette so the whole look can be re-skinned by editing a handful of values.
 
-On the viewer page, the comic panel strip is wrapped as a single elevated card — rounded corners, hairline outline, soft halo on all sides — without inserting any extra DOM elements (one container box-shadow does the lift). Homepage, detail, /canvas (home + genre tabs), and /rankings pages get matching three-level elevation (page → section card → comic card), plus per-card depth shadows and a `:hover` darken that makes title overlays readable.
+On the viewer page, the comic panel strip renders as a single elevated card — rounded corners, hairline outline, soft halo on all sides — without inserting any extra DOM elements (one container `box-shadow` does the lift, so there are no per-image seams). Homepage, series detail, `/canvas` (home + genre tabs), and `/rankings` pages get matching three-level elevation (page → section card → comic card), per-card depth shadows, and a `:hover` darken that makes title overlays readable. Active GNB and SNB tabs render in accent green at the base font size; carousel prev/next arrows are centered SVG chevrons with a green hover tint.
 
-It also ships an optional **reader dim** mode that lowers comic-panel brightness for late-night reading without affecting the rest of the page.
+An optional **reader dim** mode (`Alt+Shift+N`) lowers comic-panel brightness for late-night reading without affecting the rest of the page.
 
-WCAG-aware: contrast ratios verified for text and UI components (border 3:1, body text 14:1, accent 9:1 against the base surface). A `:focus-visible` ring is drawn on every interactive control so keyboard navigation is usable — the base site ships no visible focus indicator.
+WCAG-aware: contrast ratios verified for text and UI components (border 3:1, body text 14:1, accent 9:1 against the base surface, dim text 9.1:1). A `:focus-visible` ring is drawn on every interactive control so keyboard navigation is usable — the base site ships no visible focus indicator.
 
 ## Why not just use [a global `filter: invert()` userstyle](https://en.wikipedia.org/wiki/Filter_(higher-order_function))?
 

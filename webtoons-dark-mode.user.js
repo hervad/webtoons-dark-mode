@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.2.1
-// @description  Targeted dark theme for Webtoons (desktop + mobile). Respects OS dark/light preference on first install. Persistent toggle, optional reader dim, no image inversion.
+// @version      1.2.2
+// @description  Scoped dark theme for Webtoons (desktop + mobile) — comic panels render untouched. Elevated viewer card, accent-green active nav, WCAG-tuned contrast, optional reader dim. OS preference on first install; persistent toggle (Alt+Shift+T).
 // @author       hervad
 // @match        https://www.webtoons.com/*
 // @match        https://m.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.2.1';
+    const VERSION = '1.2.2';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -1931,6 +1931,82 @@
         }
         .paginate .pg_next::after, .paginate a[class*="next"]::after { content: '›' !important; font-size: 18px !important; line-height: 1 !important; }
         .paginate .pg_prev::before, .paginate a[class*="prev"]::before { content: '‹' !important; font-size: 18px !important; line-height: 1 !important; }
+
+        /* Viewer toolbar prev/next-episode buttons (.paginate.v2 around #N).
+           Same class family as the bottom-of-list pager but rendered at
+           toolbar scale. Three things needed:
+           1. Size the buttons explicitly (the disabled .pg_next.dim is a
+              <span>, not <a>, so it picks up no pill rule from the generic
+              .paginate a rule — zero dimensions, chevron invisible).
+           2. Match parent line-height to button height so the text "#N"
+              and the buttons share the same line metrics — without this,
+              vertical-align:middle still leaves the buttons below text.
+           3. Replace the thin ‹ › guillemets the generic .paginate rule
+              injects with the heavy chevron ornaments ❮ ❯ (same as the
+              snb scroll arrows), and absolutely-position the pseudo
+              inside the button — centering becomes bulletproof regardless
+              of font metrics. Specificity beats the generic rule. */
+        .paginate.v2 {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+        }
+        .paginate.v2 .pg_prev,
+        .paginate.v2 .pg_next {
+            display: inline-block !important;
+            position: relative !important;
+            width: 36px !important;
+            min-width: 36px !important;
+            height: 36px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border-radius: 6px !important;
+            background: none !important;
+            background-image: none !important;
+            text-indent: 0 !important;
+            color: var(--wt-text) !important;
+            flex: 0 0 auto !important;
+        }
+        .paginate.v2 ._btnOpenEpisodeList,
+        .paginate.v2 .tx {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 36px !important;
+            line-height: 1 !important;
+            flex: 0 0 auto !important;
+            /* Nudge text up to optically align with the chevron centers.
+               Empirical offset — flex-centering the line-box doesn't match
+               the digits' visual center because "#289" has no descenders. */
+            transform: translateY(-5px) !important;
+        }
+        .paginate.v2 .pg_prev::before { content: '\\276E' !important; }
+        .paginate.v2 .pg_next::after  { content: '\\276F' !important; }
+        .paginate.v2 .pg_prev::before,
+        .paginate.v2 .pg_next::after {
+            position: absolute !important;
+            inset: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 28px !important;
+            font-weight: normal !important;
+            line-height: 1 !important;
+            color: inherit !important;
+        }
+        .paginate.v2 a.pg_prev:hover,
+        .paginate.v2 a.pg_next:hover {
+            background-color: var(--wt-bg-hover) !important;
+            color: var(--wt-accent) !important;
+            box-shadow: inset 0 0 0 1px var(--wt-accent-soft) !important;
+        }
+        .paginate.v2 .pg_prev.dim,
+        .paginate.v2 .pg_next.dim {
+            opacity: 0.35 !important;
+            cursor: default !important;
+            pointer-events: none !important;
+        }
 
         /* ---------- Static / policy pages ---------- */
 

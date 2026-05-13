@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-05-13
+
+### Fixed
+
+- Viewer toolbar prev/next-episode buttons (`.paginate.v2 .pg_prev` / `.pg_next` around the `#N` chapter number) no longer render as tiny mis-aligned chevrons. They now sit as 40×40 buttons with a centered 28px chevron, a green hover tint, and a visibly faded (`opacity: 0.35`) state when the button is disabled (`.dim`, e.g. on the first or last episode). The previous styling cascaded down from the bottom-of-list pagination rules: the prev anchor inherited a 28×28 pill from `.paginate a`, and the disabled next `<span>` matched no pill rule at all — making it invisible.
+
 ## [1.2.1] - 2026-05-13
 
 ### Fixed
