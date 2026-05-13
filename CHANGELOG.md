@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-05-13
+
+### Fixed
+
+- Viewer bottom episode-strip scroll arrows (`.episode_lst .pg_prev` / `.pg_next`) now render as 40×87 buttons with heavy chevrons (`❮ ❯`), aligned with the thumbnail row, instead of tiny mis-positioned sprite glyphs.
+- Comment editor toolbar action icons (image / sticker / GIF / etc., under `TextEditor_*` CSS modules) are now visible at `--wt-text-dim` and brighten on hover. They render as inline SVGs with `stroke="currentColor"` / `fill="currentColor"`, so setting `color` on the parent button is enough — earlier filter-based attempts flattened them to solid white blobs.
+- Viewer toolbar prev/next-episode buttons (`.paginate.v2`) refinement: parent is now `display: flex; align-items: center` so the chevrons and the `#N` text line up geometrically; the text span gets `transform: translateY(-5px)` to compensate for the digits' optical-vs-geometric center offset.
+
+### Added
+
+- Hover-darken extended to the viewer bottom episode-strip thumbnails and the viewer sidebar rankings (`.aside .ranking_lst li img`) — matches the homepage card behaviour.
+
 ## [1.2.2] - 2026-05-13
 
 ### Fixed
