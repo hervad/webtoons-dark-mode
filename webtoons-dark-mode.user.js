@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.2.3
+// @version      1.2.4
 // @description  Scoped dark theme for Webtoons (desktop + mobile) — comic panels render untouched. Elevated viewer card, accent-green active nav, WCAG-tuned contrast, optional reader dim. OS preference on first install; persistent toggle (Alt+Shift+T).
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.2.3';
+    const VERSION = '1.2.4';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -49,11 +49,12 @@
             --wt-border-strong:   #5a6472;
             --wt-text:            #e6e6e6;
             --wt-text-dim:        #b5b9c0;
-            --wt-text-mute:       #7b828d;
+            --wt-text-mute:       #878e99;
             --wt-text-on-accent:  #0a0a0a;
             --wt-link:            #7cb6ff;
             --wt-accent:          #00d564;
             --wt-accent-soft:     #4ade80;
+            --wt-accent-like:     #f06868;
             --wt-shadow:          0 1px 2px rgba(0,0,0,.6);
         }
     `;
@@ -86,11 +87,11 @@
            turns their text bright blue on hover which looks broken. Keep
            the button's own text color on hover. */
         a.btn:hover, a[class*="btn_" i]:hover,
-        a[class*="button" i]:hover, a[class*="Button" i]:hover,
+        a[class*="button" i]:hover,
         a[role="button"]:hover, button a:hover,
-        [class*="cta" i]:hover, [class*="CTA"]:hover,
-        a[class*="primary" i]:hover, a[class*="Primary"]:hover,
-        a[class*="Continue" i]:hover {
+        a[class~="cta"]:hover, a[class*="_cta_" i]:hover, a[class*="_cta" i]:hover,
+        a[class*="primary" i]:hover,
+        a.lk_continue:hover, a._btn_enter:hover {
             color: inherit !important;
         }
 
@@ -133,8 +134,7 @@
            ID prefixes (#header / #gnbWrap) boost specificity above the site's
            own color rule which wins at 0,2,1 or lower. */
         #header .gnb a[aria-current="true"], #gnbWrap .gnb a[aria-current="true"],
-        #header .lnb a[aria-current="true"], #gnbWrap .lnb a[aria-current="true"],
-        .gnb a[aria-current="true"], .lnb a[aria-current="true"] {
+        #header .lnb a[aria-current="true"], #gnbWrap .lnb a[aria-current="true"] {
             color: var(--wt-accent) !important;
             box-shadow: inset 0 -2px 0 var(--wt-accent) !important;
             border-radius: 6px 6px 0 0 !important;
@@ -251,6 +251,10 @@
         a.discover_item:hover {
             background: var(--wt-bg-elev2) !important;
         }
+        a.discover_item:hover .subj,
+        a.discover_item:hover .title,
+        .discover_lst li:hover .subj,
+        .discover_lst li:hover .title { color: var(--wt-accent) !important; }
 
         /* Hover darken: when the cursor lands on a card thumbnail, dim the
            artwork so the title/genre overlay (which sits on top of the image
@@ -296,31 +300,31 @@
            container, no border, no rounded corners. Mirror the .discover_item
            treatment so /canvas/{genre} matches /canvas home visually. */
         a.challenge_item {
-            background: var(--wt-bg-elev) !important;
+            background: transparent !important;
             color: var(--wt-text) !important;
-            border-radius: 10px !important;
-            overflow: hidden !important;
-            border: 1px solid var(--wt-border) !important;
+            border-radius: 6px !important;
+            overflow: visible !important;
+            border: 0 !important;
+            box-shadow: none !important;
             display: block !important;
-            /* Depth: a soft drop shadow plus a 1 px inset hairline highlight
-               at the top makes each card read as a lifted tile rather than a
-               flat rectangle. The inset highlight catches "light from above". */
-            box-shadow:
-                0 2px 6px rgba(0,0,0,.45),
-                0 8px 20px rgba(0,0,0,.35),
-                inset 0 1px 0 rgba(255,255,255,.06) !important;
-            transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease !important;
+            /* Flat tile — parent .challenge_cont_area provides elevation.
+               overflow: visible so the rounded image (clipped on the img/thmb
+               itself, not the anchor) doesn't fight a square clip box. */
+            transition: color .15s ease !important;
         }
-        /* Hover: stay in place (no transform / no shadow upgrade) and just
-           darken the card. Movement / scaling on hover feels noisy when
-           browsing a dense grid — the static darken matches conventions
-           on other manhwa aggregator sites. */
-        a.challenge_item:hover {
-            background: #0e1013 !important;
-            border-color: #2a2f37 !important;
-        }
+        a.challenge_item:hover { background: transparent !important; }
         .challenge_item img { transition: filter .2s ease !important; }
         a.challenge_item:hover img { filter: brightness(.7) !important; }
+        a.challenge_item:hover .subj,
+        a.challenge_item:hover .title { color: var(--wt-accent) !important; }
+        /* Kill background/border on the parent <li> that 'Cards / lists'
+           rule painted — same "flat tile" reasoning. */
+        .challenge_lst li,
+        .challenge_cont_area .challenge_lst li {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+        }
         .challenge_item .info,
         .challenge_item .info_area,
         .challenge_item .area_genre { background: transparent !important; }
@@ -328,8 +332,15 @@
         .challenge_item .title { color: var(--wt-text) !important; }
         .challenge_item .area_genre,
         .challenge_item .genre,
-        .challenge_item .author,
-        .challenge_item .grade_num { color: var(--wt-text-dim) !important; }
+        .challenge_item .author { color: var(--wt-text) !important; }
+        /* Like / subscriber counter on canvas cards — match the green heart
+           icon so number + icon read as one element. */
+        .challenge_item .grade_num,
+        .challenge_item .num,
+        .challenge_item .like_area .num,
+        .challenge_item .like_area,
+        .challenge_item .subscribe,
+        .challenge_item .subscribe_count { color: var(--wt-accent) !important; }
         /* Wrap the whole canvas grid in one elevated section card to match
            how other listing pages group their content. box-sizing:border-box
            is critical — without it, the 24 px padding adds outside the
@@ -376,6 +387,11 @@
             max-width: 100% !important;
             height: auto !important;
             display: block !important;
+            /* Soft rounding on all four corners of the thumbnail itself so
+               the card image reads as a discrete tile (rather than a
+               half-rounded slab that meets a square text strip below). */
+            border-radius: 6px !important;
+            overflow: hidden !important;
         }
         a.challenge_item { min-width: 0 !important; max-width: 100% !important; }
         /* Base CSS draws a 1 px light separator at the bottom of multiple
@@ -402,17 +418,95 @@
         /* Shrink the floated sidebar slightly so the grid section gets more
            horizontal room (the rightmost card column was being shaved). */
         .aside.challenge { width: 280px !important; }
-        .aside.challenge .lst_area {
-            background: var(--wt-bg-elev) !important;
-            border: 1px solid var(--wt-border) !important;
+        /* Card-style outer wrapper for Top CANVAS (#challengeGenreRanking)
+           and Up & Coming (#upcomingChallengeRanking). Match background and
+           padding across both so they read as a matched pair. Extra
+           padding-bottom guarantees the last ranking-row tile's bottom
+           border has clearance from the panel edge. */
+        .aside.challenge .lst_area,
+        #challengeGenreRanking,
+        #upcomingChallengeRanking,
+        .ranking_lst.viewer > .lst_area,
+        .ranking_lst.viewer .lst_area {
+            background: var(--wt-bg-elev2) !important;
+            background-color: var(--wt-bg-elev2) !important;
+            border: 1px solid rgba(255,255,255,.4) !important;
             border-radius: 12px !important;
             padding: 14px !important;
             box-sizing: border-box !important;
             box-shadow:
-                0 2px 6px rgba(0,0,0,.45),
-                0 8px 20px rgba(0,0,0,.35),
-                inset 0 1px 0 rgba(255,255,255,.06) !important;
+                inset 0 0 0 1px rgba(255,255,255,.08),
+                0 4px 12px rgba(0,0,0,.55),
+                0 12px 28px rgba(0,0,0,.45) !important;
             margin: 0 !important;
+        }
+        /* Flat ranking rows inside Top CANVAS / Up & Coming — no per-row
+           border or background ("volume"). Hover only turns the title green. */
+        .aside.challenge .lst_type1 > li,
+        #challengeGenreRanking .lst_type1 > li,
+        #upcomingChallengeRanking .lst_type1 > li,
+        .ranking_lst.viewer .lst_type1 > li {
+            border: 0 !important;
+            background: transparent !important;
+            padding: 6px 0 !important;
+            margin: 0 !important;
+            transition: color .15s ease !important;
+        }
+        .aside.challenge .lst_type1 > li:hover,
+        #challengeGenreRanking .lst_type1 > li:hover,
+        #upcomingChallengeRanking .lst_type1 > li:hover,
+        .ranking_lst.viewer .lst_type1 > li:hover {
+            background: transparent !important;
+        }
+        .aside.challenge .lst_type1 > li:hover .subj,
+        #challengeGenreRanking .lst_type1 > li:hover .subj,
+        #upcomingChallengeRanking .lst_type1 > li:hover .subj,
+        .ranking_lst.viewer .lst_type1 > li:hover .subj {
+            color: var(--wt-accent) !important;
+        }
+        /* Header arrow (.ico_arr1) next to "Top CANVAS" / "Up & Coming" —
+           force inline-flex alignment so the chevron sits beside the title
+           text, not on the line below it. Base CSS often gives ico_arr1
+           display:block or width:14px (sprite). */
+        #challengeGenreRanking .ico_arr1,
+        #upcomingChallengeRanking .ico_arr1,
+        .ranking_lst.viewer .title_area .ico_arr1,
+        .aside.challenge .title_area .ico_arr1,
+        .title_area h2 .ico_arr1 {
+            background-image: none !important;
+            background: none !important;
+            color: var(--wt-text-dim) !important;
+            font-size: 18px !important;
+            line-height: 1 !important;
+            font-style: normal !important;
+            font-weight: 400 !important;
+            text-indent: 0 !important;
+            overflow: visible !important;
+            white-space: nowrap !important;
+            filter: none !important;
+            width: auto !important;
+            height: auto !important;
+            min-width: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            margin: 0 0 0 6px !important;
+            padding: 0 !important;
+            vertical-align: middle !important;
+            position: static !important;
+            top: auto !important;
+        }
+        /* Make sure the parent h2 lays children out inline. */
+        #challengeGenreRanking .title_area h2,
+        #upcomingChallengeRanking .title_area h2,
+        .aside.challenge .title_area h2 {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0 !important;
+        }
+        #challengeGenreRanking .title_area h2 span,
+        #upcomingChallengeRanking .title_area h2 span,
+        .aside.challenge .title_area h2 span {
+            display: inline !important;
         }
         /* Tight stacking: kill the flex column gap entirely and zero any
            top margin on the second .lst_area so Up & Coming sits directly
@@ -423,13 +517,6 @@
         }
         .aside.challenge .lst_area + .lst_area { margin-top: 8px !important; }
         .aside.challenge .lst_type1 { border-bottom: none !important; }
-        .aside.challenge .lst_type1 > li {
-            background: transparent !important;
-            border-bottom: 1px solid var(--wt-border) !important;
-            padding: 8px 0 !important;
-        }
-        .aside.challenge .lst_type1 > li:last-child { border-bottom: none !important; }
-        .aside.challenge .lst_type1 > li:hover { background: var(--wt-bg-elev2) !important; }
         .aside.challenge h2, .aside.challenge h3,
         .aside.challenge .title_area { color: var(--wt-text) !important; }
         /* Subscriber-count badge overlaid on each carousel card thumbnail.
@@ -465,7 +552,7 @@
             overflow: hidden !important;
             border-radius: 16px !important;
             background: var(--wt-bg) !important;
-            padding-top: 0px !important;
+            padding-top: 0 !important;
         }
         .detail_header { color: var(--wt-text) !important; }
 
@@ -488,20 +575,28 @@
            Ships as <a class="contest_banner" style="background-color: #bdffdb">
            with an inline mint-green PNG inside. Override the inline style with
            !important and tone the embedded image down so it blends with dark. */
+        /* Promotional banners on /canvas. The <a class="contest_banner"> ships
+           with inline style="background-color: #bdffdb" (mint green) and an
+           <img> child whose pixels are also mint green. We override the inline
+           bg and clip the image so its mint-green padding doesn't bleed past
+           the dark anchor — image stretches to fill the full anchor width
+           via object-fit, with the mint-green centre portion heavily
+           desaturated so it blends with the dark page. */
         .contest_banner, a.contest_banner {
             background-color: var(--wt-bg-elev) !important;
-            border-radius: 8px !important;
+            border-radius: 0 !important;
             overflow: hidden !important;
+            display: block !important;
+            position: relative !important;
         }
-        /* Aggressive darkening so the mint-green PNG image actually blends into
-           the dark page — the background-color override only affects areas the
-           image doesn't cover; the image itself must be filtered dark. */
         .contest_banner img {
-            filter: brightness(.35) saturate(.45) !important;
+            display: block !important;
+            margin: 0 auto !important;
+            filter: brightness(.32) saturate(.35) contrast(1.05) !important;
             transition: filter .2s !important;
         }
         .contest_banner:hover img {
-            filter: brightness(.55) saturate(.65) !important;
+            filter: brightness(.5) saturate(.55) contrast(1.05) !important;
         }
 
         /* Sub-nav (snb): day-of-week picker AND genre tabs share this component */
@@ -618,8 +713,57 @@
         /* "View all ›" link in section header. */
         .section_header .button_view_all { color: var(--wt-text-dim) !important; }
         .section_header .button_view_all:hover { color: var(--wt-accent-soft) !important; }
+        /* "more ›" link — two element variants render this:
+           - .button_view_all (homepage sections) — chevron via ::after sprite
+           - a.lk_more (canvas / popular-by-category) — chevron via a
+             child <span class="ico_arr"> sprite
+           Both inherit text colour from our a/h rules, but the chevron sprite
+           ships as a dark glyph. Strip the sprite and either inject our own
+           text chevron (::after) or invert the inline span. */
+        a.lk_more, .lk_more {
+            color: var(--wt-text-dim) !important;
+        }
+        a.lk_more:hover, .lk_more:hover {
+            color: var(--wt-accent-soft) !important;
+        }
+        .lk_more .ico_arr {
+            background-image: none !important;
+            background: none !important;
+            width: auto !important;
+            height: auto !important;
+            text-indent: 0 !important;
+            overflow: visible !important;
+            white-space: normal !important;
+            display: inline-block !important;
+            vertical-align: middle !important;
+            margin-left: 4px !important;
+        }
+        .lk_more .ico_arr::after {
+            content: '\\203A' !important;
+            color: inherit !important;
+            font-size: 18px !important;
+            line-height: 1 !important;
+        }
+        .button_view_all::after,
+        .section_header .button_view_all::after {
+            background-image: none !important;
+            background: none !important;
+            content: '\\203A' !important;
+            color: inherit !important;
+            font-size: 18px !important;
+            line-height: 1 !important;
+            width: auto !important;
+            height: auto !important;
+            margin-left: 4px !important;
+            text-indent: 0 !important;
+            overflow: visible !important;
+            white-space: normal !important;
+        }
 
-        /* Comic cards within section containers: elevated above the section bg. */
+        /* Comic cards within section containers: flat tiles. The parent
+           section already provides elevation, so per-card shadow + lift
+           created a "double volume" effect. Hover = image darken (handled by
+           the generic .card_item img rule above) + title turns accent green. */
         .main_section .card_item,
         .main_section .card_lst li,
         .main_section .webtoon_list li,
@@ -628,36 +772,88 @@
         .webtoon_list_wrap ._popularList li,
         .webtoon_list_wrap ._dailyList li,
         .webtoon_list_wrap .webtoon_list li {
-            background: var(--wt-bg-elev2) !important;
-            border-color: rgba(255,255,255,.06) !important;
+            background: transparent !important;
+            border-color: transparent !important;
             border-radius: 10px !important;
-            box-shadow: 0 4px 16px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.3) !important;
-            transition: transform .18s ease, box-shadow .18s ease, border-color .18s !important;
+            box-shadow: none !important;
+            transform: none !important;
+            transition: color .15s ease !important;
         }
-        .main_section .card_item:hover,
-        .main_section .card_lst li:hover,
-        .main_section .webtoon_list li:hover,
-        .webtoon_list_wrap .card_item:hover,
-        .webtoon_list_wrap .card_lst li:hover,
-        .webtoon_list_wrap ._popularList li:hover,
-        .webtoon_list_wrap ._dailyList li:hover,
-        .webtoon_list_wrap .webtoon_list li:hover {
-            transform: translateY(-6px) scale(1.02) !important;
-            background: #30363f !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 0 0 1px rgba(255,255,255,.15) !important;
-            border-color: rgba(255,255,255,.15) !important;
+        .main_section .card_item:hover .title,
+        .main_section .card_item:hover .subj,
+        .main_section .card_lst li:hover .title,
+        .main_section .card_lst li:hover .subj,
+        .main_section .webtoon_list li:hover .title,
+        .main_section .webtoon_list li:hover .subj,
+        .webtoon_list_wrap .card_item:hover .title,
+        .webtoon_list_wrap .card_item:hover .subj,
+        .webtoon_list_wrap .card_lst li:hover .title,
+        .webtoon_list_wrap .card_lst li:hover .subj,
+        .webtoon_list_wrap ._popularList li:hover .title,
+        .webtoon_list_wrap ._popularList li:hover .subj,
+        .webtoon_list_wrap ._dailyList li:hover .title,
+        .webtoon_list_wrap ._dailyList li:hover .subj,
+        .webtoon_list_wrap .webtoon_list li:hover .title,
+        .webtoon_list_wrap .webtoon_list li:hover .subj {
+            color: var(--wt-accent) !important;
         }
-        /* Card text area: more breathing room for title + view count. */
+        /* Card text area: title sits on its own row; genre + like/view sit
+           on a single row beneath. flex-wrap allows fallback to two rows on
+           very narrow cards. Removing the previous .view_count margin-top is
+           what brings the count onto the same line as .genre. */
         .webtoon_list .info_text {
             margin-top: 10px !important;
             padding: 0 4px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
         }
-        .webtoon_list .view_count {
-            margin-top: 5px !important;
-            color: var(--wt-text-mute) !important;
-        }
-        .webtoon_list .title {
+        .webtoon_list .info_text .title {
             color: var(--wt-text) !important;
+        }
+        .webtoon_list .info_text > .genre,
+        .webtoon_list .info_text > .view_count,
+        .webtoon_list .info_text > .like_count,
+        .webtoon_list .info_text > .count_like {
+            display: inline-block !important;
+            margin: 0 !important;
+        }
+        /* Heart / view counter inherits the brand-green heart-icon colour so
+           number and icon read as one element. */
+        .webtoon_list .view_count,
+        .webtoon_list .like_count,
+        .webtoon_list .count_like {
+            color: var(--wt-accent) !important;
+        }
+        /* Pair genre with the heart/view stat on one row. Wraps both children
+           in a flex row when both exist. Uses :has() so cards with only one
+           child fall back gracefully. */
+        .webtoon_list .info_text:has(.genre + .view_count),
+        .webtoon_list .info_text:has(.genre + .like_count),
+        .webtoon_list .info_text:has(.genre + .count_like) {
+            display: grid !important;
+            grid-template-columns: 1fr auto !important;
+            grid-template-areas:
+                "title title"
+                "genre stat" !important;
+            column-gap: 8px !important;
+        }
+        .webtoon_list .info_text > .title { grid-area: title !important; }
+        .webtoon_list .info_text > .genre { grid-area: genre !important; }
+        .webtoon_list .info_text > .view_count,
+        .webtoon_list .info_text > .like_count,
+        .webtoon_list .info_text > .count_like { grid-area: stat !important; justify-self: end !important; }
+        /* Green hover on the heart/view number. */
+        .main_section .card_item:hover .view_count,
+        .main_section .card_item:hover .like_count,
+        .main_section .card_item:hover .count_like,
+        .webtoon_list_wrap li:hover .view_count,
+        .webtoon_list_wrap li:hover .like_count,
+        .webtoon_list_wrap li:hover .count_like,
+        .webtoon_list li:hover .view_count,
+        .webtoon_list li:hover .like_count,
+        .webtoon_list li:hover .count_like {
+            color: var(--wt-accent) !important;
         }
 
         /* Section header text. */
@@ -675,6 +871,287 @@
         .sort_by[aria-current="true"], ._sort_by_a[aria-current="true"] {
             color: var(--wt-text) !important;
         }
+
+        /* /canvas sort dropdown ("Sort by Date ▾"). Trigger is .sort_area .checked,
+           panel is .sort_box. Base ships a white panel with a sprite checkmark
+           — both invisible on dark. Render the trigger as a soft pill with a
+           subtle chevron, and the panel as an elevated card with hover rows. */
+        /* Trigger pill — best-practice sort/filter button:
+           - Clear affordance: icon prefix + label + caret suffix
+           - Distinct open state via [aria-expanded="true"]
+           - Generous touch target, focus-visible safe (--wt-border-strong) */
+        .sort_area .checked {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            position: relative !important;
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text) !important;
+            border: 1px solid rgba(255,255,255,.22) !important;
+            border-radius: 999px !important;
+            padding: 8px 32px 8px 30px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            line-height: 16px !important;
+            white-space: nowrap !important;
+            cursor: pointer !important;
+            box-shadow: 0 1px 0 rgba(255,255,255,.04) !important;
+            transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease !important;
+        }
+        /* Sort-icon glyph (⇅) prefix — communicates the button's purpose. */
+        .sort_area .checked::before {
+            content: '\\21F5' !important;
+            position: absolute !important;
+            left: 12px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            font-size: 13px !important;
+            color: var(--wt-text-dim) !important;
+            line-height: 1 !important;
+            transition: color .15s ease !important;
+        }
+        .sort_area .checked:hover {
+            background: var(--wt-bg-hover) !important;
+            border-color: var(--wt-accent) !important;
+            color: var(--wt-accent) !important;
+            box-shadow: 0 0 0 3px rgba(0,213,100,.12) !important;
+        }
+        .sort_area .checked:hover::before { color: var(--wt-accent) !important; }
+        /* Open state — solid accent border ring + brighter bg so it reads
+           clearly as "active/pressed". Mirrors common dropdown patterns. */
+        .sort_area .checked[aria-expanded="true"] {
+            background: var(--wt-bg-hover) !important;
+            border-color: var(--wt-accent) !important;
+            color: var(--wt-accent) !important;
+            box-shadow: 0 0 0 3px rgba(0,213,100,.18) !important;
+        }
+        .sort_area .checked[aria-expanded="true"]::before { color: var(--wt-accent) !important; }
+        /* Outer page sort (.sort_area._sorting) on /canvas/list — lift it
+           ABOVE the cards section block entirely using negative top so the
+           pill sits as a free-standing control, not overlapping the grid.
+           The section card has 16px+ padding so position:absolute relative
+           to the section card with top:-48px clears the top edge. */
+        .challenge_cont_area { position: relative !important; }
+        .sort_area._sorting {
+            position: absolute !important;
+            right: 4px !important;
+            top: -52px !important;
+            left: auto !important;
+            margin: 0 !important;
+            display: inline-block !important;
+            float: none !important;
+            z-index: 50 !important;
+        }
+        .sort_area._sorting .checked {
+            padding: 11px 32px !important;
+            font-size: 15px !important;
+            letter-spacing: .02em !important;
+            min-width: 160px !important;
+        }
+        .sort_area._sorting .sort_box {
+            right: 0 !important;
+            top: calc(100% + 6px) !important;
+            min-width: 200px !important;
+            z-index: 200 !important;
+        }
+        /* Inner Top-CANVAS filter (.sort_area._filterArea) — shares the
+           .title_area row with the "Top CANVAS" h2. Keep it compact so long
+           labels (HEARTWARMING, SUPERNATURAL) don't push the row. */
+        .sort_area._filterArea {
+            position: relative !important;
+            top: auto !important;
+            right: auto !important;
+            margin-left: auto !important;
+            flex-shrink: 0 !important;
+            z-index: 5 !important;
+        }
+        .sort_area._filterArea .checked {
+            padding: 5px 14px !important;
+            font-size: 11px !important;
+            letter-spacing: .04em !important;
+            min-width: 90px !important;
+            max-width: 140px !important;
+            text-overflow: ellipsis !important;
+            overflow: hidden !important;
+        }
+        /* Compact filter pill: no leading ⇅ icon, no trailing caret — the
+           label alone is sufficient in this context, and removing both
+           glyphs frees space for long category names. */
+        .sort_area._filterArea .checked::before { content: none !important; display: none !important; }
+        .sort_area._filterArea .checked .ico_chk,
+        .sort_area._filterArea .checked .ico_chk::after { display: none !important; content: none !important; }
+        .sort_area._filterArea .sort_box._filterLayer {
+            right: 0 !important;
+            top: calc(100% + 4px) !important;
+            min-width: 160px !important;
+            max-height: 280px !important;
+            overflow-y: auto !important;
+            /* High z-index so the panel paints above the ranking-number
+               sprites (.ico_nN) AND the body::before vignette gradient
+               (z-index 9999). 10001 clears both unconditionally. */
+            z-index: 10001 !important;
+            background: var(--wt-bg-elev) !important;
+            background-color: var(--wt-bg-elev) !important;
+            isolation: isolate !important;
+        }
+        /* Lift the filter pill's stacking context above sibling card rows
+           so the panel it spawns isn't trapped beneath them. */
+        .sort_area._filterArea { z-index: 10000 !important; }
+        /* Make the .title_area inside the Top CANVAS card a flex row so the
+           h2 and the filter pill align horizontally without one pushing
+           the other. */
+        .aside.challenge .lst_area .title_area {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+        }
+        .aside.challenge .lst_area .title_area h2 {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+        }
+        /* Replace the sprite check-mark icon next to the trigger with a
+           caret-down so users see it's a dropdown. */
+        .sort_area .checked .ico_chk {
+            background: none !important;
+            background-image: none !important;
+            width: auto !important;
+            height: auto !important;
+            position: absolute !important;
+            top: 50% !important;
+            right: 10px !important;
+            transform: translateY(-50%) !important;
+            line-height: 1 !important;
+            pointer-events: none !important;
+        }
+        .sort_area .checked .ico_chk::after {
+            content: '\\25BE' !important;
+            color: var(--wt-text-dim) !important;
+            font-size: 11px !important;
+            display: block !important;
+            transition: transform .15s ease, color .15s ease !important;
+        }
+        /* Caret rotates 180° when the panel is open — visual confirmation
+           that the menu is expanded. */
+        .sort_area .checked[aria-expanded="true"] .ico_chk::after {
+            transform: rotate(180deg) !important;
+            color: var(--wt-accent) !important;
+        }
+        .sort_area .checked:hover .ico_chk::after { color: var(--wt-accent) !important; }
+        /* Dropdown panel — elevated card with smooth open animation and
+           ≥40 px hit targets on each option for accessibility. */
+        .sort_box {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid var(--wt-border-strong) !important;
+            border-radius: 10px !important;
+            padding: 6px !important;
+            box-shadow:
+                0 12px 32px rgba(0,0,0,.6),
+                0 4px 8px rgba(0,0,0,.4) !important;
+            overflow: hidden !important;
+            transform-origin: top right !important;
+            animation: wt-sortbox-in .14s ease-out !important;
+        }
+        @keyframes wt-sortbox-in {
+            from { opacity: 0; transform: translateY(-4px) scale(.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .sort_box li {
+            height: auto !important;
+            padding: 0 !important;
+            text-align: left !important;
+            background: transparent !important;
+            border-bottom: 0 !important;
+        }
+        .sort_box a {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            color: var(--wt-text-dim) !important;
+            padding: 10px 14px !important;
+            border-radius: 6px !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            line-height: 1.2 !important;
+            min-height: 22px !important;
+            height: auto !important;
+            transition: background-color .12s ease, color .12s ease, padding .12s ease !important;
+        }
+        .sort_box a:hover {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text) !important;
+            padding-left: 18px !important;
+        }
+        .sort_box .ico_chk {
+            background: none !important;
+            background-image: none !important;
+            width: auto !important;
+            height: auto !important;
+            position: static !important;
+            margin-left: 8px !important;
+        }
+        /* Active option — accent text + soft-tinted background tile so it
+           reads at a glance, not just by colour difference. */
+        .sort_box .on a,
+        .sort_box [aria-current="true"],
+        .sort_box li.on a,
+        .sort_box li a[aria-current="true"] {
+            color: var(--wt-accent) !important;
+            background: rgba(0,213,100,.12) !important;
+            font-weight: 700 !important;
+        }
+        .sort_box .on a:hover,
+        .sort_box li a[aria-current="true"]:hover {
+            background: rgba(0,213,100,.18) !important;
+            padding-left: 14px !important;
+        }
+        .sort_box .on .ico_chk::after,
+        .sort_box [aria-current="true"] .ico_chk::after,
+        .sort_box li a[aria-current="true"] .ico_chk::after {
+            content: '\\2713' !important;
+            color: var(--wt-accent) !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+        }
+
+        /* Genre labels (.genre.g_romance, .g_fantasy, …) — Webtoons' light
+           theme tints these per category. Reproduce on dark, lightening the
+           originally-dark hues (navy / brown / charcoal) so they stay legible. */
+        .genre.g_romance, .g_romance { color: #fd337f !important; }
+        .genre.g_romance_m, .g_romance_m { color: #fd337f !important; }
+        .genre.g_comedy, .g_comedy { color: #ffc233 !important; }
+        .genre.g_fantasy, .g_fantasy { color: #b56af2 !important; }
+        .genre.g_romantic_fantasy, .g_romantic_fantasy { color: #e155f4 !important; }
+        .genre.g_action, .g_action { color: #4a91ff !important; }
+        .genre.g_drama, .g_drama { color: #2dd4be !important; }
+        .genre.g_slice_of_life, .g_slice_of_life { color: #b8d62e !important; }
+        .genre.g_supernatural, .g_supernatural { color: #9b6df2 !important; }
+        .genre.g_horror, .g_horror { color: #e84545 !important; }
+        .genre.g_thriller, .g_thriller { color: #e23a72 !important; }
+        .genre.g_sports, .g_sports { color: #4ec4f5 !important; }
+        .genre.g_sf, .g_sf { color: #8da8ce !important; }
+        .genre.g_historical, .g_historical { color: #c0926a !important; }
+        .genre.g_heartwarming, .g_heartwarming { color: #ff8a3d !important; }
+        .genre.g_super_hero, .g_super_hero { color: #8a6fff !important; }
+        .genre.g_tiptoon, .g_tiptoon { color: #ff8fd9 !important; }
+        .genre.g_short_story, .g_short_story { color: #7fb2ff !important; }
+        .genre.g_web_novel, .g_web_novel { color: #5fb6e0 !important; }
+        .genre.g_mystery, .g_mystery { color: #a5a8c8 !important; }
+        .genre.g_bl_gl, .g_bl_gl { color: #ee82ff !important; }
+        .genre.g_western_palace, .g_western_palace { color: #e155f4 !important; }
+        .genre.g_eastern_palace, .g_eastern_palace { color: #c0926a !important; }
+        .genre.g_time_slip, .g_time_slip { color: #9085ff !important; }
+        .genre.g_city_office, .g_city_office { color: #8a85e0 !important; }
+        .genre.g_adaptation, .g_adaptation { color: #2ee672 !important; }
+        .genre.g_school, .g_school { color: #f0a064 !important; }
+        .genre.g_local, .g_local { color: #25ef92 !important; }
+        .genre.g_shonen, .g_shonen { color: #6a98e0 !important; }
+        .genre.g_martial_arts, .g_martial_arts { color: #c08555 !important; }
+        .genre.g_graphic_novel, .g_graphic_novel { color: #7a83e8 !important; }
+        .genre.g_others, .g_others { color: #9ea3ab !important; }
+        .genre.g_informative { color: #7fc6a0 !important; }
+        .genre.g_lgbtq { color: #ff7ed0 !important; }
 
         /* Notice strip above the footer (shown conditionally) */
         .notice_area, #noticeArea {
@@ -823,23 +1300,22 @@
             color: var(--wt-text) !important;
         }
         /* Age-verification screen (.age_gate_container > .age_gate_area).
-           The month picker is a custom <span class="month _monthSelect">
-           with a chevron, not a native <select>; the day/year are plain
-           inputs. Style the whole form area so nothing renders on white. */
+           The month picker is <a class="lk_month _selectedMonth">; the
+           day/year are plain inputs. .month is the legacy span wrapper
+           still present in some builds. */
         .age_gate_container,
         .age_gate_area, .age_gate_area .form_area {
             background: transparent !important;
             color: var(--wt-text) !important;
         }
-        .age_gate_area .month, .age_gate_area ._monthSelect,
+        .age_gate_area .month,
         .age_gate_area .month *, .age_gate_area input {
             background-color: var(--wt-bg-input) !important;
             color: var(--wt-text) !important;
             border: 1px solid var(--wt-border) !important;
             border-radius: 6px !important;
         }
-        .age_gate_area .month::after,
-        .age_gate_area ._monthSelect::after { color: var(--wt-text) !important; }
+        .age_gate_area .month::after { color: var(--wt-text) !important; }
         /* Continue CTA — explicit hover state so it actually reacts to the
            cursor. The button uses brand green at idle; darken on hover with
            a subtle shadow lift instead of falling back to plain inheritance. */
@@ -1044,6 +1520,14 @@
                 0 0 60px rgba(0,0,0,.9),
                 0 16px 40px rgba(0,0,0,.7) !important;
         }
+        /* font-size:0 above cascades to anything Webtoons injects between
+           panels (ads, chapter links). Restore normal text metrics on
+           non-img children so future inline content stays readable. */
+        .viewer_img._img_viewer_area > :not(img),
+        #_imageList > :not(img) {
+            font-size: 14px !important;
+            line-height: normal !important;
+        }
         .viewer_lst, .cont_box, body.wt-viewer #content { overflow: visible !important; }
 
         /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
@@ -1180,9 +1664,14 @@
             border: 1px solid var(--wt-border) !important;
             box-shadow: 0 8px 32px rgba(0,0,0,.35) !important;
         }
-        /* Section header arrow — sprite, needs filter not color. */
-        .aside.viewer .ico_arr1 {
-            filter: brightness(0) invert(1) opacity(.6) !important;
+        /* Section header arrow — sprite, needs filter not color.
+           Same treatment on .aside.viewer (viewer page) and .aside.challenge
+           (canvas page sidebar). */
+        .aside.viewer .ico_arr1,
+        .aside.challenge .ico_arr1,
+        .title_area .ico_arr1 {
+            filter: brightness(0) invert(1) opacity(.7) !important;
+            color: var(--wt-text) !important;
         }
         .ranking_lst .title_area h2 a, .ranking_lst .title_area h2 span {
             color: var(--wt-text) !important;
@@ -1223,13 +1712,13 @@
 
         /* "Share this series and show support" prompt + Like/Subscribe pills */
         .viewer_lst .dsc_encourage { color: var(--wt-text) !important; }
-        .viewer_lst .spi_area .bx, .spi_area .bx {
+        .spi_area .bx {
             background: var(--wt-bg-elev2) !important;
             color: var(--wt-text) !important;
             border: 1px solid var(--wt-border) !important;
             transition: background .15s, border-color .15s, box-shadow .15s, transform .1s !important;
         }
-        .viewer_lst .spi_area .bx:hover, .spi_area .bx:hover {
+        .spi_area .bx:hover {
             background: var(--wt-bg-hover) !important;
             border-color: var(--wt-accent) !important;
             box-shadow: 0 0 0 1px var(--wt-accent), 0 4px 14px rgba(0,213,100,.15) !important;
@@ -1569,8 +2058,7 @@
         /* Login modal (Naver SNS-login widget). Uses ._loginLayer / ._loginDimLayer
            injected by /static/bundle/common/gnb-*.js when "Log In" is clicked. */
         ._loginDimLayer { background: rgba(0,0,0,.7) !important; }
-        ._loginLayer, ._loginComponentParent,
-        ._defaultLoginComponent, .emailLoginComponent {
+        ._loginLayer, ._defaultLoginComponent {
             background: var(--wt-bg-elev) !important;
             color: var(--wt-text) !important;
             border: 1px solid var(--wt-border) !important;
@@ -1584,16 +2072,15 @@
             color: var(--wt-text) !important;
             background: transparent !important;
         }
-        ._btnLoginSns, .btn_sns, ._emailLoginButton, ._btnLoginEmail {
+        ._btnLoginSns, .btn_sns, ._btnLoginEmail {
             background: var(--wt-bg-elev2) !important;
             color: var(--wt-text) !important;
             border: 1px solid var(--wt-border) !important;
         }
-        ._btnLoginSns:hover, .btn_sns:hover,
-        ._emailLoginButton:hover, ._btnLoginEmail:hover {
+        ._btnLoginSns:hover, .btn_sns:hover, ._btnLoginEmail:hover {
             background: var(--wt-bg-hover) !important;
         }
-        ._btnLoginLayerClose, ._backToDefaultLoginButton { color: var(--wt-text) !important; }
+        ._btnLoginLayerClose { color: var(--wt-text) !important; }
 
         /* ---------- Series detail page (e.g. /<lang>/<genre>/<slug>/list?title_no=...) ---------- */
 
@@ -1733,17 +2220,19 @@
             box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
         }
 
-        /* Episode sort dropdown (.sort_box) — "Latest / Oldest" selector above
-           the episode list; base CSS: background:#fff; border:1px solid #ddd. */
-        .sort_box {
+        /* Episode sort dropdown — "Latest / Oldest" selector above the
+           episode list on detail pages. Scoped to .detail_body so it
+           doesn't clobber the /canvas .sort_box rules above (which set
+           the elevated panel + border-radius + open animation). */
+        .detail_body .sort_box {
             background: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
             color: var(--wt-text) !important;
             box-shadow: 0 4px 12px rgba(0,0,0,.5) !important;
         }
-        .sort_box a, .sort_box button { color: var(--wt-text-dim) !important; background: transparent !important; }
-        .sort_box a:hover, .sort_box button:hover,
-        .sort_box .on, .sort_box [aria-current="true"] { color: var(--wt-text) !important; }
+        .detail_body .sort_box a, .detail_body .sort_box button { color: var(--wt-text-dim) !important; background: transparent !important; }
+        .detail_body .sort_box a:hover, .detail_body .sort_box button:hover,
+        .detail_body .sort_box .on, .detail_body .sort_box [aria-current="true"] { color: var(--wt-text) !important; }
 
         /* "You may also like" recommendation card items (.other_card_item) —
            base CSS: background:#fff. They sit inside .detail_other which has
@@ -1754,15 +2243,18 @@
         }
         .other_card_item:hover { background: var(--wt-bg-elev2) !important; }
 
-        .detail_other .lst_type1 li, .lst_type1 li {
+        /* Scoped to .detail_other so it doesn't paint .lst_type1 rows
+           inside elevated viewer/canvas sidebar cards (those should
+           stay flat — see Top CANVAS / wt-viewer-card rules above). */
+        .detail_other .lst_type1 li {
             background: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
             border-radius: 6px;
         }
-        .lst_type1 li:hover { background: var(--wt-bg-elev2) !important; }
-        .lst_type1 .subj   { color: var(--wt-text) !important; }
-        .lst_type1 .author { color: var(--wt-text-dim) !important; }
-        .lst_type1 .grade_num, .lst_type1 .grade_area { color: var(--wt-text-mute) !important; }
+        .detail_other .lst_type1 li:hover { background: var(--wt-bg-elev2) !important; }
+        .detail_other .lst_type1 .subj   { color: var(--wt-text) !important; }
+        .detail_other .lst_type1 .author { color: var(--wt-text-dim) !important; }
+        .detail_other .lst_type1 .grade_num, .detail_other .lst_type1 .grade_area { color: var(--wt-text-mute) !important; }
         .detail_other h2 { color: var(--wt-text) !important; }
         .detail_other h2 .point { color: var(--wt-accent) !important; }
 
@@ -1826,7 +2318,7 @@
         }
         /* Like area count number — red to match the heart icon. */
         .detail_body .detail_lst .like_area {
-            color: #e05252 !important;
+            color: var(--wt-accent-like) !important;
             font-size: 13px !important;
         }
         /* .ico_like is a sprite (background-image), not text — filter it red. */
@@ -1942,13 +2434,14 @@
 
         /* Pagination row at the bottom of the episode list. Base CSS hard-codes
            color:#070707 on both .paginate a and strong — invisible on dark.
-           On the detail page (body.wt-detail) the .paginate row also renders
-           between episode rows because the base places it inside the floated
-           .detail_lst column at a position the floated children paint around.
-           Force it to a normal-flow block at the bottom of the list. Scoped
-           to wt-detail so /canvas pagination (already in normal flow) is
-           untouched — a previous unscoped attempt broke /canvas layout. */
-        body.wt-detail .paginate {
+           On detail pages the base places .paginate inside the floated
+           .detail_lst column at a position the floated children paint around,
+           so it renders between episode rows. Force normal flow unconditionally
+           — gating on body.wt-detail (set by JS) caused a visible flash where
+           pagination painted mid-list before the class was applied. /canvas
+           pagination is already in normal flow, so position/clear are no-ops
+           there. */
+        .paginate:not(.v2) {
             position: static !important;
             display: block !important;
             clear: both !important;
@@ -2010,8 +2503,8 @@
         .paginate [class*="ico_arr"] {
             display: none !important;
         }
-        .paginate .pg_next::after, .paginate a[class*="next"]::after { content: '›' !important; font-size: 18px !important; line-height: 1 !important; }
-        .paginate .pg_prev::before, .paginate a[class*="prev"]::before { content: '‹' !important; font-size: 18px !important; line-height: 1 !important; }
+        .paginate .pg_next::after, .paginate a[class*="next"]::after { content: '\\203A' !important; font-size: 18px !important; line-height: 1 !important; }
+        .paginate .pg_prev::before, .paginate a[class*="prev"]::before { content: '\\2039' !important; font-size: 18px !important; line-height: 1 !important; }
 
         /* Viewer toolbar prev/next-episode buttons (.paginate.v2 around #N).
            Same class family as the bottom-of-list pager but rendered at
