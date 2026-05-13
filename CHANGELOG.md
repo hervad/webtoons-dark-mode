@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4] - 2026-05-13
+
+### Fixed
+
+- Duplicate `.sort_box` rule block: the second definition (intended for the detail-page "Latest / Oldest" episode sort) was clobbering the canvas filter dropdown's elevated styling. Both sets now coexist — the detail-page block is scoped to `.detail_body .sort_box`.
+- `--wt-text-mute` raised from `#7b828d` to `#878e99` so comment dates, episode numbers, and other muted text clear the WCAG AA 4.5:1 contrast floor on `--wt-bg-elev2`.
+- Hard-coded `#e05252` heart-count red replaced with a new palette token `--wt-accent-like: #f06868` — slightly brighter, themeable, and reused for the heart sprite filter target.
+- Panel-strip text-metrics reset: anything Webtoons injects between comic panels (ads, chapter links) was rendering invisible because `font-size: 0` cascaded from the strip wrapper. Added a `> :not(img)` rule that restores normal text metrics on non-image children.
+- `[class*="cta" i]` / `[class*="Continue" i]` substring traps replaced with tighter selectors (`a[class~="cta"]`, `a.lk_continue`, `a._btn_enter`, `a[class*="_cta_" i]`). Prevents the button-hover override from firing on unrelated classes that happen to contain the substring "cta" (e.g. `tactical`, `practical`).
+- Canvas filter dropdown z-index lifted from `9999` to `10001` so the panel always paints above the vignette gradient (`body::before` at `9999`) at the right viewport edge.
+- Generic `.lst_type1 li` background scoped to `.detail_other` — viewer/canvas sidebars no longer get a double-elevation row inside their already-elevated card.
+
+### Cleaned up
+
+- Removed dead JS hooks that the current Webtoons bundle no longer ships: `._btnMore`, `._monthSelect`, `._loginComponentParent`, `.emailLoginComponent`, `._emailLoginButton`, `._backToDefaultLoginButton`. The `.lk_more` / `.lk_month` replacements remain.
+- Collapsed the duplicate `.spi_area .bx` selector list (`.viewer_lst .spi_area .bx, .spi_area .bx` → `.spi_area .bx`).
+- Removed the redundant unprefixed `.gnb a[aria-current="true"]` alternative; the ID-prefixed `#header` / `#gnbWrap` variants are the load-bearing ones.
+- Pagination chevrons in `.paginate` now use the same `\\203A` / `\\2039` unicode escapes as the rest of the file (was using literal glyphs).
+- `padding-top: 0px` → `padding-top: 0`.
+
 ## [1.2.3] - 2026-05-13
 
 ### Fixed
