@@ -14,10 +14,13 @@ On first run the theme follows your system setting: dark if your OS is in dark m
 
 - **Turn dark mode on / off:** `Alt + Shift + T` (backup: `Ctrl + Alt + D`)
 - **Dim comic panels for night reading:** `Alt + Shift + N` (backup: `Ctrl + Alt + Shift + D`)
+- **Dark edge shading on / off:** `Alt + Shift + V` (backup: `Ctrl + Alt + Shift + V`)
 
-Both toggles are also in the Tampermonkey / Violentmonkey menu. The backup shortcuts exist because `Alt + Shift` switches keyboard layouts on Windows machines with more than one input language.
+All three toggles are also in the Tampermonkey / Violentmonkey menu. The backup shortcuts exist because `Alt + Shift` switches keyboard layouts on Windows machines with more than one input language.
 
 **Reader dim** lowers the brightness of the comic panels only, which is easier on the eyes in a dark room. It's off by default.
+
+**Edge shading** is the soft dark gradient on the left and right edges of the screen, which frames the page. It's on by default; turn it off if you prefer a flat background.
 
 ## What it covers
 

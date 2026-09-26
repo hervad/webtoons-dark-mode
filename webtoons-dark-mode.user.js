@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.3.1
+// @version      1.4.0
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,8 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.3.1';
+    const KEY_VIGNETTE = 'wt_vignette';
+    const VERSION = '1.4.0';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -1472,10 +1473,11 @@
            All three classes are set/cleared by JS on every navigation; no CSS
            :has() fallback (caused false positives — see detail-page-dom.md).
            position:fixed + inset:0 locks the overlay to the viewport so it
-           never scrolls away. pointer-events:none lets all clicks through. */
-        body.wt-viewer::before,
-        body.wt-detail::before,
-        body.wt-home::before {
+           never scrolls away. pointer-events:none lets all clicks through.
+           Optional: toggleVignette() sets html[data-wt-vignette="off"]. */
+        html:not([data-wt-vignette="off"]) body.wt-viewer::before,
+        html:not([data-wt-vignette="off"]) body.wt-detail::before,
+        html:not([data-wt-vignette="off"]) body.wt-home::before {
             content: '' !important;
             position: fixed !important;
             inset: 0 !important;
@@ -1544,8 +1546,16 @@
         }
         .viewer_lst, .cont_box, body.wt-viewer #content { overflow: visible !important; }
 
-        /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line). */
+        /* Top fixed toolbar (.tool_area is natively #2f2f2f — bring it in line).
+           Base z-index is 100, under the vignette (9999), which dimmed the
+           logo and the share icons at both ends of the bar. Raising it alone
+           does nothing: its ancestor #container (position:relative;
+           z-index:10) is a stacking context that caps every descendant below
+           body::before. z-index:auto on #container dissolves that context in
+           the reader so the bar can paint above the vignette. */
+        body.wt-viewer #container { z-index: auto !important; }
         .tool_area {
+            z-index: 10000 !important;
             background: var(--wt-bg-elev) !important;
             color: var(--wt-text) !important;
             border-bottom: 1px solid var(--wt-border) !important;
@@ -2820,6 +2830,11 @@
         document.documentElement.dataset.wtDark = on ? 'on' : 'off';
     };
     const applyDim = (on) => ensureStyle('wt-dim-style', dimCss, on);
+    // The vignette lives in the theme CSS, gated on this attribute, so it
+    // follows the theme on/off state without a separate <style>.
+    const applyVignette = (on) => {
+        document.documentElement.dataset.wtVignette = on ? 'on' : 'off';
+    };
 
     // First-run default follows the OS preference — once the user toggles, their
     // choice persists and OS changes are ignored.
@@ -2828,9 +2843,11 @@
     // Cached state — avoids GM IPC calls in the hot MutationObserver path.
     let darkOn = GM_getValue(KEY_THEME, themeDefault);
     let dimOn = GM_getValue(KEY_DIM, false);
+    let vignetteOn = GM_getValue(KEY_VIGNETTE, true);
 
     applyTheme(darkOn);
     applyDim(dimOn);
+    applyVignette(vignetteOn);
 
     // SPA / late-loading bundle defense: if our <style> ever gets removed
     // (Webtoons swaps stylesheets on some chapter transitions), put it back.
@@ -2861,16 +2878,24 @@
         applyDim(dimOn);
         console.info('[webtoons-dark-mode] reader dim →', dimOn ? 'on' : 'off');
     }
+    function toggleVignette() {
+        vignetteOn = !vignetteOn;
+        GM_setValue(KEY_VIGNETTE, vignetteOn);
+        applyVignette(vignetteOn);
+        console.info('[webtoons-dark-mode] edge vignette →', vignetteOn ? 'on' : 'off');
+    }
 
     if (typeof GM_registerMenuCommand === 'function') {
         GM_registerMenuCommand('Toggle Webtoons dark mode', toggleTheme);
         GM_registerMenuCommand('Toggle reader dim', toggleDim);
+        GM_registerMenuCommand('Toggle edge shading (vignette)', toggleVignette);
     }
 
     // Keyboard shortcuts. Multiple combos so the user can use whichever doesn't
     // conflict with their OS / browser / keyboard-layout switcher:
     //   - Alt+Shift+T  OR  Ctrl+Alt+D       → toggle theme
     //   - Alt+Shift+N  OR  Ctrl+Alt+Shift+D → toggle reader dim
+    //   - Alt+Shift+V  OR  Ctrl+Alt+Shift+V → toggle edge vignette
     // Note: bare Alt+D opens the address bar; Alt+Shift on Windows can also
     // trigger the input-language switcher, which can swallow Alt+Shift+T on
     // multi-language setups. The Ctrl+Alt+D backup avoids both.
@@ -2888,6 +2913,8 @@
         const themeCtrlAltD = matchCombo(e, { alt: true, shift: false, ctrl: true, code: 'KeyD', letter: 'D' });
         const dimAltShiftN = matchCombo(e, { alt: true, shift: true, ctrl: false, code: 'KeyN', letter: 'N' });
         const dimCtrlAltShD = matchCombo(e, { alt: true, shift: true, ctrl: true, code: 'KeyD', letter: 'D' });
+        const vigAltShiftV = matchCombo(e, { alt: true, shift: true, ctrl: false, code: 'KeyV', letter: 'V' });
+        const vigCtrlAltShV = matchCombo(e, { alt: true, shift: true, ctrl: true, code: 'KeyV', letter: 'V' });
 
         let handled = false;
         try {
@@ -2896,6 +2923,9 @@
                 handled = true;
             } else if (dimAltShiftN || dimCtrlAltShD) {
                 toggleDim();
+                handled = true;
+            } else if (vigAltShiftV || vigCtrlAltShV) {
+                toggleVignette();
                 handled = true;
             }
         } catch (err) {
@@ -3034,5 +3064,5 @@
     document.addEventListener('DOMContentLoaded', fixViewerBanners);
     scheduleViewerBanners();
 
-    console.info(`[webtoons-dark-mode] v${VERSION} fully loaded — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
+    console.info(`[webtoons-dark-mode] v${VERSION} fully loaded — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim | Alt+Shift+V / Ctrl+Alt+Shift+V: vignette`);
 })();

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-26
+
+### Added
+
+- The dark edge shading (the vignette on the left and right screen edges) can now be turned off. Use `Alt + Shift + V` (backup: `Ctrl + Alt + Shift + V`) or the new **Toggle edge shading (vignette)** menu entry. The choice is remembered, and it stays on by default. ([#1](https://github.com/hervad/webtoons-dark-mode/issues/1))
+
+### Fixed
+
+- The reader's top toolbar was dimmed at both ends: the edge shading painted over the WEBTOON logo and the subscribe / share icons. `#container` (`z-index: 10`) formed a stacking context that capped the toolbar below the shading. In the reader it is now `z-index: auto`, and the toolbar sits above the shading.
+
 ## [1.3.1] - 2026-09-26
 
 ### Changed
