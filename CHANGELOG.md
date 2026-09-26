@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2] - 2026-09-26
+
+### Changed
+
+- **Comment votes:** the upvote (icon and count) is green and the downvote is red, each on a lightly tinted pill. A comment you've voted on shows a solid green or red pill. The two buttons share a class, so they're told apart by their icon with `:has(.wcc_UpvoteIcon / .wcc_DownvoteIcon)`.
+- **Reply threads** (opened with "Replies N") are an indented thread with a thin rail on the left, on the parent comment's surface. Before, they sat in a lighter box with a second card nested inside, because the top-level comment-list card style also applied to the nested list. The "└" corner glyphs are hidden, and "Show less" is a small pill button.
+- **Series page like counts** use the heart's red on every row. Already-read episodes are now marked on the title only; date, likes and episode number keep the same colours on read and unread rows, so the numbers no longer switch between bright and dim.
+
 ## [1.5.1] - 2026-09-26
 
 ### Fixed

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.5.1
+// @version      1.5.2
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.5.1';
+    const VERSION = '1.5.2';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -2368,11 +2368,99 @@
             border-color: rgba(255,255,255,.2) !important;
         }
         [class*="wcc_ReplyFolderToggle__root"] { color: var(--wt-text-dim) !important; }
-        [class*="wcc_ReplyFolder__root"] {
-            background: var(--wt-bg-elev2) !important;
-            border-radius: 12px !important;
-            margin-top: 12px !important;
+        /* Upvote = green, downvote = red — icon, count and a tinted pill.
+           The two buttons share one class; they differ only by the icon
+           inside (wcc_UpvoteIcon / wcc_DownvoteIcon), hence :has(). The icon
+           is an SVG <path> painted via fill (not currentColor), so the fill
+           is set explicitly. Voted (__active) = solid pill. */
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_UpvoteIcon"]) {
+            color: var(--wt-accent) !important;
+            border-color: rgba(0,213,100,.35) !important;
+            background: rgba(0,213,100,.08) !important;
         }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_DownvoteIcon"]) {
+            color: var(--wt-accent-like) !important;
+            border-color: rgba(240,104,104,.35) !important;
+            background: rgba(240,104,104,.08) !important;
+        }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_UpvoteIcon"]) svg path { fill: var(--wt-accent) !important; }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_DownvoteIcon"]) svg path { fill: var(--wt-accent-like) !important; }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_UpvoteIcon"]):hover {
+            background: rgba(0,213,100,.16) !important;
+            border-color: var(--wt-accent) !important;
+        }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_DownvoteIcon"]):hover {
+            background: rgba(240,104,104,.16) !important;
+            border-color: var(--wt-accent-like) !important;
+        }
+        [class*="wcc_CommentReaction__active"]:has([class*="wcc_UpvoteIcon"]) {
+            background: var(--wt-accent) !important;
+            border-color: var(--wt-accent) !important;
+            color: var(--wt-text-on-accent) !important;
+        }
+        [class*="wcc_CommentReaction__active"]:has([class*="wcc_DownvoteIcon"]) {
+            background: var(--wt-accent-like) !important;
+            border-color: var(--wt-accent-like) !important;
+            color: var(--wt-text-on-accent) !important;
+        }
+        [class*="wcc_CommentReaction__active"]:has([class*="wcc_UpvoteIcon"]) svg path,
+        [class*="wcc_CommentReaction__active"]:has([class*="wcc_DownvoteIcon"]) svg path { fill: var(--wt-text-on-accent) !important; }
+        /* Reply thread (opened via "Replies N"): an indented thread on the
+           parent comment's own surface — a thin rail on the left instead of
+           a lighter box with a second card nested inside it. The nested
+           ul.wcc_CommentList__list must NOT pick up the top-level list-card
+           style (that was the card-in-a-box). */
+        [class*="wcc_ReplyFolder__root"] {
+            background: transparent !important;
+            border: 0 !important;
+            border-left: 2px solid rgba(255,255,255,.1) !important;
+            border-radius: 0 !important;
+            margin: 14px 0 0 2px !important;
+            padding: 0 0 0 18px !important;
+        }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentList__list"] {
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+        }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"] {
+            padding: 14px 0 !important;
+        }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:first-child { padding-top: 4px !important; }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:hover { background: transparent !important; }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentHeader__name"] { font-size: 14px !important; }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_TextContent__content"] { font-size: 14px !important; }
+        /* The "└" corner glyphs are redundant next to the thread rail. */
+        [class*="wcc_CommentItem__corner"],
+        [class*="wcc_Editor__bottomLeftCornerIcon"] { display: none !important; }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_Editor__replyContainer"] { margin: 8px 0 0 !important; }
+        /* "Show less" — small ghost pill under the thread, not a boxed button. */
+        [class*="wcc_ReplyUnfold__root"] {
+            text-align: left !important;
+            padding: 12px 0 4px !important;
+            border: 0 !important;
+        }
+        [class*="wcc_ReplyUnfold__unfold"] {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            height: auto !important;
+            padding: 6px 14px !important;
+            background: transparent !important;
+            border: 1px solid rgba(255,255,255,.12) !important;
+            border-radius: 999px !important;
+            color: var(--wt-text-dim) !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+        }
+        [class*="wcc_ReplyUnfold__unfold"]:hover {
+            background: var(--wt-bg-hover) !important;
+            border-color: rgba(255,255,255,.22) !important;
+            color: var(--wt-text) !important;
+        }
+        [class*="wcc_ReplyUnfold__arrow"] path { fill: currentColor !important; }
         /* "More" — full pill button under the card, not a boxed link. */
         [class*="wcc_CommentMore__root"] { padding: 18px 0 4px !important; text-align: center !important; }
         [class*="wcc_CommentMore__more"] {
@@ -2633,8 +2721,10 @@
             font-size: 13px !important;
             font-variant-numeric: tabular-nums !important;
         }
+        /* Like count takes the heart's colour so icon + number read as one
+           unit and stay equally visible on every row (read or unread). */
         .detail_body .detail_list_area .like_area {
-            color: var(--wt-text-dim) !important;
+            color: var(--wt-accent-like) !important;
             font-size: 13px !important;
             font-variant-numeric: tabular-nums !important;
         }
@@ -2653,24 +2743,22 @@
         .detail_body .detail_list_area .detail_list_item:hover .subj span {
             color: var(--wt-accent) !important;
         }
-        .detail_body .detail_list_area .detail_list_item:hover .date,
-        .detail_body .detail_list_area .detail_list_item:hover .like_area {
+        .detail_body .detail_list_area .detail_list_item:hover .date {
             color: var(--wt-text) !important;
         }
 
         /* Already-read episodes. Base CSS greys every column of a :visited
-           row to #c4c4c4 — on white that reads as "done", on dark it made
-           the whole list look washed out. Keep the "read" signal but make it
-           a clearly readable muted tone (~5.8:1 on --wt-bg-elev); unread
-           rows stay full brightness so the next episode stands out. */
+           row to #c4c4c4 — on dark that made the list look washed out and
+           the numbers inconsistent row to row. The "read" signal now lives on
+           the TITLE only (muted, ~5.8:1 on --wt-bg-elev); date, likes and #N
+           keep the same colours on every row so the metadata columns stay
+           uniform and readable. */
         .detail_body .detail_list_area .detail_list_link:visited .subj span {
             color: var(--wt-text-read) !important;
         }
-        .detail_body .detail_list_area .detail_list_link:visited .date,
-        .detail_body .detail_list_area .detail_list_link:visited .like_area,
-        .detail_body .detail_list_area .detail_list_link:visited .tx {
-            color: var(--wt-text-mute) !important;
-        }
+        .detail_body .detail_list_area .detail_list_link:visited .date { color: var(--wt-text-dim) !important; }
+        .detail_body .detail_list_area .detail_list_link:visited .like_area { color: var(--wt-accent-like) !important; }
+        .detail_body .detail_list_area .detail_list_link:visited .tx { color: var(--wt-text-mute) !important; }
         .detail_body .detail_list_area .detail_list_item:hover .detail_list_link:visited .subj span {
             color: var(--wt-accent) !important;
         }
