@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.4] - 2026-09-26
+
+### Changed
+
+- **Reply votes belong to their reply.** In an opened thread, each reply's 👍 / 👎 now sits directly under that reply's text, instead of floating at the far right edge between replies. Hovering a reply tints the whole row, text and votes together, so it's always clear which reply the votes belong to.
+
 ## [1.6.3] - 2026-09-26
 
 ### Changed

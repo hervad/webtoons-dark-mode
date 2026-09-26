@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.6.3
+// @version      1.6.4
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.6.3';
+    const VERSION = '1.6.4';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -2690,27 +2690,32 @@
             margin: 0 !important;
             overflow: visible !important;
         }
+        /* Each reply row is inset 12px on both sides (negative margin keeps
+           the avatar where it was) so hovering it tints the whole reply —
+           text AND its votes — as one unit. */
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"] {
             position: relative !important;
             background: transparent !important;
             border: 0 !important;
             border-radius: 10px !important;
-            padding: 10px 0 0 !important;
+            margin: 0 0 0 -12px !important;
+            padding: 10px 12px 0 !important;
             box-shadow: none !important;
+            transition: background-color .15s ease !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:hover {
-            background: transparent !important;
+            background: rgba(255,255,255,.035) !important;
             border: 0 !important;
             box-shadow: none !important;
         }
-        /* Elbow: from the rail (35px left of the reply) curving into the
-           middle of the 32px reply avatar (10px top padding + 16px). */
+        /* Elbow: from the rail (23px left of the reply's box, i.e. 35px left
+           of its content) curving into the middle of the 32px avatar. */
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]::after {
             content: '' !important;
             position: absolute !important;
-            left: -35px !important;
+            left: -23px !important;
             top: 0 !important;
-            width: 30px !important;
+            width: 31px !important;
             height: 26px !important;
             border-left: 2px solid rgba(255,255,255,.13) !important;
             border-bottom: 2px solid rgba(255,255,255,.13) !important;
@@ -2723,7 +2728,14 @@
             height: 32px !important;
             font-size: 14px !important;
         }
-        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__action"] { padding-bottom: 8px !important; }
+        /* Replies: votes sit directly under the reply's own text, left-aligned
+           (there is no Reply button to balance them), so they visibly belong
+           to that reply instead of floating at the far right edge. */
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__action"] {
+            padding: 2px 0 10px !important;
+            margin-top: -8px !important;
+        }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentReaction__root"] { margin-left: -10px !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentHeader__name"] { font-size: 14px !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_TextContent__content"] { font-size: 14px !important; }
         /* The "└" corner glyphs are redundant next to the thread rail. */
