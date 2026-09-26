@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.6.2
+// @version      1.6.3
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.6.2';
+    const VERSION = '1.6.3';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -2405,6 +2405,58 @@
             box-shadow: 0 0 0 3px rgba(0,213,100,.15) !important;
         }
         [class*="wcc_Editor__actionBar"] { border-top: 1px solid rgba(255,255,255,.06) !important; }
+        /* Logged out, the composer is a read-only box saying "Please log in
+           to leave a comment / reply" (its editable area is
+           contenteditable=false) — clicking it opens the login. Present it
+           as an inviting call-to-action: green-tinted surface, bold green
+           prompt with an arrow, a glow on hover, and no empty typing space. */
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) {
+            cursor: pointer !important;
+            border: 1px solid rgba(0,213,100,.3) !important;
+            background: linear-gradient(135deg, rgba(0,213,100,.10), rgba(0,213,100,.03)) !important;
+            transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease !important;
+        }
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__scrollArea"],
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__content"],
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__spoilerWrapper"],
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__actionBar"] {
+            background: transparent !important;
+        }
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__content"] { min-height: 0 !important; }
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) { padding: 14px 18px !important; }
+        /* Spoiler switch + emoji / sticker / GIF / send do nothing until you
+           log in — hide them so the box is a single clear prompt. */
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__spoilerWrapper"],
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__actionBar"] { display: none !important; }
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__scrollArea"],
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="wcc_Editor__content"],
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) .ProseMirror,
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) .ProseMirror p {
+            min-height: 0 !important;
+            height: auto !important;
+            padding: 0 !important;
+        }
+        /* The reply composer's wrapper has min-height: 9.75rem baked in. */
+        [class*="wcc_Editor__replyContainer"]:has([contenteditable="false"]) { min-height: 0 !important; }
+        /* Empty paragraph holds a <br> that adds a blank line under the prompt. */
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) .ProseMirror p br { display: none !important; }
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]) [class*="EditorCore-module__empty"]::before {
+            content: attr(data-placeholder) "  \\2192" !important;
+            color: var(--wt-accent-soft) !important;
+            font-weight: 700 !important;
+            font-size: 15px !important;
+            float: none !important;
+            display: block !important;
+            height: auto !important;
+            padding: 0 !important;
+        }
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]):hover {
+            border-color: var(--wt-accent) !important;
+            box-shadow: 0 0 0 3px rgba(0,213,100,.14), 0 8px 24px rgba(0,213,100,.10) !important;
+        }
+        [class*="wcc_Editor__editor"]:has([contenteditable="false"]):hover [class*="EditorCore-module__empty"]::before {
+            color: var(--wt-accent) !important;
+        }
         [class*="TextEditor_Toolbar-module__root"] button,
         [class*="TextEditor_SubmitControlPanel-module__button"] {
             background: transparent !important;
@@ -2600,18 +2652,38 @@
            a lighter box with a second card nested inside it. The nested
            ul.wcc_CommentList__list must NOT pick up the top-level list-card
            style (that was the card-in-a-box). */
-        /* Each reply is its own nested mini-card (a step lighter than the
-           parent card, author-colour left edge) stacked with a small gap,
-           sitting under the parent's text column. */
+        /* Connected thread (asurascans-style): the reply folder sits inside
+           the parent's text column (54px right of its avatar). Pull it back
+           to the parent avatar's centre line (x = 20px) and draw ONE rail
+           down from there; each reply then gets a curved elbow from the rail
+           into its own avatar. Replies are plain rows (no cards) so the
+           whole thread reads as one conversation hanging off the comment. */
         [class*="wcc_ReplyFolder__root"] {
+            position: relative !important;
             background: transparent !important;
             border: 0 !important;
+            border: 0 !important;
             border-radius: 0 !important;
-            margin: 2px 0 16px !important;
-            padding: 0 !important;
+            margin: 4px 0 16px -35px !important;
+            padding: 0 0 0 35px !important;
+        }
+        /* The rail itself hangs off the parent comment: from just under its
+           40px avatar straight down to the end of the thread, so it visibly
+           starts AT the author it replies to (the folder begins lower, below
+           the text and actions). */
+        [class*="wcc_CommentItem__inside"]:has([class*="wcc_ReplyFolder__root"])::after {
+            content: '' !important;
+            position: absolute !important;
+            left: 19px !important;
+            top: 46px !important;
+            bottom: 16px !important;
+            width: 2px !important;
+            background: rgba(255,255,255,.13) !important;
+            border-radius: 2px !important;
+            pointer-events: none !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentList__list"] {
-            gap: 8px !important;
+            gap: 0 !important;
             background: transparent !important;
             border: 0 !important;
             border-radius: 0 !important;
@@ -2619,16 +2691,31 @@
             overflow: visible !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"] {
-            background: rgba(255,255,255,.035) !important;
-            border: 1px solid rgba(255,255,255,.06) !important;
-            border-radius: 12px !important;
-            padding: 12px 14px 0 16px !important;
-            box-shadow: inset 3px 0 0 var(--wt-av, rgba(255,255,255,.12)) !important;
+            position: relative !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 10px !important;
+            padding: 10px 0 0 !important;
+            box-shadow: none !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:hover {
-            background: rgba(255,255,255,.055) !important;
-            border-color: rgba(255,255,255,.12) !important;
-            box-shadow: inset 3px 0 0 var(--wt-av, rgba(255,255,255,.2)) !important;
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+        }
+        /* Elbow: from the rail (35px left of the reply) curving into the
+           middle of the 32px reply avatar (10px top padding + 16px). */
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]::after {
+            content: '' !important;
+            position: absolute !important;
+            left: -35px !important;
+            top: 0 !important;
+            width: 30px !important;
+            height: 26px !important;
+            border-left: 2px solid rgba(255,255,255,.13) !important;
+            border-bottom: 2px solid rgba(255,255,255,.13) !important;
+            border-bottom-left-radius: 12px !important;
+            pointer-events: none !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__inside"] { padding-left: 44px !important; min-height: 34px !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__inside"][data-wt-initial]::before {
@@ -2642,7 +2729,7 @@
         /* The "└" corner glyphs are redundant next to the thread rail. */
         [class*="wcc_CommentItem__corner"],
         [class*="wcc_Editor__bottomLeftCornerIcon"] { display: none !important; }
-        [class*="wcc_ReplyFolder__root"] [class*="wcc_Editor__replyContainer"] { margin: 8px 0 0 !important; }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_Editor__replyContainer"] { margin: 12px 0 0 !important; }
         /* "Show less" — small ghost pill under the thread, not a boxed button. */
         [class*="wcc_ReplyUnfold__root"] {
             text-align: left !important;

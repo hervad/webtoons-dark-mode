@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.3] - 2026-09-26
+
+### Changed
+
+- **Replies are a connected thread** (asurascans-style). One line drops from the parent comment's avatar, and each reply branches off it with a curved elbow into its own avatar. Replies are plain rows rather than separate cards, so the thread reads as one conversation.
+- **"Please log in to leave a comment / reply"** is now an inviting call-to-action: a compact green-tinted box with a bold green prompt and an arrow, and a glow on hover. The Spoiler switch and the emoji / GIF / send buttons, which do nothing while logged out, are hidden. The reply box's built-in 9.75rem minimum height is removed, so it's no longer a big empty box. Nothing changes once you're logged in.
+
 ## [1.6.2] - 2026-09-26
 
 ### Changed
