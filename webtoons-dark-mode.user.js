@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.5.0
+// @version      1.5.1
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.5.0';
+    const VERSION = '1.5.1';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -54,6 +54,7 @@
             --wt-text-read:       #9aa1ab;
             --wt-text-on-accent:  #0a0a0a;
             --wt-link:            #7cb6ff;
+            --wt-name:            #8ab4f8;
             --wt-accent:          #00d564;
             --wt-accent-soft:     #4ade80;
             --wt-accent-like:     #f06868;
@@ -1619,6 +1620,7 @@
         /* Heavy chevron drawn via pseudo-element, absolutely positioned + flex
            centered so the glyph sits dead-center in the button. */
         .episode_area .episode_lst .pg_prev::before, .episode_area .episode_lst .pg_next::after {
+            text-indent: 0 !important;
             background: none !important;
             width: auto !important;
             height: auto !important;
@@ -2165,8 +2167,11 @@
         /* .episode_cont also matches our mobile-site rule (which paints it
            --wt-bg) — keep the strip's inner viewport on the card surface. */
         #bottomEpisodeList .episode_lst .episode_cont { background: transparent !important; }
-        /* Base height 175px leaves ~40px of dead space under the titles. */
-        #bottomEpisodeList .episode_lst { height: 150px !important; }
+        /* Base height 175px leaves dead space under the titles. Content runs
+           12px (li padding-top) → ~123px (title baseline), so 135px gives the
+           same 12px above the thumbnails and below the titles — vertically
+           centred inside the card. */
+        #bottomEpisodeList .episode_lst { height: 135px !important; }
         #bottomEpisodeList .episode_lst .thmb,
         #bottomEpisodeList .episode_lst .thmb img,
         #bottomEpisodeList .episode_lst ul .mask { border-radius: 8px !important; }
@@ -2189,8 +2194,54 @@
             border: 1px solid rgba(255,255,255,.12) !important;
             box-shadow: 0 4px 12px rgba(0,0,0,.4) !important;
         }
+        /* Arrows sit in the card's side padding, clear of the first/last
+           thumbnail (base left/right:-3px made them overlap the artwork). */
+        .episode_area#bottomEpisodeList .episode_lst .pg_prev { left: -12px !important; }
+        .episode_area#bottomEpisodeList .episode_lst .pg_next { right: -12px !important; left: auto !important; }
+        /* text-indent:0 — the pseudo inherits the site's text-indent:100%
+           hidden-label trick, which shoved ❮ to the circle's right edge. */
         .episode_area#bottomEpisodeList .episode_lst .pg_prev::before,
-        .episode_area#bottomEpisodeList .episode_lst .pg_next::after { font-size: 18px !important; }
+        .episode_area#bottomEpisodeList .episode_lst .pg_next::after {
+            font-size: 18px !important;
+            text-indent: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Sidebar card headers ("Trending & Popular ›", "Top Originals ›"):
+           the h2 is display:block with a plain-text ">" (.ico_arr1) that sat
+           low beside the larger title. Flex-centre title + chevron, draw a
+           proper › glyph, and move the whole header into one hover target. */
+        .ranking_lst.viewer > .lst_area > .title_area h2 {
+            display: flex !important;
+            align-items: center !important;
+            gap: 2px !important;
+            line-height: 1.2 !important;
+        }
+        .ranking_lst.viewer > .lst_area > .title_area h2 > a {
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            letter-spacing: .01em !important;
+        }
+        .ranking_lst.viewer > .lst_area > .title_area h2 .ico_arr1 {
+            font-size: 0 !important;
+            width: 22px !important;
+            height: 22px !important;
+            margin: 0 !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            transition: background-color .15s ease, color .15s ease !important;
+        }
+        .ranking_lst.viewer > .lst_area > .title_area h2 .ico_arr1::after {
+            content: '\\203A' !important;
+            font-size: 20px !important;
+            line-height: 1 !important;
+            color: var(--wt-text-mute) !important;
+            transform: translateY(-1px) !important;
+        }
+        .ranking_lst.viewer > .lst_area > .title_area h2:hover > a { color: var(--wt-accent) !important; }
+        .ranking_lst.viewer > .lst_area > .title_area h2:hover .ico_arr1 { background: var(--wt-bg-hover) !important; }
+        .ranking_lst.viewer > .lst_area > .title_area h2:hover .ico_arr1::after { color: var(--wt-accent) !important; }
 
         /* Creator note — highlighted card with an accent edge. */
         .comment_area .creator_note {
@@ -2290,9 +2341,11 @@
             border-top: 1px solid rgba(255,255,255,.06) !important;
         }
         [class*="wcc_CommentItem__root"]:hover { background: rgba(255,255,255,.02) !important; }
+        /* Names in a soft blue (not body-text white) so the author of each
+           comment is identifiable at a glance; weight carries the hierarchy. */
         [class*="wcc_CommentHeader__name"] {
-            color: var(--wt-text) !important;
-            font-weight: 600 !important;
+            color: var(--wt-name) !important;
+            font-weight: 700 !important;
             font-size: 15px !important;
         }
         [class*="wcc_CommentHeader__createdAt"] { font-size: 12px !important; }
@@ -3009,6 +3062,7 @@
            showed behind a squashed glyph ("<‹"). ::after (next) has no sprite. */
         .paginate.v2 .pg_prev::before,
         .paginate.v2 .pg_next::after {
+            text-indent: 0 !important;
             background: none !important;
             width: auto !important;
             height: auto !important;

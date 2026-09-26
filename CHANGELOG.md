@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-09-26
+
+### Fixed
+
+- **Episode strip:** the previous-arrow chevron sat off-centre in its circle. The glyph inherited the site's `text-indent: 100%` hidden-label trick; it's now `text-indent: 0` on the strip and toolbar arrow glyphs. The arrows also moved into the card's side padding, clear of the first and last thumbnail, and the strip height now centres the thumbnails and titles vertically in the card.
+- **Sidebar headers** ("Trending & Popular ›", "Top Originals ›"): the plain-text ">" sat low beside the larger title. The title and a proper › chevron now share one centre line, and the whole header gets a hover state.
+
+### Changed
+
+- **Commenter names** use a soft blue (`--wt-name`, bold) instead of body-text white, so each comment's author stands out.
+
 ## [1.5.0] - 2026-09-26
 
 ### Changed
