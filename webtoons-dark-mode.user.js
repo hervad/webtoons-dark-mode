@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.6.1
+// @version      1.6.2
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.6.1';
+    const VERSION = '1.6.2';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -2521,8 +2521,8 @@
             line-height: 1.6 !important;
         }
 
-        /* Action row: votes first, then the reply toggle — left-aligned under
-           the text (the base layout pushed votes to the far right). */
+        /* Action row: reply toggle on the left under the text, votes pushed
+           to the card's right edge. */
         [class*="wcc_CommentItem__action"] {
             justify-content: flex-start !important;
             align-items: center !important;
@@ -2530,7 +2530,7 @@
             padding: 0 0 14px !important;
             margin-top: -6px !important;
         }
-        [class*="wcc_CommentReaction__root"] { order: -1 !important; gap: 4px !important; }
+        [class*="wcc_CommentReaction__root"] { margin-left: auto !important; gap: 4px !important; }
         [class*="wcc_ReplyFolderToggle__root"] { margin-right: 0 !important; }
         /* Votes: icon + count, no box — tinted round hover like asura. Upvote
            green, downvote red. Both buttons share a class and differ only by
@@ -2565,22 +2565,22 @@
         }
         [class*="wcc_CommentReaction__active"]:has([class*="wcc_UpvoteIcon"]) svg path,
         [class*="wcc_CommentReaction__active"]:has([class*="wcc_DownvoteIcon"]) svg path { fill: var(--wt-text-on-accent) !important; }
-        /* "Reply" / "Replies N": a quiet text button with a speech-bubble
-           icon (inline SVG mask), accent on hover — an invitation to join
-           the thread rather than a boxed control. */
+        /* "Reply" / "Replies N": a soft blue-tinted pill with a speech-bubble
+           icon (inline SVG mask) — visibly clickable and inviting, but
+           quieter than the green Subscribe-level actions. */
         [class*="wcc_ReplyFolderToggle__root"] {
             display: inline-flex !important;
             align-items: center !important;
             gap: 6px !important;
-            background: transparent !important;
-            border: 0 !important;
+            background: rgba(138,180,248,.10) !important;
+            border: 1px solid rgba(138,180,248,.28) !important;
             border-radius: 999px !important;
             min-height: 30px !important;
-            padding: 0 10px !important;
-            color: var(--wt-text-dim) !important;
+            padding: 0 14px 0 12px !important;
+            color: var(--wt-name) !important;
             font-size: 13px !important;
             font-weight: 600 !important;
-            transition: background-color .15s ease, color .15s ease !important;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease !important;
         }
         [class*="wcc_ReplyFolderToggle__root"]::before {
             content: '' !important;
@@ -2591,8 +2591,9 @@
             mask: var(--wt-bubble-mask) center / contain no-repeat !important;
         }
         [class*="wcc_ReplyFolderToggle__root"]:hover {
-            background: var(--wt-bg-hover) !important;
-            color: var(--wt-accent) !important;
+            background: rgba(138,180,248,.18) !important;
+            border-color: rgba(138,180,248,.5) !important;
+            color: #b3cdfb !important;
         }
         /* Reply thread (opened via "Replies N"): an indented thread on the
            parent comment's own surface — a thin rail on the left instead of
