@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.3] - 2026-09-26
+
+### Changed
+
+- **Redesigned the ranking sidebar cards** (reader: Trending & Popular, Top Originals; /canvas: Top CANVAS, Up & Coming) as one shared component. The header has a single, vertically centred chevron, and a hairline separates it from the list. Each row reads rank · rounded thumbnail · genre / title / author, the top 3 ranks are accent green, and hovering a row gives a rounded highlight.
+
+### Fixed
+
+- **Double ">›" next to "Top CANVAS":** an older rule scoped to the card's ID outranked the new header styling and brought back the site's own ">" text. The ID-scoped rules are removed. "Up & Coming" is now `#rateRanking` in the site's markup.
+- **Page-pager ‹ › sat low in their pills:** they are now CSS-drawn chevrons, centred exactly.
+- **/canvas "Make money with WEBTOON" banner** had grey side strips and a near-black, dimmed creative. The banner keeps the site's own background, which matches each rotating creative, so the strip is seamless. Only light creatives are dimmed, and the image and strip dim together.
+
 ## [1.5.2] - 2026-09-26
 
 ### Changed

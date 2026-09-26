@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.5.2
+// @version      1.5.3
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.5.2';
+    const VERSION = '1.5.3';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -503,49 +503,22 @@
         .ranking_lst.viewer .lst_type1 > li:hover .subj {
             color: var(--wt-accent) !important;
         }
-        /* Header arrow (.ico_arr1) next to "Top CANVAS" / "Up & Coming" —
-           force inline-flex alignment so the chevron sits beside the title
-           text, not on the line below it. Base CSS often gives ico_arr1
-           display:block or width:14px (sprite). */
-        #challengeGenreRanking .ico_arr1,
-        #upcomingChallengeRanking .ico_arr1,
-        .ranking_lst.viewer .title_area .ico_arr1,
-        .aside.challenge .title_area .ico_arr1,
+        /* Header arrow (.ico_arr1) on other .title_area headings (not the
+           ranking cards — those are styled by the "Ranking sidebar cards"
+           block): strip the sprite, keep an inline text chevron. */
         .title_area h2 .ico_arr1 {
-            background-image: none !important;
             background: none !important;
             color: var(--wt-text-dim) !important;
-            font-size: 18px !important;
-            line-height: 1 !important;
             font-style: normal !important;
-            font-weight: 400 !important;
             text-indent: 0 !important;
-            overflow: visible !important;
-            white-space: nowrap !important;
             filter: none !important;
             width: auto !important;
             height: auto !important;
-            min-width: 0 !important;
             display: inline-flex !important;
             align-items: center !important;
             margin: 0 0 0 6px !important;
-            padding: 0 !important;
             vertical-align: middle !important;
             position: static !important;
-            top: auto !important;
-        }
-        /* Make sure the parent h2 lays children out inline. */
-        #challengeGenreRanking .title_area h2,
-        #upcomingChallengeRanking .title_area h2,
-        .aside.challenge .title_area h2 {
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 0 !important;
-        }
-        #challengeGenreRanking .title_area h2 span,
-        #upcomingChallengeRanking .title_area h2 span,
-        .aside.challenge .title_area h2 span {
-            display: inline !important;
         }
         /* Tight stacking: kill the flex column gap entirely and zero any
            top margin on the second .lst_area so Up & Coming sits directly
@@ -603,33 +576,25 @@
             box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
         }
 
-        /* Promotional banner on /canvas ("Try the New CANVAS Creator Dashboard!").
-           Ships as <a class="contest_banner" style="background-color: #bdffdb">
-           with an inline mint-green PNG inside. Override the inline style with
-           !important and tone the embedded image down so it blends with dark. */
-        /* Promotional banners on /canvas. The <a class="contest_banner"> ships
-           with inline style="background-color: #bdffdb" (mint green) and an
-           <img> child whose pixels are also mint green. We override the inline
-           bg and clip the image so its mint-green padding doesn't bleed past
-           the dark anchor — image stretches to fill the full anchor width
-           via object-fit, with the mint-green centre portion heavily
-           desaturated so it blends with the dark page. */
+        /* Promotional banners on /canvas: <a class="contest_banner"
+           style="background-color: …"> — a full-width strip with a 1200px
+           creative centred inside. Webtoons rotates creatives (mint #bdffdb,
+           dark #181818, …) and sets the inline background to match each
+           creative's edges, so KEEP that background — overriding it made grey
+           side strips around the ad. Only light creatives get dimmed, and the
+           filter goes on the whole anchor so image + side strips dim together
+           and stay seamless. tuneContestBanners() (JS) measures the inline
+           colour and sets data-wt-light on light ones. */
         .contest_banner, a.contest_banner {
-            background-color: var(--wt-bg-elev) !important;
             border-radius: 0 !important;
             overflow: hidden !important;
             display: block !important;
             position: relative !important;
+            transition: filter .2s ease !important;
         }
-        .contest_banner img {
-            display: block !important;
-            margin: 0 auto !important;
-            filter: brightness(.32) saturate(.35) contrast(1.05) !important;
-            transition: filter .2s !important;
-        }
-        .contest_banner:hover img {
-            filter: brightness(.5) saturate(.55) contrast(1.05) !important;
-        }
+        .contest_banner img { display: block !important; margin: 0 auto !important; }
+        .contest_banner[data-wt-light] { filter: brightness(.34) saturate(.4) contrast(1.05) !important; }
+        .contest_banner[data-wt-light]:hover { filter: brightness(.5) saturate(.55) contrast(1.05) !important; }
 
         /* Sub-nav (snb): day-of-week picker AND genre tabs share this component */
         .snb_wrap, .snb_inner, .snb {
@@ -2207,41 +2172,172 @@
             padding: 0 !important;
         }
 
-        /* Sidebar card headers ("Trending & Popular ›", "Top Originals ›"):
-           the h2 is display:block with a plain-text ">" (.ico_arr1) that sat
-           low beside the larger title. Flex-centre title + chevron, draw a
-           proper › glyph, and move the whole header into one hover target. */
+        /* ================================================================
+           Ranking sidebar cards — one component for the reader sidebar
+           (Trending & Popular, Top Originals) and the /canvas right rail
+           (Top CANVAS, Up & Coming): all are .ranking_lst.viewer > .lst_area.
+           Header: title + one CSS-drawn chevron (a text ">" / "›" never
+           centres across fonts, and older ID-scoped rules doubled it), filter
+           pill on the right, hairline underneath. Rows: the base layout
+           absolutely positions thumb / rank / text at fixed offsets; here it
+           becomes one flex row — rank · rounded thumb · genre/title/author —
+           with a rounded hover highlight. Top-3 ranks are accent green.
+           ================================================================ */
+        .ranking_lst.viewer > .lst_area > .title_area {
+            height: auto !important;
+            padding: 0 0 12px !important;
+            margin: 0 0 8px !important;
+            border-bottom: 1px solid rgba(255,255,255,.07) !important;
+        }
         .ranking_lst.viewer > .lst_area > .title_area h2 {
             display: flex !important;
             align-items: center !important;
             gap: 2px !important;
+            margin: 0 !important;
             line-height: 1.2 !important;
+            cursor: pointer !important;
         }
-        .ranking_lst.viewer > .lst_area > .title_area h2 > a {
-            font-size: 18px !important;
+        .ranking_lst.viewer > .lst_area > .title_area h2 > a,
+        .ranking_lst.viewer > .lst_area > .title_area h2 > span {
+            display: inline-block !important;
+            font-size: 17px !important;
             font-weight: 700 !important;
             line-height: 1.2 !important;
             letter-spacing: .01em !important;
+            color: var(--wt-text) !important;
+            vertical-align: middle !important;
+            transition: color .15s ease !important;
         }
         .ranking_lst.viewer > .lst_area > .title_area h2 .ico_arr1 {
-            font-size: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex: none !important;
             width: 22px !important;
             height: 22px !important;
             margin: 0 !important;
-            justify-content: center !important;
+            padding: 0 !important;
+            font-size: 0 !important;
+            color: var(--wt-text-mute) !important;
+            background: none !important;
+            filter: none !important;
             border-radius: 50% !important;
+            position: static !important;
             transition: background-color .15s ease, color .15s ease !important;
         }
         .ranking_lst.viewer > .lst_area > .title_area h2 .ico_arr1::after {
-            content: '\\203A' !important;
-            font-size: 20px !important;
-            line-height: 1 !important;
-            color: var(--wt-text-mute) !important;
-            transform: translateY(-1px) !important;
+            content: '' !important;
+            width: 6px !important;
+            height: 6px !important;
+            margin-left: -3px !important;
+            border-top: 2px solid currentColor !important;
+            border-right: 2px solid currentColor !important;
+            transform: rotate(45deg) !important;
         }
-        .ranking_lst.viewer > .lst_area > .title_area h2:hover > a { color: var(--wt-accent) !important; }
-        .ranking_lst.viewer > .lst_area > .title_area h2:hover .ico_arr1 { background: var(--wt-bg-hover) !important; }
-        .ranking_lst.viewer > .lst_area > .title_area h2:hover .ico_arr1::after { color: var(--wt-accent) !important; }
+        .ranking_lst.viewer > .lst_area > .title_area h2:hover > a,
+        .ranking_lst.viewer > .lst_area > .title_area h2:hover > span { color: var(--wt-accent) !important; }
+        .ranking_lst.viewer > .lst_area > .title_area h2:hover .ico_arr1 {
+            background: var(--wt-bg-hover) !important;
+            color: var(--wt-accent) !important;
+        }
+
+        /* Rows */
+        .ranking_lst.viewer .lst_type1 { border: 0 !important; }
+        .ranking_lst.viewer .lst_type1 > li {
+            height: auto !important;
+            padding: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+        }
+        .ranking_lst.viewer .lst_type1 > li + li { margin-top: 2px !important; }
+        .ranking_lst.viewer .lst_type1 > li > a {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            height: auto !important;
+            padding: 8px 8px 8px 4px !important;
+            border-radius: 12px !important;
+            transition: background-color .15s ease !important;
+        }
+        .ranking_lst.viewer .lst_type1 > li > a:hover { background: var(--wt-bg-hover) !important; }
+        .ranking_lst.viewer .lst_type1 .num_area {
+            position: static !important;
+            order: -1 !important;
+            flex: none !important;
+            width: 22px !important;
+            height: auto !important;
+            justify-content: center !important;
+        }
+        /* Rank digits ship as sprite spans (.ico_n1 …) with the number as
+           hidden text — show the text, drop the sprite. */
+        .ranking_lst.viewer .lst_type1 .num_area [class^="ico_n"] {
+            background: none !important;
+            filter: none !important;
+            width: auto !important;
+            height: auto !important;
+            text-indent: 0 !important;
+            overflow: visible !important;
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            line-height: 1 !important;
+            font-style: normal !important;
+            color: var(--wt-text-mute) !important;
+            font-variant-numeric: tabular-nums !important;
+        }
+        .ranking_lst.viewer .lst_type1 > li:nth-child(-n+3) .num_area [class^="ico_n"] { color: var(--wt-accent) !important; }
+        .ranking_lst.viewer .lst_type1 .pic_area {
+            position: relative !important;
+            inset: auto !important;
+            flex: none !important;
+            width: 64px !important;
+            height: 64px !important;
+            border-radius: 10px !important;
+            overflow: hidden !important;
+        }
+        .ranking_lst.viewer .lst_type1 .pic_area img {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+        .ranking_lst.viewer .lst_type1 .pic_area::before {
+            border-color: rgba(255,255,255,.08) !important;
+            border-radius: inherit !important;
+            z-index: 1 !important;
+        }
+        /* Thumbnail badges (e.g. "NEW") were positioned against the old
+           layout; re-anchor them on the thumbnail (4 + 22 + 12 + 4 px). */
+        .ranking_lst.viewer .lst_type1 .icon_area { left: 42px !important; top: 12px !important; }
+        .ranking_lst.viewer .lst_type1 .info_area {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            height: auto !important;
+            padding: 0 !important;
+            gap: 1px !important;
+        }
+        .ranking_lst.viewer .lst_type1 .info_area .genre {
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            line-height: 15px !important;
+            letter-spacing: .04em !important;
+            text-transform: uppercase !important;
+            color: var(--wt-text-mute) !important;
+        }
+        .ranking_lst.viewer .lst_type1 .info_area .subj {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            line-height: 20px !important;
+            margin: 0 !important;
+            color: var(--wt-text) !important;
+        }
+        .ranking_lst.viewer .lst_type1 .info_area .author {
+            font-size: 12px !important;
+            line-height: 16px !important;
+            margin: 0 !important;
+            color: var(--wt-text-mute) !important;
+        }
+        .ranking_lst.viewer .lst_type1 > li > a:hover .subj { color: var(--wt-accent) !important; }
+        .ranking_lst.viewer .lst_type1 > li > a:hover img { filter: none !important; }
 
         /* Creator note — highlighted card with an accent edge. */
         .comment_area .creator_note {
@@ -3092,6 +3188,22 @@
             opacity: .3 !important;
             pointer-events: none !important;
         }
+        /* Page-pager chevrons drawn with borders, not text: a "‹ ›" glyph
+           sits on the font baseline and rendered visibly low in its pill. A
+           rotated 7px box is centred exactly by the pill's flex centring. */
+        .paginate:not(.v2):not(.episode_lst *) .pg_prev::before,
+        .paginate:not(.v2):not(.episode_lst *) .pg_next::after {
+            content: '' !important;
+            display: block !important;
+            width: 7px !important;
+            height: 7px !important;
+            font-size: 0 !important;
+            background: none !important;
+            border-top: 2px solid currentColor !important;
+            border-right: 2px solid currentColor !important;
+        }
+        .paginate:not(.v2):not(.episode_lst *) .pg_prev::before { transform: rotate(-135deg) !important; margin: 0 0 0 3px !important; }
+        .paginate:not(.v2):not(.episode_lst *) .pg_next::after  { transform: rotate(45deg) !important;  margin: 0 3px 0 0 !important; }
 
         /* Viewer toolbar prev/next-episode buttons (.paginate.v2 around #N).
            Same class family as the bottom-of-list pager but rendered at
@@ -3447,6 +3559,7 @@
         scheduleViewerSync();
         scheduleViewerBanners();
         scheduleCarouselArrows();
+        scheduleSpa(tuneContestBanners);
     }
     // Navigation API: its events reach every JS world, so this fires even
     // when the manager runs us in an isolated world (Tampermonkey MV3) where
@@ -3531,6 +3644,21 @@
     }
     document.addEventListener('DOMContentLoaded', fixViewerBanners);
     scheduleViewerBanners();
+
+    // Mark light-background promo banners (/canvas .contest_banner) so CSS can
+    // dim them. The site sets an inline background-color that matches each
+    // rotating creative; dark creatives are left untouched.
+    function tuneContestBanners() {
+        document.querySelectorAll('.contest_banner').forEach(a => {
+            const m = (a.style.backgroundColor || '').match(/\d+(\.\d+)?/g);
+            if (!m || m.length < 3) return;
+            const [r, g, b] = m.slice(0, 3).map(Number);
+            const light = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.5;
+            a.toggleAttribute('data-wt-light', light);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', tuneContestBanners);
+    scheduleSpa(tuneContestBanners);
 
     console.info(`[webtoons-dark-mode] v${VERSION} fully loaded — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim | Alt+Shift+V / Ctrl+Alt+Shift+V: vignette`);
 })();
