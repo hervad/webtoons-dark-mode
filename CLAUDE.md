@@ -25,7 +25,7 @@ webtoons-dark-mode.user.js
 ├── _navGen + scheduleSpa() generation-token-gated SPA retry helper
 ├── onSpaNav()              pushState/replaceState/popstate dispatcher
 ├── fixViewerBanners()      clears rogue backgrounds inside #_viewerBox
-└── buildViewerCards()      wraps sidebar sections in elevated card divs
+└── styleCarouselArrows()   injects SVG chevrons into /canvas carousel buttons
 ```
 
 Key invariants:
@@ -41,7 +41,12 @@ Key invariants:
 - **`font-size: 0` / `line-height: 0` on the strip container** — sibling `<img class="_images">` elements have text nodes between them; without zeroing text metrics those nodes reserve baseline whitespace and create visible gaps between stacked panels. Pair with `display: block; vertical-align: top` on `img._images`.
 - **`overflow: visible` must cascade up** — the container shadow needs `.viewer_lst`, `.cont_box`, and `body.wt-viewer #content` all set to `overflow: visible` or the halo gets clipped by parent wrappers.
 - **SPA-deferred work runs through `scheduleSpa(fn)`** — every `pushState` / `replaceState` / `popstate` increments `_navGen`, and timers from previous routes early-out when they fire. Do not call `setTimeout` directly for navigation work; route it through `scheduleSpa` so rapid back-to-back nav doesn't queue stale DOM mutations.
-- **`onSpaNav()` clears `aside.dataset.wtCards`** — the viewer sidebar DOM node sometimes survives viewer-to-viewer navigation; without clearing the idempotency flag the new chapter's sidebar would never be re-wrapped.
+- **Sidebar cards are pure CSS, one card per `.lst_area`** — both the viewer sidebar (Trending & Popular, Top Originals) and the /canvas right rail are `.ranking_lst.viewer > .lst_area`. Style that element as the card. Never wrap it in JS-injected elements: the old `buildViewerCards()` wrapper stacked a second card around the already-carded `.lst_area` (card-inside-a-card) and was removed.
+- **SPA hooks: Navigation API first** — `navigation.addEventListener('navigatesuccess')` reaches every JS world, so it fires even when the userscript manager isolates us (Tampermonkey MV3) and the page's own `history.pushState` calls bypass our wrapper. The `pushState` / `popstate` hooks stay as the fallback; a duplicate `onSpaNav()` call is harmless.
+- **Detail-page episode list is `.detail_list_area > ul.detail_list > li.detail_list_item > a.detail_list_link`** — the old `.detail_lst` markup is gone. Base CSS paints the area `#fff`, titles `#3c3c3c`, and greys every column of a `:visited` row to `#c4c4c4`. Visited rows use `--wt-text-read` (title) / `--wt-text-mute` (meta) so read episodes stay readable but distinct from unread ones.
+- **`.paginate` stays `display: flex`** — the base pager is a 32 px flex row. Forcing `display: block` turned the prev-arrow `::before` (a base `display: block` sprite box) into a full-width line and pushed the page numbers below `.detail_body`'s `overflow: hidden` clip.
+- **Comments: theme via `--wcc-*` / `--wte-*` tokens first** — the WCC widget styles itself from custom properties and ships a dark set under `.wcc_theme_dark`, which Webtoons never applies for us. The theme re-declares that dark set at `html:root` (beats WCC's light `:root`); the per-element `[class*="wcc_…"]` rules only handle shape / layout tweaks.
+- **`.search_cont` is NOT the search panel** — it only wraps the header search button. The floating panel is `.search_area`; everything inside it (`.input_box`, `.ly_autocomplete`, `.lst_history`) is flat on that panel. Boxing `.search_cont` or `.ly_autocomplete` produced stacked frames.
 - **`snb_wrap` separator uses `::after`, not `border-bottom`** — `snb_inner` has `position: relative` which creates a stacking context that paints above the parent's border, hiding the separator in the centre section. The fix is a full-width `::after` pseudo-element with `z-index: 10` on `snb_wrap`. Also set `padding-bottom: 0` on `snb_wrap` to align its bottom edge with `snb_inner` so the line sits at a consistent Y across the full width.
 - **Active GNB link uses `aria-current="true"` on `<a>`, not `.on` on `<li>`** — the legacy `.gnb .on a` selector never fires on the current site. Target `.gnb a[aria-current="true"]` and prefix with `#header`/`#gnbWrap` to gain the ID-level specificity needed to override the site's own colour rule.
 - **GNB links wrap their text in `<h1>`** — our blanket `h1 { color: var(--wt-text) !important }` rule sets heading colour explicitly, overriding the accent colour inherited from the `<a>`. Always add `#header a[aria-current="true"] h1` alongside the link rule, with `font-size: inherit` and `font-weight: inherit` to prevent the site's UA/base heading styles from shrinking the text.
@@ -108,7 +113,6 @@ The DevTools **Computed** tab shows which rule wins — useful when `!important`
 | `.lk_more`, `._btnMore` | "more ›" link in homepage Popular-by-Category headers. Sprite chevron lives in `<span class="ico_arr">` child, not on a pseudo-element |
 | `#challengeGenreRanking` / `#upcomingChallengeRanking` | Top CANVAS / Up & Coming sidebar cards on `/canvas`. Target by id (or path `.aside.challenge .lst_area`) for outer card styling |
 | `[class*="wcc_"]` | WCC comment widget (CSS-module hashed names) |
-| `.u_cbox_*` | Legacy Naver comment widget (fallback) |
 | `._loginLayer`, `._loginDimLayer` | Login modal (injected by gnb bundle) |
 | `section[class*="layout_container"]` | Next.js subapp pages (About, Contact…) |
 
@@ -171,7 +175,12 @@ There is no automated test suite — this is a DOM-manipulation script. Manual t
 - [ ] Sub-nav tabs near the right viewport edge are bright — not dimmed by the page vignette (`body::before`)
 - [ ] `/canvas` carousel arrows are centered in their dark circles and gain a green tint + glow on hover
 - [ ] Subscriber-count badges on carousel cards render as green-text pills
-- [ ] Viewer aside cards (ranking, info, ad, patron sections) re-wrap correctly after viewer→viewer SPA navigation
+- [ ] Viewer sidebar: Trending & Popular and Top Originals are each ONE card (no card inside a card); the genre filter pill sits on the title row, not over the first ranking row
+- [ ] Detail page: episode list card is dark (no white panel); unread titles bright, already-read titles muted but readable; hover shows an accent bar + green title
+- [ ] Detail page: pagination is one centred row of pills inside the card (not clipped at the card's bottom edge)
+- [ ] Search dropdown: one panel, no nested frames; recent-search rows highlight dark (not white) on hover / arrow-key selection
+- [ ] Comments: TOP / NEWEST are underline tabs; like / dislike / Reply are rounded pills
+- [ ] Scroll-to-top button is a dark disc with a light arrow on every page (not a white circle on /canvas)
 - [ ] `/canvas/genre/*` (DRAMA, FANTASY, …) renders cards inside one elevated section card with 4 columns, ~14 px gap, and the rightmost card's right border visible (not clipped)
 - [ ] `/canvas` right rail shows **Top CANVAS** and **Up & Coming** as two separate stacked elevated cards with 8 px gap between, sidebar 280 px wide
 - [ ] Pagination numbers render as 28 px pills with a visible hover state (`--wt-bg-hover` background + soft-accent ring); active page is a brand-green pill

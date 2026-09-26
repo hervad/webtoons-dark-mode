@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-26
+
+### Fixed
+
+- **Series detail page was white again.** Webtoons renamed the episode-list markup from `.detail_lst` to `.detail_list_area > ul.detail_list > li.detail_list_item > a.detail_list_link`, so none of our rules matched. The list panel, the "Read N new episodes on the app" strip, and the NOTE strip were all white, and episode titles were the site's `#3c3c3c` on our dark rows. Retargeted every rule to the new classes.
+- **Washed-out episode titles.** The base CSS greys every column of an already-read (`:visited`) row to `#c4c4c4`. Read episodes now use a dedicated muted-but-readable tone (`--wt-text-read`, ~5.8:1 on the list card), while unread episodes stay full brightness so the next one to read stands out.
+- **Viewer sidebar showed a card inside a card** (Trending & Popular, Top Originals). `buildViewerCards()` wrapped each `.lst_area` in a JS-injected card, and `.lst_area` was already a card via CSS. Removed the JS wrapper entirely; the sidebar is now pure CSS, one card per section. The genre filter pill now sits on the title row instead of overlapping the first ranking.
+- **Detail-page pagination clipped.** Forcing `.paginate` to `display: block` dropped the prev-arrow onto its own line and pushed the page numbers under the card's clip edge. The pager is now a wrapping flex row of pills; disabled first/last arrows are dimmed.
+- **Search dropdown drew stacked frames**, and the recent-search row highlighted white. `.search_cont` (the button wrapper) and `.ly_autocomplete` no longer get their own box. The input pill shows focus with an accent ring via `:focus-within`. Recent-search (`.lst_history`) rows and autocomplete rows highlight dark.
+- **Scroll-to-top button** was a white disc on `/canvas`. It had only looked dark elsewhere because the vignette layer covered it. It is now an inverted dark disc placed above the vignette.
+
+### Improved
+
+- Comments: TOP / NEWEST are underline tabs instead of boxed buttons; like / dislike / Reply are rounded pills; the editor toolbar and kebab-menu icons lost their square boxes.
+- Comments: the WCC widget's own `--wcc-*` / `--wte-*` design tokens are re-declared with its dark set (greys remapped to our palette), so every icon fill, divider, loader and popover the per-element rules don't name also renders dark.
+- Sidebar cards (viewer + `/canvas` right rail) use a softer top-lit hairline border instead of a 40 %-white outline.
+- Episode rows: flat on the card with an accent left-edge bar on hover, tabular numerals for dates / likes / episode numbers.
+- `color-scheme: dark` on `:root`, so browser-painted UI (scrollbars, `<select>` popups, autofill, the load-time canvas) is dark too. `accent-color` gives native checkboxes and radios the brand green.
+- `prefers-reduced-motion` is honoured: hover lifts and transitions are dropped for users who ask for less motion.
+- SPA route changes are also detected through the Navigation API (`navigatesuccess`). This works even when the userscript manager runs the script in an isolated world, where the `history.pushState` wrapper never sees the page's calls.
+
+### Cleaned up
+
+- Removed selectors for markup Webtoons no longer ships: `.detail_lst`, the legacy `u_cbox` comment widget block, `.card_lst` / `.daily_lst` / `.genre_lst` / `._popularList` / `._dailyList` / `.spot_lst`, `#gnbWrap` / `.gnb_wrap` / `.header_bn`, `.search_box`, `._listInfo`, `.layer_popup` / `.pop_layer` / `.tooltip` / `.balloon`, `.viewer_header` / `.viewer_footer` / `._toolBox` / `.ly_episode`, `.viewer_dsc_area` / `.viewer_bnr` / `._patronArea`, `.aside_item` / `.aside_wrap` / `.section_wrap` / `.ranking_wrap`, and a few others. Each was checked against the live desktop and mobile bundles before removal.
+- Removed `buildViewerCards()` and its SPA re-wrap bookkeeping.
+
 ## [1.2.4] - 2026-05-13
 
 ### Fixed

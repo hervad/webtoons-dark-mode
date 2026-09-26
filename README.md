@@ -54,7 +54,7 @@ State persists across pages and reloads via `GM_setValue`.
 
 ## How it works
 
-A single `<style>` element is injected at `document-start` (before paint, so no flash of light theme). The CSS targets the actual container classes Webtoons uses — `.gnb`, `.detail_lst`, `.viewer_lst`, the WCC comment widget (`[class*="wcc_*"]`), etc. — and overrides background, color, and border properties. Comic panels (`img._images`) are explicitly excluded with `filter: none`, so they render exactly as the artist intended.
+A single `<style>` element is injected at `document-start` (before paint, so no flash of light theme). The CSS targets the actual container classes Webtoons uses — `.gnb`, `.detail_list_area`, `.viewer_lst`, the WCC comment widget (`[class*="wcc_*"]`), etc. — and overrides background, color, and border properties. Comic panels (`img._images`) are explicitly excluded with `filter: none`, so they render exactly as the artist intended.
 
 A small amount of JavaScript runs to handle Webtoons' SPA navigation: a `<head>` `MutationObserver` re-injects the `<style>` if Webtoons swaps stylesheets, `pushState` / `popstate` hooks sync three body classes (`wt-viewer`, `wt-detail`, `wt-home`) that scope page-specific CSS, and `fixViewerBanners()` clears rogue background colors that Webtoons sets via JS inside the viewer column. All listeners are bounded — no `requestAnimationFrame` loops, no per-frame work.
 

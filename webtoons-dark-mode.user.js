@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.2.4
+// @version      1.3.0
 // @description  Scoped dark theme for Webtoons (desktop + mobile) — comic panels render untouched. Elevated viewer card, accent-green active nav, WCAG-tuned contrast, optional reader dim. OS preference on first install; persistent toggle (Alt+Shift+T).
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.2.4';
+    const VERSION = '1.3.0';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -50,6 +50,7 @@
             --wt-text:            #e6e6e6;
             --wt-text-dim:        #b5b9c0;
             --wt-text-mute:       #878e99;
+            --wt-text-read:       #9aa1ab;
             --wt-text-on-accent:  #0a0a0a;
             --wt-link:            #7cb6ff;
             --wt-accent:          #00d564;
@@ -61,10 +62,29 @@
 
     /* ---------- theme: targeted selectors, no global filter ---------- */
     const theme = `
+        /* color-scheme tells the browser the page is dark, so everything it
+           paints itself — native scrollbars, <select> popups, date pickers,
+           autofill, the canvas behind the page during load — renders dark
+           too instead of flashing white. accent-color brands checkboxes,
+           radios and range sliders without restyling them by hand. */
+        :root {
+            color-scheme: dark !important;
+            accent-color: var(--wt-accent);
+        }
         html, body {
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
-            scrollbar-color: var(--wt-bg-elev2) var(--wt-bg);
+            scrollbar-color: var(--wt-bg-hover) var(--wt-bg);
+        }
+        /* Respect the OS "reduce motion" setting: keep colour changes, drop
+           the lifts / slides / smooth-scroll our hover states add. */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+            }
         }
 
         /* Text */
@@ -72,8 +92,8 @@
         .tit, .sub_tit, .subj, .author, .genre, .grade_num, .info, .summary {
             color: var(--wt-text) !important;
         }
-        .desc, .date, .count, .from, .ico_view, .ico_grade, .num,
-        .grade_area, .info_area .author, .nick, .meta, .help_txt, .comment_count {
+        .desc, .date, .count, .from, .ico_view, .num,
+        .grade_area, .info_area .author, .nick, .meta {
             color: var(--wt-text-dim) !important;
         }
 
@@ -105,11 +125,11 @@
             outline: 2px solid var(--wt-border-strong) !important;
             outline-offset: 2px !important;
         }
-        .NPI a, .lk_link, .more, .btn_link { color: var(--wt-link) !important; }
+        .more { color: var(--wt-link) !important; }
 
         /* Header / global nav — border-color and box-shadow only on the outer
            header shell, NOT on .gnb/.lnb nav lists (causes nav item artifacts). */
-        #header, .header, .gnb_wrap, #gnbWrap, .header_bn {
+        #header, .header {
             background-color: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
             box-shadow: var(--wt-shadow) !important;
@@ -131,10 +151,10 @@
         /* Active page link — accent green + inset underline (box-shadow avoids
            clipping, works even when the parent has overflow:hidden). */
         /* Active GNB link: site sets aria-current="true" on the <a> itself.
-           ID prefixes (#header / #gnbWrap) boost specificity above the site's
+           The #header ID prefix boosts specificity above the site's
            own color rule which wins at 0,2,1 or lower. */
-        #header .gnb a[aria-current="true"], #gnbWrap .gnb a[aria-current="true"],
-        #header .lnb a[aria-current="true"], #gnbWrap .lnb a[aria-current="true"] {
+        #header .gnb a[aria-current="true"],
+        #header .lnb a[aria-current="true"] {
             color: var(--wt-accent) !important;
             box-shadow: inset 0 -2px 0 var(--wt-accent) !important;
             border-radius: 6px 6px 0 0 !important;
@@ -144,9 +164,7 @@
            Scope the override directly under #header so it wins by ID specificity. */
         #header a[aria-current="true"] h1,
         #header a[aria-current="true"] h2,
-        #header a[aria-current="true"] h3,
-        #gnbWrap a[aria-current="true"] h1,
-        #gnbWrap a[aria-current="true"] h2 {
+        #header a[aria-current="true"] h3 {
             color: var(--wt-accent) !important;
             font-size: inherit !important;
             font-weight: inherit !important;
@@ -172,44 +190,74 @@
             background: var(--wt-bg-hover) !important;
         }
 
-        /* Search dropdown — three nested layers: .search_area (outer panel) →
-           .input_box (the rounded grey pill) → .input_search (the transparent
-           <input>). All three need overriding; .input_box has its own bg. */
-        .search_cont, .search_area, ._searchArea, .big_search.search_area {
+        /* Search dropdown — ONE surface. .search_area is the floating panel;
+           everything inside it (.input_box pill, .ly_autocomplete list) is
+           flat on that panel. .search_cont is only the wrapper around the
+           header's search button — giving it a box drew a second frame
+           behind the panel. The <input> itself gets no border / bg / outline
+           (the generic input rule would add a box inside the pill); focus is
+           shown on the pill via :focus-within instead. */
+        .search_area, .big_search.search_area {
             background: var(--wt-bg-elev) !important;
-            border: 1px solid var(--wt-border) !important;
-            box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
+            border: 1px solid rgba(255,255,255,.12) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 16px 40px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.4) !important;
         }
         .search_area .input_box {
             background: var(--wt-bg-input) !important;
-            border: 1px solid var(--wt-border) !important;
+            border: 1px solid transparent !important;
+            transition: border-color .15s ease, box-shadow .15s ease !important;
         }
-        .input_search, ._txtKeyword,
-        .search_area .input_search {
+        .search_area .input_box:focus-within {
+            border-color: var(--wt-accent) !important;
+            box-shadow: 0 0 0 3px rgba(0,213,100,.18) !important;
+        }
+        .search_area .input_box:before { filter: brightness(0) invert(1) opacity(.6) !important; }
+        .search_area .input_search, .search_area ._txtKeyword {
             background: transparent !important;
+            border: 0 !important;
+            outline: none !important;
+            box-shadow: none !important;
             color: var(--wt-text) !important;
         }
+        .search_area .btn_delete_search { filter: brightness(0) invert(1) opacity(.6) !important; }
         input::placeholder { color: var(--wt-text-mute) !important; }
-        .ly_autocomplete, ._searchLayer {
-            background: var(--wt-bg-elev) !important;
-            border: 1px solid var(--wt-border) !important;
-            border-radius: 4px;
+        .search_area .ly_autocomplete {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
         }
-        .ly_autocomplete li, ._searchLayer li { background: transparent !important; }
-        .ly_autocomplete li:hover, ._searchLayer li:hover,
-        .ly_autocomplete li.on, ._searchLayer li.on {
-            background: var(--wt-bg-elev2) !important;
-        }
-        .ly_autocomplete a, ._searchLayer a, .ly_autocomplete .title { color: var(--wt-text) !important; }
+        .search_area .ly_autocomplete li { background: transparent !important; }
+        .search_area .ly_autocomplete a, .search_area .ly_autocomplete .title { color: var(--wt-text) !important; }
         .search_area .ly_autocomplete .autocomplete_foot a { color: var(--wt-text-dim) !important; }
+        .search_area .ly_autocomplete .autocomplete_foot a:hover { color: var(--wt-text) !important; }
+        .search_area .ly_autocomplete .autocomplete_foot .ico_arr_black { filter: invert(1) opacity(.7) !important; }
+
+        /* Recent-search history. Base: #767676 text, #f3f3f3 hover / keyboard
+           (.on) background — the white bar in the dropdown. */
+        .search_area .lst_history a {
+            color: var(--wt-text-dim) !important;
+            border-radius: 8px !important;
+            transition: background-color .12s ease, color .12s ease !important;
+        }
+        .search_area .lst_history li.on,
+        .search_area .lst_history li { background: transparent !important; }
+        .search_area .lst_history a:hover,
+        .search_area .lst_history li.on a {
+            background: var(--wt-bg-hover) !important;
+            color: var(--wt-text) !important;
+        }
+        .search_area .lst_history a strong { color: var(--wt-accent) !important; }
+        .search_area .lst_history.type_none { color: var(--wt-text-mute) !important; }
 
         /* Search autocomplete RESULT LIST (e.g. typing "roman" → Selfish Romance,
            Sweet Romance, ... Each <li class="link"> has white-on-hover from base
            CSS, plus #000 title + #8c8c8c info — all needs overriding. */
+        .search_area .list_autocomplete .link { border-radius: 8px !important; }
         .search_area .list_autocomplete li.on,
         .search_area .list_autocomplete .link:hover,
         .search_area .list_autocomplete li.on .link {
-            background: var(--wt-bg-elev2) !important;
+            background: var(--wt-bg-hover) !important;
         }
         .search_area .list_autocomplete .subj { color: var(--wt-text) !important; }
         .search_area .list_autocomplete .info { color: var(--wt-text-dim) !important; }
@@ -221,21 +269,12 @@
         .search_area .list_autocomplete .pic:before { border-color: var(--wt-border) !important; }
 
         /* Creators section in search autocomplete — base hover is #f3f3f3 (white). */
-        .search_area .list_creator .link:hover { background: var(--wt-bg-elev2) !important; }
+        .search_area .list_creator .link:hover { background: var(--wt-bg-hover) !important; }
+        .search_area .list_creator .info .author { color: var(--wt-text) !important; }
+        .search_area .list_creator .link strong { color: var(--wt-accent) !important; }
         .search_area .list_creator .info { color: var(--wt-text-dim) !important; }
         .search_area .list_creator .info .bar { background: var(--wt-border) !important; }
 
-        /* Cards / lists */
-        .card_lst li, .card_item, .detail_lst li, .lst_area li,
-        .daily_lst li, .ranking_lst li, .genre_lst li, .challenge_lst li,
-        ._popularList li, ._dailyList li {
-            background-color: var(--wt-bg-elev) !important;
-            border-color: var(--wt-border) !important;
-            border-radius: 6px;
-        }
-        .card_lst li:hover, .card_item:hover, .detail_lst li:hover {
-            background-color: var(--wt-bg-elev2) !important;
-        }
 
         /* /canvas "Weekly HOT" and "Popular By Category" grids. Each card is
            <a class="discover_item"> inside <li>; base CSS paints the link with
@@ -261,20 +300,14 @@
            as the card's only label) becomes readable. Scoped strictly to card
            containers to avoid touching viewer panel images, which must stay
            pristine. transition lives on the img so the dim eases in/out. */
-        .card_lst li img, .card_item img, .detail_lst li img,
         .discover_lst li img, a.discover_item img,
-        .daily_lst li img, ._dailyList li img, ._popularList li img,
         .webtoon_list li img, .webtoon_list_wrap li img,
-        .main_section .card_item img,
-        .discover_spot li img, .spot_lst li img {
+        .discover_spot li img {
             transition: filter .2s ease !important;
         }
-        .card_lst li:hover img, .card_item:hover img, .detail_lst li:hover img,
         .discover_lst li:hover img, a.discover_item:hover img,
-        .daily_lst li:hover img, ._dailyList li:hover img, ._popularList li:hover img,
         .webtoon_list li:hover img, .webtoon_list_wrap li:hover img,
-        .main_section .card_item:hover img,
-        .discover_spot li:hover img, .spot_lst li:hover img {
+        .discover_spot li:hover img {
             filter: brightness(.7) !important;
         }
         /* Hover darken extended to: viewer bottom episode strip + viewer sidebar
@@ -418,26 +451,25 @@
         /* Shrink the floated sidebar slightly so the grid section gets more
            horizontal room (the rightmost card column was being shaved). */
         .aside.challenge { width: 280px !important; }
-        /* Card-style outer wrapper for Top CANVAS (#challengeGenreRanking)
-           and Up & Coming (#upcomingChallengeRanking). Match background and
-           padding across both so they read as a matched pair. Extra
-           padding-bottom guarantees the last ranking-row tile's bottom
-           border has clearance from the panel edge. */
+        /* Shared sidebar card: /canvas Top CANVAS (#challengeGenreRanking) /
+           Up & Coming (#upcomingChallengeRanking) AND the viewer's Trending &
+           Popular / Top Originals — all are .ranking_lst.viewer > .lst_area.
+           One card per .lst_area, nothing wrapped around it. A top-lit
+           hairline (brighter top edge) + two-layer shadow separates the card
+           from the page without the harsh full-white outline. */
         .aside.challenge .lst_area,
         #challengeGenreRanking,
         #upcomingChallengeRanking,
-        .ranking_lst.viewer > .lst_area,
-        .ranking_lst.viewer .lst_area {
-            background: var(--wt-bg-elev2) !important;
-            background-color: var(--wt-bg-elev2) !important;
-            border: 1px solid rgba(255,255,255,.4) !important;
-            border-radius: 12px !important;
-            padding: 14px !important;
+        .ranking_lst.viewer > .lst_area {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid rgba(255,255,255,.12) !important;
+            border-top-color: rgba(255,255,255,.2) !important;
+            border-radius: 14px !important;
+            padding: 16px !important;
             box-sizing: border-box !important;
             box-shadow:
-                inset 0 0 0 1px rgba(255,255,255,.08),
-                0 4px 12px rgba(0,0,0,.55),
-                0 12px 28px rgba(0,0,0,.45) !important;
+                0 2px 6px rgba(0,0,0,.35),
+                0 12px 32px rgba(0,0,0,.45) !important;
             margin: 0 !important;
         }
         /* Flat ranking rows inside Top CANVAS / Up & Coming — no per-row
@@ -557,18 +589,11 @@
         .detail_header { color: var(--wt-text) !important; }
 
         /* Popups / modals */
-        .layer_popup, ._popupLayer, .layer_box, .pop_layer,
-        .modal, .dialog, .tooltip, .balloon, .ly_box {
+        .modal, .dialog, .ly_box {
             background-color: var(--wt-bg-elev) !important;
             color: var(--wt-text) !important;
             border: 1px solid var(--wt-border) !important;
             box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
-        }
-
-        /* Tone down the top marketing banner */
-        .header_bn {
-            background: var(--wt-bg-elev) !important;
-            filter: brightness(.85);
         }
 
         /* Promotional banner on /canvas ("Try the New CANVAS Creator Dashboard!").
@@ -1001,13 +1026,16 @@
         /* Make the .title_area inside the Top CANVAS card a flex row so the
            h2 and the filter pill align horizontally without one pushing
            the other. */
-        .aside.challenge .lst_area .title_area {
+        .aside.challenge .lst_area .title_area,
+        .ranking_lst.viewer > .lst_area > .title_area {
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
             gap: 8px !important;
+            margin-bottom: 8px !important;
         }
-        .aside.challenge .lst_area .title_area h2 {
+        .aside.challenge .lst_area .title_area h2,
+        .ranking_lst.viewer > .lst_area > .title_area h2 {
             flex: 1 1 auto !important;
             min-width: 0 !important;
         }
@@ -1183,7 +1211,7 @@
             border: 1px solid var(--wt-border) !important;
         }
         button:hover, .btn:hover { background-color: var(--wt-bg-hover) !important; }
-        .btn_subscribe, .btn_main, ._btnSubscribe {
+        .btn_subscribe {
             background-color: var(--wt-accent) !important;
             color: var(--wt-text-on-accent) !important;
             border-color: var(--wt-accent) !important;
@@ -1439,19 +1467,6 @@
             text-decoration: underline !important;
         }
         .age_gate_area ::selection { background: var(--wt-bg-hover) !important; color: var(--wt-text) !important; }
-        .search_box, ._searchBox {
-            background-color: var(--wt-bg-elev) !important;
-            border-color: var(--wt-border) !important;
-        }
-
-        /* Episode list */
-        ._listInfo, .episode_lst {
-            background-color: var(--wt-bg) !important;
-        }
-        .detail_lst li, ._episodeItem {
-            background-color: var(--wt-bg-elev) !important;
-            border-bottom: 1px solid var(--wt-border) !important;
-        }
 
         /* Vignette gradient — applied to viewer, detail, and home/listing pages.
            All three classes are set/cleared by JS on every navigation; no CSS
@@ -1479,8 +1494,7 @@
         body.wt-viewer .comment_area {
             background-color: transparent !important;
         }
-        .viewer_lst, .viewer_header,
-        .viewer_footer, ._toolBox, .ly_episode {
+        .viewer_lst {
             background-color: transparent !important;
             color: var(--wt-text) !important;
         }
@@ -1613,8 +1627,7 @@
 
         /* Viewer sub-sections below the comic panels — explicitly dark so they
            don't reveal the cont_box background when set to transparent. */
-        .viewer_info_area, .viewer_ad_area, .viewer_patron_area,
-        ._patronArea, .viewer_dsc_area, .viewer_bnr {
+        .viewer_info_area, .viewer_ad_area, .viewer_patron_area {
             background: var(--wt-bg) !important;
             color: var(--wt-text) !important;
         }
@@ -1629,8 +1642,10 @@
         }
 
         /* === Viewer page elevation ===
-           Cards are injected by buildViewerCards() in JS — CSS only provides the
-           class definition and resets; JS handles the section grouping. */
+           .aside.viewer > .ranking_lst.viewer > .lst_area × 2 (Trending &
+           Popular, Top Originals). Each .lst_area is carded by the shared
+           sidebar-card rule above — do NOT wrap them in extra elements or add
+           a second card layer here (that produced a card-inside-a-card). */
 
         /* width:330px keeps the float from exceeding the 1200px cont_box;
            height:fit-content prevents stretching to match the comment column. */
@@ -1656,14 +1671,6 @@
             border-radius: 0 !important;
             border: none !important;
         }
-        /* Card class injected by JS onto each section wrapper. */
-        .wt-viewer-card {
-            background: var(--wt-bg-elev) !important;
-            border-radius: 14px !important;
-            padding: 16px !important;
-            border: 1px solid var(--wt-border) !important;
-            box-shadow: 0 8px 32px rgba(0,0,0,.35) !important;
-        }
         /* Section header arrow — sprite, needs filter not color.
            Same treatment on .aside.viewer (viewer page) and .aside.challenge
            (canvas page sidebar). */
@@ -1679,23 +1686,14 @@
         .ranking_lst .title_area h2 span em { color: var(--wt-text-dim) !important; }
         .ranking_lst .ico_arr1 { color: var(--wt-text-dim) !important; }
         /* Ranking list item dividers and section separators. */
-        .ranking_lst li, .aside_item, .aside_wrap,
+        .ranking_lst li,
         .cont_box .aside { border-color: var(--wt-border) !important; }
-        /* .ranking_wrap inside .aside.viewer is now a card — no internal borders.
-           Keep the rule for .section_wrap and non-viewer asides only. */
-        .cont_box .aside:not(.viewer) .section_wrap,
-        .cont_box .aside:not(.viewer) .ranking_wrap {
-            border-top-color: var(--wt-border) !important;
-            border-bottom-color: var(--wt-border) !important;
-        }
         /* Viewer info / ad / patron section top separators — hidden entirely
            so the column under the panels reads as one continuous dark surface
            (no faint horizontal lines below the comic). */
         .viewer_lst .viewer_info_area,
         .viewer_lst .viewer_ad_area,
-        .viewer_patron_area,
-        .viewer_lst .viewer_dsc_area,
-        .viewer_lst .viewer_bnr {
+        .viewer_patron_area {
             border-top: none !important;
             border-bottom: none !important;
         }
@@ -1704,7 +1702,7 @@
         /* Sidebar patron/section separator inside .aside.detail. */
         .aside.detail .aside_patron { border-top-color: var(--wt-border) !important; }
         /* Ranking list section bottom border (.lst_type1 = the ranked item list).
-           Suppress in viewer aside — each .ranking_wrap is already a card. */
+           Suppress in viewer aside — each .lst_area is already a card. */
         .lst_type1 { border-bottom-color: var(--wt-border) !important; }
         .aside.viewer .lst_type1 { border-bottom: none !important; }
         /* CANVAS Weekly round-up / challenge_spot top separator. */
@@ -1763,7 +1761,54 @@
 
         /* Webtoons replaced the legacy Naver u_cbox widget with "WCC"
            (Webtoon Comment Component), which uses CSS-module class names of
-           the form wcc_<Component>__<element>. Legacy .u_cbox_* kept as fallback. */
+           the form wcc_<Component>__<element>. */
+
+        /* WCC design tokens. The widget styles itself from --wcc-* custom
+           properties and ships a full dark set under .wcc_theme_dark, but
+           Webtoons only applies that class when the page is in its own dark
+           mode. Re-declare the dark set (greys remapped to our palette) at
+           html:root — one notch more specific than WCC's light :root block —
+           so every icon fill, divider, loader and popover the per-element
+           rules below don't name still comes out dark. */
+        html:root {
+            --wte-bg-primary: var(--wt-bg-elev); --wte-bg-primary-container-1: var(--wt-bg-elev2);
+            --wte-bg-secondary: var(--wt-bg-elev); --wte-placeholder-bg: rgba(255,255,255,.08);
+            --wte-fg-secondary: var(--wt-text-dim); --wte-fg-disabled-primary: var(--wt-text-mute);
+            --wte-fg-disabled-secondary: #5a6472; --wte-line-alpha-8: rgba(255,255,255,.08);
+            --wte-line-alpha-10: rgba(255,255,255,.1); --wte-line-divider: var(--wt-border);
+            --wte-text-primary: var(--wt-text); --wte-text-disabled: var(--wt-text-mute);
+            --wte-text-tertiary: var(--wt-text-mute); --wte-icon-primary: var(--wt-text);
+            --wte-icon-tertiary: var(--wt-text-mute); --wte-icon-inverted-primary: var(--wt-bg);
+            --wcc-primary-01: var(--wt-accent); --wcc-primary-02: #ff3f78; --wcc-secondary-01: #e24e2c; --wcc-secondary-02: #ff7f00;
+            --wcc-secondary-03: #3b6cef; --wcc-secondary-04: #9867ff; --wcc-text-01: #fff; --wcc-text-02: #8c8c8c;
+            --wcc-text-03: var(--wt-bg-elev); --wcc-text-04: var(--wt-bg); --wcc-text-05: #8c8c8c; --wcc-text-06: var(--wt-bg-elev2);
+            --wcc-text-07: #bbb; --wcc-text-08: #8c8c8c; --wcc-text-09: #a6a6a6; --wcc-text-10: #8c8c8c;
+            --wcc-text-11: #8c8c8c; --wcc-text-12: #f8f8f8; --wcc-text-13: #8c8c8c; --wcc-text-14: var(--wt-accent);
+            --wcc-text-15: #e24e2c; --wcc-text-16: #e99536; --wcc-text-17: #3b6cef; --wcc-text-20: #c9c9c9;
+            --wcc-text-21: var(--wt-bg-elev2); --wcc-text-22: var(--wt-bg-elev); --wcc-text-23: #a6a6a6; --wcc-text-24: #a6a6a6;
+            --wcc-text-25: #fff; --wcc-text-26: #ff3b0e; --wcc-text-27: #111; --wcc-text-29: rgba(255, 255, 255, 0.4);
+            --wcc-line-01: #fff; --wcc-line-02: var(--wt-bg-elev2); --wcc-line-03: #8c8c8c; --wcc-line-04: var(--wt-bg-elev2);
+            --wcc-line-05: var(--wt-bg-elev); --wcc-line-06: var(--wt-bg-elev2); --wcc-line-07: #bbb; --wcc-line-08: #a6a6a6;
+            --wcc-line-09: #a6a6a6; --wcc-line-10: var(--wt-accent); --wcc-line-11: rgba(255, 255, 255, 0.1); --wcc-line-12: rgba(255, 255, 255, 0.1);
+            --wcc-line-14: var(--wt-bg-elev); --wcc-line-15: rgba(0, 0, 0, 0.1); --wcc-line-16: #e0e0e0; --wcc-line-17: #d8d8d8;
+            --wcc-line-18: #3f4963; --wcc-line-20: var(--wt-border); --wcc-line-21: #a6a6a6; --wcc-line-23: #8c8c8c;
+            --wcc-line-25: #3b6cef; --wcc-line-26: rgba(59, 108, 239, 0.3); --wcc-line-27: rgba(255, 255, 255, 0.2); --wcc-bg-01: var(--wt-bg-elev2);
+            --wcc-bg-02: var(--wt-bg-elev); --wcc-bg-03: var(--wt-bg); --wcc-bg-04: var(--wt-bg-elev2); --wcc-bg-05: var(--wt-bg-elev);
+            --wcc-bg-06: var(--wt-bg-elev2); --wcc-bg-07: var(--wt-bg-elev2); --wcc-bg-08: #f8f8f8; --wcc-bg-09: #a6a6a6;
+            --wcc-bg-10: #8c8c8c; --wcc-bg-11: var(--wt-bg-elev2); --wcc-bg-13: var(--wt-accent); --wcc-bg-14: #8c8c8c;
+            --wcc-bg-15: var(--wt-bg-elev); --wcc-bg-16: #daffeb; --wcc-bg-18: rgba(251, 251, 251, 0.88); --wcc-bg-19: rgba(52, 60, 81, 0.88);
+            --wcc-bg-20: rgba(40, 38, 42, 0.88); --wcc-bg-21: #000; --wcc-bg-22: #8c8c8c; --wcc-bg-23: rgba(23, 23, 23, 0.9);
+            --wcc-bg-24: rgba(28, 28, 28, 0.85); --wcc-bg-25: rgba(255, 255, 255, 0.1); --wcc-bg-26: rgba(0, 0, 0, 0.6); --wcc-bg-27: #31384e;
+            --wcc-bg-28: #fff; --wcc-bg-29: #49526c; --wcc-bg-30: var(--wt-bg-hover); --wcc-bg-31: var(--wt-bg-elev);
+            --wcc-bg-32: #000; --wcc-bg-33: var(--wt-bg-elev); --wcc-bg-34: var(--wt-bg-elev); --wcc-bg-35: var(--wt-bg-elev);
+            --wcc-bg-36: rgba(36, 36, 36, 0.95); --wcc-bg-37: rgba(0, 0, 0, 0.8); --wcc-bg-38: var(--wt-bg); --wcc-bg-39: #e24e2c;
+            --wcc-bg-40: var(--wt-bg-hover); --wcc-bg-41: #141118; --wcc-bg-45: rgba(60, 60, 60, 0.6); --wcc-bg-46: rgba(0, 0, 0, 0.5);
+            --wcc-bg-47: #3b6cef; --wcc-bg-48: #818894; --wcc-bg-49: rgba(60, 60, 60, 0.08); --wcc-bg-50: rgba(59, 108, 239, 0.08);
+            --wcc-bg-51: #2e1b21; --wcc-bg-52: #fff; --wcc-bg-53: #c7c9d5; --wcc-icon-01: #fff;
+            --wcc-icon-02: #8c8c8c; --wcc-icon-03: #f8f8f8; --wcc-icon-04: #f8f8f8; --wcc-icon-05: #8c8c8c;
+            --wcc-icon-06: #8c8c8c; --wcc-icon-07: #a6a6a6; --wcc-icon-08: var(--wt-accent); --wcc-icon-09: #e24e2c;
+            --wcc-icon-10: #e99536; --wcc-icon-11: #9867ff; --wcc-loader-foreground: #555; --wcc-loader-background: #333;
+        }
 
         /* WCC App MASTER container -- this is the OUTERMOST wrapper of the
            comment widget (wcc_App__root). v1.0.9 missed this; comment
@@ -1864,21 +1909,60 @@
         [class*="wcc_CommentHeader__creatorBadge"],
         [class*="wcc_CommentHeader__ownerSign"]     { color: var(--wt-accent) !important; }
 
-        /* Sort-order tabs (TOP / NEWEST) */
+        /* Sort-order tabs (TOP / NEWEST) — underline tabs. They are <button>s,
+           so the generic button rule boxed them; strip that and mark the
+           active tab with an accent underline instead. */
         [class*="wcc_SortOrderTabs__root"], [class*="wcc_SortOrderTab__root"] {
             background: transparent !important;
             color: var(--wt-text-dim) !important;
         }
+        [class*="wcc_SortOrderTab__root"] {
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: inset 0 -2px 0 transparent !important;
+            transition: color .15s ease, box-shadow .15s ease !important;
+        }
+        [class*="wcc_SortOrderTab__root"]:hover {
+            background: transparent !important;
+            color: var(--wt-text) !important;
+        }
         [class*="wcc_SortOrderTab__active"] {
             color: var(--wt-accent) !important;
+            box-shadow: inset 0 -2px 0 var(--wt-accent) !important;
         }
 
-        /* Reaction buttons (like / dislike / etc.) */
-        [class*="wcc_CommentReaction__root"],
-        [class*="wcc_CommentReaction__action"] {
+        /* Reaction (like / dislike) and reply-toggle buttons — soft pills on
+           the comment card instead of the generic square bordered button. */
+        [class*="wcc_CommentReaction__root"] {
             background: transparent !important;
             color: var(--wt-text-dim) !important;
         }
+        [class*="wcc_CommentReaction__action"],
+        [class*="wcc_ReplyFolderToggle__root"] {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text-dim) !important;
+            border: 1px solid transparent !important;
+            border-radius: 999px !important;
+            padding: 0 12px !important;
+            min-height: 30px !important;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease !important;
+        }
+        [class*="wcc_CommentReaction__action"]:hover,
+        [class*="wcc_ReplyFolderToggle__root"]:hover {
+            background: var(--wt-bg-hover) !important;
+            border-color: var(--wt-border) !important;
+            color: var(--wt-text) !important;
+        }
+        [class*="wcc_ReplyFolderToggle__root"] { color: var(--wt-link) !important; }
+        /* Editor toolbar icons + kebab menu: icon-only buttons, no box. */
+        [class*="wcc_ContentTagPopover__button"],
+        [class*="wcc_CommentOptionMenu__trigger"] {
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 6px !important;
+        }
+        [class*="wcc_ContentTagPopover__button"]:hover,
+        [class*="wcc_CommentOptionMenu__trigger"]:hover { background: var(--wt-bg-hover) !important; }
         [class*="wcc_CommentReaction__active"] { color: var(--wt-accent) !important; }
         [class*="wcc_CommentReaction__disabled"] { color: var(--wt-text-mute) !important; }
 
@@ -1895,7 +1979,7 @@
 
         /* Reply folder + unfold buttons */
         [class*="wcc_ReplyFolder__root"], [class*="wcc_ReplyUnfold__root"],
-        [class*="wcc_ReplyUnfold__unfold"], [class*="wcc_ReplyFolderToggle__root"] {
+        [class*="wcc_ReplyUnfold__unfold"] {
             background: transparent !important;
             color: var(--wt-link) !important;
         }
@@ -1948,23 +2032,8 @@
         /* Empty state */
         [class*="wcc_CommentEmpty__message"] { color: var(--wt-text-dim) !important; }
 
-        /* Legacy u_cbox widget (kept as fallback for older pages) */
-        #_cmtArea, .cmt_area, .u_cbox, .u_cbox_content_wrap,
-        .u_cbox_comment_box, .u_cbox_write, .u_cbox_module {
-            background-color: var(--wt-bg) !important;
-            color: var(--wt-text) !important;
-        }
-        .u_cbox_comment, .u_cbox_reply_area {
-            background-color: var(--wt-bg-elev) !important;
-            border: 1px solid var(--wt-border) !important;
-            border-radius: 4px;
-        }
-        .u_cbox_nick, .u_cbox_name        { color: var(--wt-link) !important; }
-        .u_cbox_contents, .u_cbox_text    { color: var(--wt-text) !important; }
-        .u_cbox_date, .u_cbox_info_txt    { color: var(--wt-text-mute) !important; }
-
         /* Footer */
-        #footer, .footer, .ft_lnk, .ft_area {
+        #footer, .footer {
             background-color: var(--wt-bg-elev) !important;
             color: var(--wt-text-dim) !important;
             border-top: 1px solid var(--wt-border) !important;
@@ -2024,10 +2093,23 @@
         }
 
         /* Mobile (m.webtoons.com) */
-        .header_wrap, .navigation, .nav_wrap, .lst_episode, .episode_cont {
+        .navigation, .episode_cont {
             background-color: var(--wt-bg) !important;
             color: var(--wt-text) !important;
         }
+
+        /* Floating scroll-to-top button. The sprite is a white disc with a
+           dark arrow — a glaring white circle on /canvas (on vignette pages
+           it was only dark because body::before painted over it). Invert
+           to a dark disc / light arrow (hue-rotate undoes the colour flip of
+           the grey shadow ring) and lift it above the vignette layer. */
+        .go_top { z-index: 10000 !important; }
+        .go_top .btn_top {
+            filter: invert(.9) hue-rotate(180deg) !important;
+            border-radius: 50% !important;
+            transition: filter .15s ease !important;
+        }
+        .go_top .btn_top:hover { filter: invert(.82) hue-rotate(180deg) !important; }
 
         /* "Recently viewed" floating bar on the right edge. */
         .recently_area {
@@ -2097,17 +2179,17 @@
             background-color: transparent !important;
         }
 
-        /* Episode list column — .detail_body .detail_lst is float:left, 761px wide.
-           No border-top: it connects to the app-download banner above.
-           No overflow:hidden: the pagination is position:absolute at the bottom
-           and clips badly with hidden overflow. Base padding-bottom was 66px —
-           keep that so pagination stays in its original position. */
-        .detail_body .detail_lst {
+        /* Episode list column — .detail_body .detail_list_area is float:left,
+           761px wide, base background:#fff. Base padding-bottom (66px, or
+           175px on .banner pages) reserves room for an absolutely-positioned
+           pager; our .paginate:not(.v2) rule puts the pager back in normal
+           flow, so that reserved space would just be an empty white-ish gap. */
+        .detail_body .detail_list_area {
             background: var(--wt-bg-elev) !important;
             border-radius: 16px !important;
-            padding-bottom: 66px !important;
+            padding-bottom: 20px !important;
             border: none !important;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,.1), 0 8px 32px rgba(0,0,0,.55) !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 8px 32px rgba(0,0,0,.5) !important;
         }
         /* Right sidebar — its own elevated card. */
         .aside.detail {
@@ -2131,66 +2213,101 @@
             transform: translateY(-1px) !important;
             color: var(--wt-accent) !important;
         }
-        /* Episode list dividers — base CSS uses #f5f5f5 (nearly white) on both
-           top and bottom borders of each row. */
-        .detail_body .detail_lst li,
-        .detail_body .detail_lst li:first-child {
-            border-color: var(--wt-border) !important;
-            transition: background .12s, box-shadow .12s !important;
+        /* Episode rows: li.detail_list_item > a.detail_list_link (flex row:
+           thumb · title · date · likes · #N). Base CSS draws #f5f5f5 row
+           dividers and a #fbfbfb hover — both white on dark. Rows stay flat
+           on the card (no per-row background) — the list card is the only
+           elevation; hover adds a tint plus an accent bar on the left edge. */
+        .detail_body .detail_list_area .detail_list_item,
+        .detail_body .detail_list_area .detail_list_item:first-child {
+            background: transparent !important;
+            border-color: rgba(255,255,255,.07) !important;
+            transition: background-color .15s ease, box-shadow .15s ease !important;
         }
-        .detail_body .detail_lst li:hover {
-            background: var(--wt-bg-elev2) !important;
+        .detail_body .detail_list_area .detail_list_item:hover {
+            background: var(--wt-bg-hover) !important;
+            box-shadow: inset 3px 0 0 var(--wt-accent) !important;
         }
-        /* Cap .subj so the row's total column widths fit inside the li and don't
-           overflow past the ::after border. Overrides base CSS width:411px. */
-        .detail_body .detail_lst .subj {
-            max-width: 385px !important;
-            width: 385px !important;
+        .detail_body .detail_list_area .detail_list_item .thmb img {
+            border-radius: 4px !important;
+            transition: filter .15s ease !important;
         }
-        /* Pseudo-element border renders above thumbnail and all children. */
-        .detail_body .detail_lst li:hover::after {
-            content: '' !important;
-            position: absolute !important;
-            inset: 0 !important;
-            border: 2px solid var(--wt-accent) !important;
-            border-radius: 6px !important;
-            pointer-events: none !important;
-            z-index: 5 !important;
+        .detail_body .detail_list_area .detail_list_item:hover .thmb img {
+            filter: brightness(1.08) !important;
         }
-        /* Turn date and like count accent green on hover. */
-        .detail_body .detail_lst li > a:hover .date {
+
+        /* Row typography — title > date > likes > episode number. Base CSS
+           paints title / #N #3c3c3c and date / likes #666 (unreadable on
+           dark), so every column is restated at the base selector's
+           specificity. */
+        .detail_body .detail_list_area .subj span {
+            color: var(--wt-text) !important;
+            font-size: 16px !important;
+            font-weight: 500 !important;
+            letter-spacing: .01em !important;
+            transition: color .15s ease !important;
+        }
+        .detail_body .detail_list_area .date {
+            color: var(--wt-text-dim) !important;
+            font-size: 13px !important;
+            font-variant-numeric: tabular-nums !important;
+        }
+        .detail_body .detail_list_area .like_area {
+            color: var(--wt-text-dim) !important;
+            font-size: 13px !important;
+            font-variant-numeric: tabular-nums !important;
+        }
+        .detail_body .detail_list_area .tx {
+            color: var(--wt-text-mute) !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            font-variant-numeric: tabular-nums !important;
+            padding-right: 12px !important;
+        }
+        .detail_body .detail_list_area .tx_up { color: var(--wt-accent) !important; }
+        /* Heart sprite is a dark outline — tint it to the like colour. */
+        .detail_body .detail_list_area .ico_like {
+            filter: brightness(0) saturate(100%) invert(47%) sepia(89%) saturate(505%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
+        }
+        .detail_body .detail_list_area .detail_list_item:hover .subj span {
             color: var(--wt-accent) !important;
         }
-        .detail_body .detail_lst li > a:hover .like_area {
+        .detail_body .detail_list_area .detail_list_item:hover .date,
+        .detail_body .detail_list_area .detail_list_item:hover .like_area {
+            color: var(--wt-text) !important;
+        }
+
+        /* Already-read episodes. Base CSS greys every column of a :visited
+           row to #c4c4c4 — on white that reads as "done", on dark it made
+           the whole list look washed out. Keep the "read" signal but make it
+           a clearly readable muted tone (~5.8:1 on --wt-bg-elev); unread
+           rows stay full brightness so the next episode stands out. */
+        .detail_body .detail_list_area .detail_list_link:visited .subj span {
+            color: var(--wt-text-read) !important;
+        }
+        .detail_body .detail_list_area .detail_list_link:visited .date,
+        .detail_body .detail_list_area .detail_list_link:visited .like_area,
+        .detail_body .detail_list_area .detail_list_link:visited .tx {
+            color: var(--wt-text-mute) !important;
+        }
+        .detail_body .detail_list_area .detail_list_item:hover .detail_list_link:visited .subj span {
             color: var(--wt-accent) !important;
         }
-        /* Also tint the heart sprite green on hover. */
-        .detail_body .detail_lst li > a:hover .ico_like {
-            filter: brightness(0) saturate(100%) invert(62%) sepia(67%) saturate(475%) hue-rotate(103deg) brightness(95%) contrast(92%) !important;
-        }
-        .detail_body .detail_lst li > a:hover .tx {
+
+        /* Paywall "NOTE" strip and "Read N new episodes on the app" QR strip
+           at the top of the episode list. Base CSS: #f5f5f5 top border and
+           inherited text; both sit on the (now dark) list card. */
+        .detail_body .detail_paywall, .detail_body .detail_install_app {
+            border-top-color: rgba(255,255,255,.07) !important;
             color: var(--wt-text-dim) !important;
         }
-        /* Base CSS: .detail_body .detail_lst .subj span { color: #3d3d3d } and
-           .date { color: #b1b1b1 } — invisible on dark. Restate at matching
-           specificity, plus broader fallbacks to catch any internal element. */
-        .detail_body .detail_lst .subj,
-        .detail_body .detail_lst .subj span,
-        .detail_lst .subj, .detail_lst .subj span,
-        .detail_lst li a, .detail_lst li a span:not(.date):not(.tx) {
-            color: var(--wt-text) !important;
+        .detail_body .detail_install_app strong { color: var(--wt-text) !important; }
+        .detail_body .detail_install_app em,
+        .detail_body .detail_paywall .lk_more { color: var(--wt-accent) !important; }
+        .detail_body .detail_install_app .img_qrcode { border-radius: 4px !important; }
+        .detail_body .detail_paywall .ico_note {
+            filter: brightness(0) invert(1) opacity(.7) !important;
         }
-        .detail_body .detail_lst .date, .detail_lst .date,
-        .detail_body .detail_lst .tx, .detail_lst .tx { color: var(--wt-text-dim) !important; }
-
-        /* Paywall notice and install-app strip at the bottom of the episode list.
-           Base CSS uses border-top: 1px solid #f5f5f5 which is nearly invisible
-           on dark; tint to our border colour. */
-        .detail_paywall, .detail_install_app {
-            border-top-color: var(--wt-border) !important;
-            color: var(--wt-text) !important;
-        }
-        .detail_install_app em { color: var(--wt-accent) !important; }
 
         /* Subscribe / bookmark button (.btn_favorite) — base CSS hardcodes
            background:#fff + color:#000. This element is NOT a <button> so our
@@ -2245,7 +2362,7 @@
 
         /* Scoped to .detail_other so it doesn't paint .lst_type1 rows
            inside elevated viewer/canvas sidebar cards (those should
-           stay flat — see Top CANVAS / wt-viewer-card rules above). */
+           stay flat — see the shared sidebar-card rule above). */
         .detail_other .lst_type1 li {
             background: var(--wt-bg-elev) !important;
             border-color: var(--wt-border) !important;
@@ -2298,41 +2415,6 @@
            Now that btn_favorite has a dark background, invert the sprite to white. */
         .btn_favorite .ico_plus4 {
             filter: brightness(0) invert(1) !important;
-        }
-
-        /* Episode list typography — clear visual hierarchy across the four columns:
-           title > date > likes > episode number. */
-        .detail_body .detail_lst .subj span {
-            font-size: 17px !important;
-            font-weight: 500 !important;
-            color: var(--wt-text) !important;
-            letter-spacing: .01em !important;
-        }
-        .detail_body .detail_lst li > a:hover .subj span {
-            color: var(--wt-accent) !important;
-        }
-        .detail_body .detail_lst .date {
-            font-size: 13px !important;
-            color: var(--wt-text) !important;
-            letter-spacing: .03em !important;
-        }
-        /* Like area count number — red to match the heart icon. */
-        .detail_body .detail_lst .like_area {
-            color: var(--wt-accent-like) !important;
-            font-size: 13px !important;
-        }
-        /* .ico_like is a sprite (background-image), not text — filter it red. */
-        .detail_body .detail_lst .ico_like {
-            filter: brightness(0) saturate(100%) invert(47%) sepia(89%) saturate(505%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
-        }
-        /* Episode number (#5, #4 …) — slightly muted so it reads as metadata.
-           padding-right keeps it clear of the 2px hover border. */
-        .detail_body .detail_lst .tx {
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            color: var(--wt-text-mute) !important;
-            letter-spacing: .03em !important;
-            padding-right: 6px !important;
         }
 
         /* Series with .type_white skin (e.g. Sweet Romance, Spicy Roommates):
@@ -2441,17 +2523,28 @@
            pagination painted mid-list before the class was applied. /canvas
            pagination is already in normal flow, so position/clear are no-ops
            there. */
+        /* Base .paginate is display:flex with a fixed 32px height. Keep it a
+           flex row (display:block turned the prev arrow into a full-width
+           block line and pushed the numbers below the card's clip edge);
+           allow wrapping so 10+ pages never overflow the column. */
         .paginate:not(.v2) {
             position: static !important;
-            display: block !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            height: auto !important;
             clear: both !important;
-            text-align: center !important;
-            margin: 24px 0 8px !important;
+            margin: 24px 0 4px !important;
         }
+        .paginate:not(.v2) .pg_page + .pg_page,
+        .detail_body .paginate .pg_prev { margin-left: 0 !important; }
         .paginate a, .paginate strong, .paginate span,
         .paginate.v2 [class^="pg_"] {
             color: var(--wt-text) !important;
         }
+        .paginate a span { color: inherit !important; }
         /* Pagination pills: explicit centered dimensions so both the link
            and the active <strong> render as the same shape. The base CSS
            sizes .paginate .on with a sprite background and fixed width
@@ -2503,8 +2596,33 @@
         .paginate [class*="ico_arr"] {
             display: none !important;
         }
-        .paginate .pg_next::after, .paginate a[class*="next"]::after { content: '\\203A' !important; font-size: 18px !important; line-height: 1 !important; }
-        .paginate .pg_prev::before, .paginate a[class*="prev"]::before { content: '\\2039' !important; font-size: 18px !important; line-height: 1 !important; }
+        /* Base CSS draws the arrow sprite on ::before (both prev AND next)
+           as a display:block 20px box. Neutralise that box on both sides,
+           then draw text chevrons: ‹ on prev::before, › on next::after. */
+        .paginate:not(.v2) .pg_prev::before, .paginate:not(.v2) .pg_next::before {
+            display: inline !important;
+            background: none !important;
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+        }
+        .paginate:not(.v2) .pg_next::before { content: none !important; }
+        .paginate .pg_next::after, .paginate a[class*="next"]::after { content: '\\203A' !important; font-size: 20px !important; line-height: 1 !important; }
+        .paginate .pg_prev::before, .paginate a[class*="prev"]::before { content: '\\2039' !important; font-size: 20px !important; line-height: 1 !important; }
+        .paginate:not(.v2) .pg_prev, .paginate:not(.v2) .pg_next {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 32px !important;
+            height: 28px !important;
+            margin: 0 !important;
+            border-radius: 6px !important;
+        }
+        /* Disabled first/last-page arrows (<span class="pg_prev off">). */
+        .paginate .pg_prev.off, .paginate .pg_next.off {
+            opacity: .3 !important;
+            pointer-events: none !important;
+        }
 
         /* Viewer toolbar prev/next-episode buttons (.paginate.v2 around #N).
            Same class family as the bottom-of-list pager but rendered at
@@ -2822,21 +2940,23 @@
         }, d));
     }
     function scheduleViewerSync() { scheduleSpa(syncBodyClasses); }
-    function scheduleViewerCards() { scheduleSpa(buildViewerCards); }
     function scheduleViewerBanners() { scheduleSpa(fixViewerBanners); }
     function scheduleCarouselArrows() { scheduleSpa(styleCarouselArrows); }
 
     function onSpaNav() {
         _navGen++;
         if (document.body) document.body.classList.remove('wt-viewer', 'wt-detail', 'wt-home');
-        // Clear idempotency flag so the new page's sidebar gets re-wrapped.
-        // The aside DOM node sometimes persists across viewer-to-viewer nav.
-        const aside = document.querySelector('.aside.viewer');
-        if (aside) delete aside.dataset.wtCards;
         scheduleViewerSync();
-        scheduleViewerCards();
         scheduleViewerBanners();
         scheduleCarouselArrows();
+    }
+    // Navigation API: its events reach every JS world, so this fires even
+    // when the manager runs us in an isolated world (Tampermonkey MV3) where
+    // the page's own history.pushState calls never hit the wrapper below.
+    // The wrapper + popstate stay as the fallback for browsers without it.
+    // A duplicate call is harmless: onSpaNav just bumps _navGen again.
+    if (window.navigation && typeof window.navigation.addEventListener === 'function') {
+        window.navigation.addEventListener('navigatesuccess', onSpaNav);
     }
     ['pushState', 'replaceState'].forEach(fn => {
         const orig = history[fn];
@@ -2913,55 +3033,6 @@
     }
     document.addEventListener('DOMContentLoaded', fixViewerBanners);
     scheduleViewerBanners();
-
-    // Inject card wrappers into the viewer sidebar. CSS selectors for inner
-    // sections are unreliable (class names vary); JS groups children of
-    // .ranking_lst into "header + following ULs until the next header" runs
-    // and wraps each run in a card div. Idempotent via aside.dataset.wtCards;
-    // the SPA nav handler clears that flag so each new page re-wraps.
-    function buildViewerCards() {
-        const aside = document.querySelector('.aside.viewer');
-        if (!aside || aside.dataset.wtCards) return;
-        const lst = aside.querySelector('.ranking_lst');
-        if (!lst) return;
-
-        const children = Array.from(lst.children);
-        if (!children.length) return;
-
-        // A new group starts on each non-UL header; ULs belong to the current
-        // group. A leading UL with no preceding header gets its own group so
-        // it isn't silently dropped.
-        const groups = [];
-        let cur = null;
-        for (const el of children) {
-            if (el.tagName !== 'UL' || !cur) {
-                cur = [];
-                groups.push(cur);
-            }
-            cur.push(el);
-        }
-
-        aside.dataset.wtCards = '1';
-
-        if (groups.length < 2) {
-            // Fallback: single card around the whole ranking_lst.
-            lst.classList.add('wt-viewer-card');
-            lst.style.flexDirection = '';
-            lst.style.gap = '';
-            return;
-        }
-
-        // Rebuild lst with each group wrapped in a card div.
-        while (lst.firstChild) lst.removeChild(lst.firstChild);
-        groups.forEach(group => {
-            const card = document.createElement('div');
-            card.className = 'wt-viewer-card';
-            group.forEach(el => card.appendChild(el));
-            lst.appendChild(card);
-        });
-    }
-    document.addEventListener('DOMContentLoaded', buildViewerCards);
-    scheduleViewerCards();
 
     console.info(`[webtoons-dark-mode] v${VERSION} fully loaded — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim`);
 })();
