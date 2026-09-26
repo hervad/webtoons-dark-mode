@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.3.0
-// @description  Scoped dark theme for Webtoons (desktop + mobile) — comic panels render untouched. Elevated viewer card, accent-green active nav, WCAG-tuned contrast, optional reader dim. OS preference on first install; persistent toggle (Alt+Shift+T).
+// @version      1.3.1
+// @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
 // @match        https://m.webtoons.com/*
@@ -24,7 +24,7 @@
 
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
-    const VERSION = '1.3.0';
+    const VERSION = '1.3.1';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously

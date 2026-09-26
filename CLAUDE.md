@@ -144,8 +144,10 @@ git push origin vX.Y.Z
 gh release create vX.Y.Z --title "vX.Y.Z — <short title>" --notes-from-tag
 ```
 
-Auto-update for installed users happens via `@updateURL` → `raw.githubusercontent.com/main/...`.
-Pushing to `main` is enough to ship. The tag and release are for changelog readability.
+There are two install channels, and they update independently:
+
+- **GitHub installs** auto-update via `@updateURL` → `raw.githubusercontent.com/main/...`. Pushing to `main` is enough to ship to them. The tag and release are for changelog readability.
+- **Greasy Fork installs** (https://greasyfork.org/scripts/577859) update from Greasy Fork only, because Greasy Fork rewrites `@updateURL` / `@downloadURL` to its own URLs when serving the script. Greasy Fork gets new versions by syncing from the raw GitHub URL. Without a webhook the sync runs about once a day; with the GitHub webhook it runs on every push. Its summary line comes from `@description`, and its long description from `greasyfork.md` (synced separately as "Additional info"). Greasy Fork only publishes code changes that come with an `@version` bump.
 
 ## Bumping the version
 

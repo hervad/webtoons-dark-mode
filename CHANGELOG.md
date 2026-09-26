@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-09-26
+
+### Changed
+
+- Rewrote the `@description` metadata in plain language. This is the summary shown on Greasy Fork and in userscript managers. No code changes.
+- Added `greasyfork.md`, the Greasy Fork "Additional info" text, so it can be synced from this repository.
+
 ## [1.3.0] - 2026-09-26
 
 ### Fixed
