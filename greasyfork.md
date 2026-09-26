@@ -12,10 +12,8 @@ On first run the theme follows your system setting: dark if your OS is in dark m
 
 ## Shortcuts
 
-| Action | Shortcut | Backup shortcut |
-|---|---|---|
-| Turn dark mode on / off | `Alt + Shift + T` | `Ctrl + Alt + D` |
-| Dim comic panels for night reading | `Alt + Shift + N` | `Ctrl + Alt + Shift + D` |
+- **Turn dark mode on / off:** `Alt + Shift + T` (backup: `Ctrl + Alt + D`)
+- **Dim comic panels for night reading:** `Alt + Shift + N` (backup: `Ctrl + Alt + Shift + D`)
 
 Both toggles are also in the Tampermonkey / Violentmonkey menu. The backup shortcuts exist because `Alt + Shift` switches keyboard layouts on Windows machines with more than one input language.
 
