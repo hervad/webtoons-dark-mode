@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-09-26
+
+### Changed
+
+- **Comment cards are more distinct.** Each card's left edge takes the author's avatar colour, and cards have a soft shadow and more space between them. Replies are now nested mini-cards, a step lighter than the parent card and with their author's colour on the edge, instead of plain rows on a rail.
+
 ## [1.6.0] - 2026-09-26
 
 ### Changed

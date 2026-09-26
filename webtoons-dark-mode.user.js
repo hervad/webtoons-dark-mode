@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.6.0
+// @version      1.6.1
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.6.0';
+    const VERSION = '1.6.1';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -2434,22 +2434,33 @@
         [class*="wcc_CommentList__list"] {
             display: flex !important;
             flex-direction: column !important;
-            gap: 12px !important;
+            gap: 16px !important;
             background: transparent !important;
             border: 0 !important;
             border-radius: 0 !important;
-            margin-top: 16px !important;
+            margin-top: 18px !important;
             overflow: visible !important;
         }
+        /* The card's left edge takes the author's avatar colour (JS also
+           stamps data-wt-hue on the <li>), so consecutive comments by
+           different people read as clearly separate blocks. */
         [class*="wcc_CommentItem__root"] {
             background: var(--wt-bg-elev) !important;
-            border: 1px solid rgba(255,255,255,.07) !important;
+            border: 1px solid rgba(255,255,255,.08) !important;
             border-radius: 14px !important;
             margin: 0 !important;
-            padding: 18px 20px 4px !important;
-            transition: border-color .15s ease !important;
+            padding: 18px 20px 4px 22px !important;
+            box-shadow:
+                inset 3px 0 0 var(--wt-av, rgba(255,255,255,.12)),
+                0 6px 20px rgba(0,0,0,.28) !important;
+            transition: border-color .15s ease, box-shadow .15s ease !important;
         }
-        [class*="wcc_CommentItem__root"]:hover { border-color: rgba(255,255,255,.16) !important; }
+        [class*="wcc_CommentItem__root"]:hover {
+            border-color: rgba(255,255,255,.18) !important;
+            box-shadow:
+                inset 3px 0 0 var(--wt-av, rgba(255,255,255,.2)),
+                0 10px 28px rgba(0,0,0,.38) !important;
+        }
         [class*="wcc_CommentItem__inside"] {
             position: relative !important;
             padding-left: 54px !important;
@@ -2588,15 +2599,18 @@
            a lighter box with a second card nested inside it. The nested
            ul.wcc_CommentList__list must NOT pick up the top-level list-card
            style (that was the card-in-a-box). */
+        /* Each reply is its own nested mini-card (a step lighter than the
+           parent card, author-colour left edge) stacked with a small gap,
+           sitting under the parent's text column. */
         [class*="wcc_ReplyFolder__root"] {
             background: transparent !important;
             border: 0 !important;
-            border-left: 2px solid rgba(255,255,255,.1) !important;
             border-radius: 0 !important;
-            margin: 0 0 14px 19px !important;
-            padding: 0 0 0 22px !important;
+            margin: 2px 0 16px !important;
+            padding: 0 !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentList__list"] {
+            gap: 8px !important;
             background: transparent !important;
             border: 0 !important;
             border-radius: 0 !important;
@@ -2604,10 +2618,16 @@
             overflow: visible !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"] {
-            background: transparent !important;
-            border: 0 !important;
-            border-radius: 0 !important;
-            padding: 12px 0 0 !important;
+            background: rgba(255,255,255,.035) !important;
+            border: 1px solid rgba(255,255,255,.06) !important;
+            border-radius: 12px !important;
+            padding: 12px 14px 0 16px !important;
+            box-shadow: inset 3px 0 0 var(--wt-av, rgba(255,255,255,.12)) !important;
+        }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:hover {
+            background: rgba(255,255,255,.055) !important;
+            border-color: rgba(255,255,255,.12) !important;
+            box-shadow: inset 3px 0 0 var(--wt-av, rgba(255,255,255,.2)) !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__inside"] { padding-left: 44px !important; min-height: 34px !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__inside"][data-wt-initial]::before {
@@ -2615,9 +2635,7 @@
             height: 32px !important;
             font-size: 14px !important;
         }
-        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__action"] { padding-bottom: 6px !important; }
-        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:first-child { padding-top: 4px !important; }
-        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:hover { background: transparent !important; }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__action"] { padding-bottom: 8px !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentHeader__name"] { font-size: 14px !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_TextContent__content"] { font-size: 14px !important; }
         /* The "└" corner glyphs are redundant next to the thread rail. */
@@ -3778,8 +3796,11 @@
             if (!name) return;
             let hash = 0;
             for (const ch of name) hash = (hash * 31 + ch.codePointAt(0)) >>> 0;
+            const hue = String(hash % AVATAR_COLOURS);
             el.dataset.wtInitial = Array.from(name)[0].toUpperCase();
-            el.dataset.wtHue = String(hash % AVATAR_COLOURS);
+            el.dataset.wtHue = hue;
+            const item = el.closest('[class*="wcc_CommentItem__root"]');
+            if (item) item.dataset.wtHue = hue;  // card edge colour
         });
     }
     let avatarPassQueued = false;
