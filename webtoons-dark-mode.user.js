@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.5.4
+// @version      1.6.0
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.5.4';
+    const VERSION = '1.6.0';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -60,6 +60,7 @@
             --wt-accent-like:     #f06868;
             --wt-heart:           #ff5c8d;
             --wt-heart-mask:      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>");
+            --wt-bubble-mask:     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'><path d='M4 5h16v11H9l-5 4z'/></svg>");
             --wt-shadow:          0 1px 2px rgba(0,0,0,.6);
         }
     `;
@@ -2424,27 +2425,73 @@
             text-transform: none !important;
         }
 
-        /* Comment list — ONE card with hairline dividers, not a stack of
-           separately bordered boxes. */
+        /* Comments — each comment is its OWN card (asurascans-style), so
+           people can tell comments apart at a glance: avatar column, name ·
+           date on one line, text, then votes + replies. WCC renders no
+           avatar, so tagCommentAvatars() (JS) stamps data-wt-initial /
+           data-wt-hue on each .wcc_CommentItem__inside and ::before draws a
+           coloured initial circle — same user, same colour, every time. */
         [class*="wcc_CommentList__list"] {
-            background: var(--wt-bg-elev) !important;
-            border: 1px solid rgba(255,255,255,.08) !important;
-            border-radius: 16px !important;
-            margin-top: 14px !important;
-            overflow: hidden !important;
-        }
-        [class*="wcc_CommentItem__root"] {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
             background: transparent !important;
             border: 0 !important;
             border-radius: 0 !important;
+            margin-top: 16px !important;
+            overflow: visible !important;
+        }
+        [class*="wcc_CommentItem__root"] {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid rgba(255,255,255,.07) !important;
+            border-radius: 14px !important;
             margin: 0 !important;
-            padding: 18px 22px !important;
-            transition: background-color .15s ease !important;
+            padding: 18px 20px 4px !important;
+            transition: border-color .15s ease !important;
         }
-        [class*="wcc_CommentItem__root"] + [class*="wcc_CommentItem__root"] {
-            border-top: 1px solid rgba(255,255,255,.06) !important;
+        [class*="wcc_CommentItem__root"]:hover { border-color: rgba(255,255,255,.16) !important; }
+        [class*="wcc_CommentItem__inside"] {
+            position: relative !important;
+            padding-left: 54px !important;
+            min-height: 42px !important;
         }
-        [class*="wcc_CommentItem__root"]:hover { background: rgba(255,255,255,.02) !important; }
+        [class*="wcc_CommentItem__inside"][data-wt-initial]::before {
+            content: attr(data-wt-initial) !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 17px !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+            color: #fff !important;
+            background: var(--wt-av, #5b6574) !important;
+            box-shadow: 0 0 0 2px rgba(255,255,255,.08) !important;
+        }
+        [data-wt-hue="0"] { --wt-av: #e5484d; }
+        [data-wt-hue="1"] { --wt-av: #e8691c; }
+        [data-wt-hue="2"] { --wt-av: #b7870c; }
+        [data-wt-hue="3"] { --wt-av: #2f9e62; }
+        [data-wt-hue="4"] { --wt-av: #0f8f88; }
+        [data-wt-hue="5"] { --wt-av: #3b76e0; }
+        [data-wt-hue="6"] { --wt-av: #8455e8; }
+        [data-wt-hue="7"] { --wt-av: #cc3f93; }
+
+        /* Header: name · date on one line, kebab menu top-right. */
+        [class*="wcc_CommentHeader__root"] {
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+            column-gap: 8px !important;
+            margin-bottom: 4px !important;
+            padding-right: 28px !important;
+        }
+        [class*="wcc_CommentHeader__identity"] { padding-right: 0 !important; margin: 0 !important; }
         /* Names in a soft blue (not body-text white) so the author of each
            comment is identifiable at a glance; weight carries the hierarchy. */
         [class*="wcc_CommentHeader__name"] {
@@ -2452,63 +2499,90 @@
             font-weight: 700 !important;
             font-size: 15px !important;
         }
-        [class*="wcc_CommentHeader__createdAt"] { font-size: 12px !important; }
+        [class*="wcc_CommentHeader__createdAt"] {
+            font-size: 12px !important;
+            color: var(--wt-text-mute) !important;
+        }
+        [class*="wcc_CommentOptionMenu__trigger"] { top: 2px !important; right: 0 !important; }
         [class*="wcc_TextContent__content"] {
             color: var(--wt-text) !important;
             font-size: 15px !important;
             line-height: 1.6 !important;
         }
-        /* Actions: ghost pills — quiet until hovered. */
-        [class*="wcc_CommentReaction__action"],
-        [class*="wcc_ReplyFolderToggle__root"] {
+
+        /* Action row: votes first, then the reply toggle — left-aligned under
+           the text (the base layout pushed votes to the far right). */
+        [class*="wcc_CommentItem__action"] {
+            justify-content: flex-start !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 0 0 14px !important;
+            margin-top: -6px !important;
+        }
+        [class*="wcc_CommentReaction__root"] { order: -1 !important; gap: 4px !important; }
+        [class*="wcc_ReplyFolderToggle__root"] { margin-right: 0 !important; }
+        /* Votes: icon + count, no box — tinted round hover like asura. Upvote
+           green, downvote red. Both buttons share a class and differ only by
+           the icon inside (wcc_UpvoteIcon / wcc_DownvoteIcon), hence :has().
+           The icon is an SVG <path> painted via fill, set explicitly. A vote
+           you've cast (__active) becomes a solid pill. */
+        [class*="wcc_CommentReaction__action"] {
             background: transparent !important;
-            border: 1px solid rgba(255,255,255,.1) !important;
+            border: 1px solid transparent !important;
+            border-radius: 999px !important;
             min-height: 30px !important;
+            padding: 0 10px !important;
+            margin: 0 !important;
             font-size: 13px !important;
+            font-weight: 600 !important;
+            transition: background-color .15s ease, border-color .15s ease !important;
         }
-        [class*="wcc_CommentReaction__action"]:hover,
-        [class*="wcc_ReplyFolderToggle__root"]:hover {
-            background: var(--wt-bg-hover) !important;
-            border-color: rgba(255,255,255,.2) !important;
-        }
-        [class*="wcc_ReplyFolderToggle__root"] { color: var(--wt-text-dim) !important; }
-        /* Upvote = green, downvote = red — icon, count and a tinted pill.
-           The two buttons share one class; they differ only by the icon
-           inside (wcc_UpvoteIcon / wcc_DownvoteIcon), hence :has(). The icon
-           is an SVG <path> painted via fill (not currentColor), so the fill
-           is set explicitly. Voted (__active) = solid pill. */
-        [class*="wcc_CommentReaction__action"]:has([class*="wcc_UpvoteIcon"]) {
-            color: var(--wt-accent) !important;
-            border-color: rgba(0,213,100,.35) !important;
-            background: rgba(0,213,100,.08) !important;
-        }
-        [class*="wcc_CommentReaction__action"]:has([class*="wcc_DownvoteIcon"]) {
-            color: var(--wt-accent-like) !important;
-            border-color: rgba(240,104,104,.35) !important;
-            background: rgba(240,104,104,.08) !important;
-        }
+        [class*="wcc_CommentReaction__action"] svg { width: 13px !important; margin-right: 5px !important; }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_UpvoteIcon"]) { color: var(--wt-accent) !important; }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_DownvoteIcon"]) { color: var(--wt-accent-like) !important; }
         [class*="wcc_CommentReaction__action"]:has([class*="wcc_UpvoteIcon"]) svg path { fill: var(--wt-accent) !important; }
         [class*="wcc_CommentReaction__action"]:has([class*="wcc_DownvoteIcon"]) svg path { fill: var(--wt-accent-like) !important; }
-        [class*="wcc_CommentReaction__action"]:has([class*="wcc_UpvoteIcon"]):hover {
-            background: rgba(0,213,100,.16) !important;
-            border-color: var(--wt-accent) !important;
-        }
-        [class*="wcc_CommentReaction__action"]:has([class*="wcc_DownvoteIcon"]):hover {
-            background: rgba(240,104,104,.16) !important;
-            border-color: var(--wt-accent-like) !important;
-        }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_UpvoteIcon"]):hover { background: rgba(0,213,100,.12) !important; }
+        [class*="wcc_CommentReaction__action"]:has([class*="wcc_DownvoteIcon"]):hover { background: rgba(240,104,104,.12) !important; }
         [class*="wcc_CommentReaction__active"]:has([class*="wcc_UpvoteIcon"]) {
             background: var(--wt-accent) !important;
-            border-color: var(--wt-accent) !important;
             color: var(--wt-text-on-accent) !important;
         }
         [class*="wcc_CommentReaction__active"]:has([class*="wcc_DownvoteIcon"]) {
             background: var(--wt-accent-like) !important;
-            border-color: var(--wt-accent-like) !important;
             color: var(--wt-text-on-accent) !important;
         }
         [class*="wcc_CommentReaction__active"]:has([class*="wcc_UpvoteIcon"]) svg path,
         [class*="wcc_CommentReaction__active"]:has([class*="wcc_DownvoteIcon"]) svg path { fill: var(--wt-text-on-accent) !important; }
+        /* "Reply" / "Replies N": a quiet text button with a speech-bubble
+           icon (inline SVG mask), accent on hover — an invitation to join
+           the thread rather than a boxed control. */
+        [class*="wcc_ReplyFolderToggle__root"] {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 999px !important;
+            min-height: 30px !important;
+            padding: 0 10px !important;
+            color: var(--wt-text-dim) !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            transition: background-color .15s ease, color .15s ease !important;
+        }
+        [class*="wcc_ReplyFolderToggle__root"]::before {
+            content: '' !important;
+            width: 14px !important;
+            height: 14px !important;
+            background: currentColor !important;
+            -webkit-mask: var(--wt-bubble-mask) center / contain no-repeat !important;
+            mask: var(--wt-bubble-mask) center / contain no-repeat !important;
+        }
+        [class*="wcc_ReplyFolderToggle__root"]:hover {
+            background: var(--wt-bg-hover) !important;
+            color: var(--wt-accent) !important;
+        }
         /* Reply thread (opened via "Replies N"): an indented thread on the
            parent comment's own surface — a thin rail on the left instead of
            a lighter box with a second card nested inside it. The nested
@@ -2519,8 +2593,8 @@
             border: 0 !important;
             border-left: 2px solid rgba(255,255,255,.1) !important;
             border-radius: 0 !important;
-            margin: 14px 0 0 2px !important;
-            padding: 0 0 0 18px !important;
+            margin: 0 0 14px 19px !important;
+            padding: 0 0 0 22px !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentList__list"] {
             background: transparent !important;
@@ -2530,8 +2604,18 @@
             overflow: visible !important;
         }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"] {
-            padding: 14px 0 !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            padding: 12px 0 0 !important;
         }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__inside"] { padding-left: 44px !important; min-height: 34px !important; }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__inside"][data-wt-initial]::before {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 14px !important;
+        }
+        [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__action"] { padding-bottom: 6px !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:first-child { padding-top: 4px !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentItem__root"]:hover { background: transparent !important; }
         [class*="wcc_ReplyFolder__root"] [class*="wcc_CommentHeader__name"] { font-size: 14px !important; }
@@ -3680,6 +3764,33 @@
     }
     document.addEventListener('DOMContentLoaded', tuneContestBanners);
     scheduleSpa(tuneContestBanners);
+
+    // Comment avatars. WCC renders no profile picture, so stamp each comment
+    // with its author's initial + a stable colour bucket (hash of the name)
+    // and let CSS draw the circle. Runs on DOM insertions, throttled to one
+    // pass per frame, and only when the comment widget is on the page.
+    const AVATAR_COLOURS = 8;
+    function tagCommentAvatars() {
+        if (!document.querySelector('[class*="wcc_App__root"]')) return;
+        document.querySelectorAll('[class*="wcc_CommentItem__inside"]:not([data-wt-initial])').forEach(el => {
+            const nameEl = el.querySelector('[class*="wcc_CommentHeader__name"]');
+            const name = nameEl && nameEl.textContent.trim();
+            if (!name) return;
+            let hash = 0;
+            for (const ch of name) hash = (hash * 31 + ch.codePointAt(0)) >>> 0;
+            el.dataset.wtInitial = Array.from(name)[0].toUpperCase();
+            el.dataset.wtHue = String(hash % AVATAR_COLOURS);
+        });
+    }
+    let avatarPassQueued = false;
+    const avatarObserver = new MutationObserver(() => {
+        if (avatarPassQueued) return;
+        avatarPassQueued = true;
+        requestAnimationFrame(() => { avatarPassQueued = false; tagCommentAvatars(); });
+    });
+    function watchComments() { avatarObserver.observe(document.body, { childList: true, subtree: true }); }
+    if (document.body) watchComments();
+    else document.addEventListener('DOMContentLoaded', watchComments, { once: true });
 
     console.info(`[webtoons-dark-mode] v${VERSION} fully loaded — Alt+Shift+T / Ctrl+Alt+D: theme | Alt+Shift+N / Ctrl+Alt+Shift+D: dim | Alt+Shift+V / Ctrl+Alt+Shift+V: vignette`);
 })();

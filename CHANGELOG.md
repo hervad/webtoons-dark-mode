@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-09-26
+
+### Changed
+
+- **Comments redesigned in the style of asurascans.com:**
+  - **Separate cards:** every comment is its own card, so comments are easy to tell apart.
+  - **Avatars:** each comment shows a coloured avatar with the author's initial. The widget has no profile pictures, so `tagCommentAvatars()` gives each name a stable colour, and the same person always gets the same colour.
+  - **Layout:** name and date are on one line.
+  - **Votes:** they sit under the text as coloured icons with counts (green up, red down), without boxes.
+  - **Replies:** "Reply" / "Replies N" is a quiet text button with a speech-bubble icon.
+  - **Reply threads:** they get smaller avatars on the thread rail.
+
 ## [1.5.4] - 2026-09-26
 
 ### Changed
