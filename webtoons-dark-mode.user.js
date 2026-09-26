@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.5.3
+// @version      1.5.4
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.5.3';
+    const VERSION = '1.5.4';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -58,6 +58,8 @@
             --wt-accent:          #00d564;
             --wt-accent-soft:     #4ade80;
             --wt-accent-like:     #f06868;
+            --wt-heart:           #ff5c8d;
+            --wt-heart-mask:      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>");
             --wt-shadow:          0 1px 2px rgba(0,0,0,.6);
         }
     `;
@@ -1708,9 +1710,15 @@
             box-shadow: 0 0 0 1px var(--wt-accent), 0 4px 14px rgba(0,213,100,.15) !important;
             transform: translateY(-1px) !important;
         }
-        /* Heart sprite (ico_like2) — tint red to signal "like". */
+        /* Like-button heart (ico_like2): same filled --wt-heart mask as the
+           series-page episode list, instead of a filter-tinted outline. */
         .spi_area .ico_like2 {
-            filter: brightness(0) saturate(100%) invert(47%) sepia(89%) saturate(505%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
+            background: var(--wt-heart) !important;
+            -webkit-mask: var(--wt-heart-mask) center / contain no-repeat !important;
+            mask: var(--wt-heart-mask) center / contain no-repeat !important;
+            filter: none !important;
+            font-size: 0 !important;
+            color: transparent !important;
         }
         /* Subscribe "+" icon (ico_plus3/ico_plus4) — sprite is dark-on-transparent,
            invert to white so it's visible on the dark button background. */
@@ -2817,10 +2825,10 @@
             font-size: 13px !important;
             font-variant-numeric: tabular-nums !important;
         }
-        /* Like count takes the heart's colour so icon + number read as one
-           unit and stay equally visible on every row (read or unread). */
+        /* Like count in brand green, next to a filled rose heart — same on
+           every row (read or unread) so the column reads uniformly. */
         .detail_body .detail_list_area .like_area {
-            color: var(--wt-accent-like) !important;
+            color: var(--wt-accent) !important;
             font-size: 13px !important;
             font-variant-numeric: tabular-nums !important;
         }
@@ -2832,9 +2840,22 @@
             padding-right: 12px !important;
         }
         .detail_body .detail_list_area .tx_up { color: var(--wt-accent) !important; }
-        /* Heart sprite is a dark outline — tint it to the like colour. */
+        /* Heart: the site's sprite is a thin dark OUTLINE. Replace it with a
+           FILLED heart drawn from an inline SVG mask (no network request)
+           painted in --wt-heart, which reads clearly on the dark card. The
+           <em> holds hidden "like" text — keep it invisible. */
         .detail_body .detail_list_area .ico_like {
-            filter: brightness(0) saturate(100%) invert(47%) sepia(89%) saturate(505%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
+            background: var(--wt-heart) !important;
+            -webkit-mask: var(--wt-heart-mask) center / contain no-repeat !important;
+            mask: var(--wt-heart-mask) center / contain no-repeat !important;
+            filter: none !important;
+            width: 14px !important;
+            height: 14px !important;
+            margin: 0 4px 0 0 !important;
+            font-size: 0 !important;
+            color: transparent !important;
+            vertical-align: -2px !important;
+            display: inline-block !important;
         }
         .detail_body .detail_list_area .detail_list_item:hover .subj span {
             color: var(--wt-accent) !important;
@@ -2853,7 +2874,7 @@
             color: var(--wt-text-read) !important;
         }
         .detail_body .detail_list_area .detail_list_link:visited .date { color: var(--wt-text-dim) !important; }
-        .detail_body .detail_list_area .detail_list_link:visited .like_area { color: var(--wt-accent-like) !important; }
+        .detail_body .detail_list_area .detail_list_link:visited .like_area { color: var(--wt-accent) !important; }
         .detail_body .detail_list_area .detail_list_link:visited .tx { color: var(--wt-text-mute) !important; }
         .detail_body .detail_list_area .detail_list_item:hover .detail_list_link:visited .subj span {
             color: var(--wt-accent) !important;

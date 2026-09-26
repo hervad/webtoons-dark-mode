@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.4] - 2026-09-26
+
+### Changed
+
+- **Series page like counts** are brand green, and the heart beside them is now a **filled** rose-pink heart (`--wt-heart: #ff5c8d`) instead of the site's thin outline sprite. The reader's end-of-chapter **Like** button uses the same heart. The heart is drawn from an inline SVG mask (`--wt-heart-mask`), so there's no image request and its colour is a single palette variable.
+
 ## [1.5.3] - 2026-09-26
 
 ### Changed
