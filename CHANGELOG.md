@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-26
+
+### Changed
+
+- **Redesigned everything below the last comic panel** in the reader. It now uses one card style, matching the sidebar:
+  - **End of chapter:** a centred card with a schedule chip, a green **Subscribe** as the main action, a secondary **Like**, and share icons that are muted until you hover them.
+  - **Episode strip:** sits on a card with rounded thumbnails and round arrow buttons.
+  - **Creator note:** gets an accent edge.
+  - **Comments:** one card with hairline dividers instead of a stack of bordered boxes. Commenter names are in regular text colour rather than link blue, body text is easier to read, the TOP / NEWEST tabs are underline tabs, the reply and like buttons are ghost pills, and **More** is a proper pill button.
+  - **CANVAS Weekly round-up:** rounded tiles with a bottom gradient, so titles stay readable on bright covers.
+
+### Fixed
+
+- **Episode-strip thumbnails stayed grey** (never lazy-loaded) for anyone whose OS asks for reduced motion, for example Windows with "Animation effects" off. This was a regression in 1.3.0: a global `prefers-reduced-motion` rule shortened *every* transition on the page, including the ones the site's own JavaScript waits on. Reduced motion now only disables the motion this script adds.
+- **Episode-strip arrows** were drawn as small, empty or tiny-chevron boxes. The page-pagination rules from 1.3.0 also matched the strip's arrows. The strip is now excluded from them, and the arrows render as round buttons with ❮ ❯.
+- **Reader toolbar "previous episode" arrow** showed a dark sprite behind a squashed glyph ("<‹"). The site's arrow sprite and its fixed 20 × 20 box are now cleared.
+
 ## [1.4.0] - 2026-09-26
 
 ### Added

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.4.0
+// @version      1.5.0
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -25,7 +25,7 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.4.0';
+    const VERSION = '1.5.0';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -77,15 +77,20 @@
             color: var(--wt-text) !important;
             scrollbar-color: var(--wt-bg-hover) var(--wt-bg);
         }
-        /* Respect the OS "reduce motion" setting: keep colour changes, drop
-           the lifts / slides / smooth-scroll our hover states add. */
+        /* Respect the OS "reduce motion" setting — but only for motion WE add
+           (hover lifts, the sort-menu slide-in). A global "* { transition-
+           duration: .01ms }" also shortened the site's own transitions and
+           broke its JS: the reader's episode-strip thumbnails never
+           lazy-loaded (they stayed grey placeholders) for anyone with
+           Windows "Animation effects" off. Never override site-wide timing. */
         @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                transition-duration: .01ms !important;
-                animation-duration: .01ms !important;
-                animation-iteration-count: 1 !important;
-                scroll-behavior: auto !important;
-            }
+            .aside.detail .aside_btn .btn_type7:hover,
+            .spi_area .bx:hover,
+            .age_gate_area button:active,
+            .age_gate_area .btn_type9:active,
+            .age_gate_area ._btn_enter:active { transform: none !important; }
+            .sort_box { animation: none !important; }
+            .sort_box a:hover { padding-left: 14px !important; }
         }
 
         /* Text */
@@ -1588,7 +1593,7 @@
            chevrons at thumbnail height, vertically centered against the
            87px tall thumbnail row. Scoped to .episode_lst so nothing else
            is touched even if the class names differ. */
-        .episode_lst .pg_prev, .episode_lst .pg_next {
+        .episode_area .episode_lst .pg_prev, .episode_area .episode_lst .pg_next {
             background: rgba(15,17,20,.6) !important;
             background-image: none !important;
             border: 1px solid var(--wt-border) !important;
@@ -1602,18 +1607,22 @@
             box-shadow: 0 2px 10px rgba(0,0,0,.6) !important;
             transition: background-color .15s, border-color .15s, box-shadow .15s !important;
         }
-        .episode_lst .pg_prev:hover, .episode_lst .pg_next:hover {
+        .episode_area .episode_lst .pg_prev:hover, .episode_area .episode_lst .pg_next:hover {
             background: rgba(0,213,100,.18) !important;
             border-color: rgba(0,213,100,.6) !important;
             box-shadow: 0 0 16px rgba(0,213,100,.35) !important;
         }
         /* Hide the inner <em> label so it doesn't show alongside the chevron. */
-        .episode_lst .pg_prev > em, .episode_lst .pg_next > em {
+        .episode_area .episode_lst .pg_prev > em, .episode_area .episode_lst .pg_next > em {
             display: none !important;
         }
         /* Heavy chevron drawn via pseudo-element, absolutely positioned + flex
            centered so the glyph sits dead-center in the button. */
-        .episode_lst .pg_prev::before, .episode_lst .pg_next::after {
+        .episode_area .episode_lst .pg_prev::before, .episode_area .episode_lst .pg_next::after {
+            background: none !important;
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
             position: absolute !important;
             inset: 0 !important;
             display: flex !important;
@@ -1625,10 +1634,10 @@
             font-weight: normal !important;
             pointer-events: none !important;
         }
-        .episode_lst .pg_prev::before { content: '\\276E' !important; }
-        .episode_lst .pg_next::after  { content: '\\276F' !important; }
-        .episode_lst .pg_prev:hover::before,
-        .episode_lst .pg_next:hover::after {
+        .episode_area .episode_lst .pg_prev::before { content: '\\276E' !important; }
+        .episode_area .episode_lst .pg_next::after  { content: '\\276F' !important; }
+        .episode_area .episode_lst .pg_prev:hover::before,
+        .episode_area .episode_lst .pg_next:hover::after {
             color: var(--wt-accent) !important;
         }
 
@@ -2042,6 +2051,315 @@
         /* Empty state */
         [class*="wcc_CommentEmpty__message"] { color: var(--wt-text-dim) !important; }
 
+        /* ================================================================
+           Reader — everything after the last comic panel.
+           One card language for the whole area (same surface, hairline and
+           radius as the sidebar cards): end-of-chapter card → episode strip
+           card → creator note + comments card | sidebar cards → round-up.
+           Declared after the generic WCC rules above so equal-specificity
+           selectors here win by source order. Layout-sensitive parts (the
+           strip's JS-measured carousel) get visual changes only — no size,
+           padding or position changes on anything the site's JS measures.
+           ================================================================ */
+
+        /* End-of-chapter card: schedule chip, prompt, actions, share. */
+        .viewer_lst .viewer_info_area {
+            max-width: 800px !important;
+            margin: 40px auto 0 !important;
+            padding: 28px 24px 26px !important;
+            box-sizing: border-box !important;
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid rgba(255,255,255,.08) !important;
+            border-top-color: rgba(255,255,255,.14) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 12px 32px rgba(0,0,0,.35) !important;
+            text-align: center !important;
+        }
+        .viewer_lst .day_info {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding: 4px 14px 4px 4px !important;
+            border-radius: 999px !important;
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text-dim) !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            letter-spacing: .08em !important;
+            text-transform: uppercase !important;
+        }
+        .viewer_lst .day_info .txt_ico_up { margin: 0 !important; transform: scale(.8) !important; }
+        .viewer_lst .dsc_encourage {
+            color: var(--wt-text-dim) !important;
+            font-size: 15px !important;
+            line-height: 1.5 !important;
+            margin: 14px 0 18px !important;
+        }
+        .viewer_lst .spi_area {
+            display: inline-flex !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+        .viewer_lst .spi_area { margin: 0 !important; }  /* base: 18px / 53px */
+        .viewer_lst .spi_area li { float: none !important; margin: 0 !important; }
+        /* Primary action = Subscribe (brand green), secondary = Like. */
+        .viewer_lst .spi_area .bx {
+            height: 42px !important;
+            line-height: 42px !important;
+            min-width: 120px !important;
+            padding: 0 18px !important;
+            border-radius: 999px !important;
+            font-weight: 600 !important;
+        }
+        .viewer_lst .spi_area .lnk_favorites.bx {
+            background: var(--wt-accent) !important;
+            border-color: var(--wt-accent) !important;
+            color: var(--wt-text-on-accent) !important;
+        }
+        .viewer_lst .spi_area .lnk_favorites.bx .ico_plus3 { filter: brightness(0) !important; }
+        .viewer_lst .spi_area .lnk_favorites.bx:hover {
+            background: var(--wt-accent-soft) !important;
+            border-color: var(--wt-accent-soft) !important;
+            box-shadow: 0 6px 18px rgba(0,213,100,.25) !important;
+        }
+        /* Already subscribed: calm secondary style so it doesn't shout. */
+        .cont_box .viewer_lst .spi_area .lnk_favorites.bx.on {
+            background: var(--wt-bg-elev2) !important;
+            border-color: var(--wt-border) !important;
+            color: var(--wt-text-dim) !important;
+        }
+        .cont_box .viewer_lst .spi_area .lnk_favorites.bx.on .ico_plus3 { filter: brightness(0) invert(1) opacity(.7) !important; }
+        /* Share icons: brand-coloured discs are loud next to the actions —
+           muted at rest, full colour on hover/focus. A hairline divider
+           separates them from the two action buttons. */
+        .viewer_lst .spi_area li:nth-child(3) {
+            margin-left: 10px !important;
+            padding-left: 18px !important;
+            border-left: 1px solid rgba(255,255,255,.1) !important;
+        }
+        .viewer_lst .spi_area [class^="ico_"]:not(.ico_like2):not(.ico_plus3) {
+            filter: grayscale(1) brightness(1.3) opacity(.55) !important;
+            transition: filter .15s ease !important;
+        }
+        .viewer_lst .spi_area [class^="ico_"]:not(.ico_like2):not(.ico_plus3):hover,
+        .viewer_lst .spi_area [class^="ico_"]:not(.ico_like2):not(.ico_plus3):focus-visible {
+            filter: none !important;
+        }
+
+        /* Episode strip — card surface drawn with an outer box-shadow spread
+           (fake padding) so the carousel's measured box is untouched. */
+        #bottomEpisodeList.episode_area {
+            background: transparent !important;
+            padding-top: 48px !important;
+        }
+        #bottomEpisodeList .episode_lst {
+            background: var(--wt-bg-elev) !important;
+            border-radius: 16px !important;
+            box-shadow:
+                0 0 0 14px var(--wt-bg-elev),
+                0 0 0 15px rgba(255,255,255,.08),
+                0 16px 40px rgba(0,0,0,.35) !important;
+        }
+        /* .episode_cont also matches our mobile-site rule (which paints it
+           --wt-bg) — keep the strip's inner viewport on the card surface. */
+        #bottomEpisodeList .episode_lst .episode_cont { background: transparent !important; }
+        /* Base height 175px leaves ~40px of dead space under the titles. */
+        #bottomEpisodeList .episode_lst { height: 150px !important; }
+        #bottomEpisodeList .episode_lst .thmb,
+        #bottomEpisodeList .episode_lst .thmb img,
+        #bottomEpisodeList .episode_lst ul .mask { border-radius: 8px !important; }
+        #bottomEpisodeList .episode_lst .subj {
+            color: var(--wt-text-dim) !important;
+            font-size: 13px !important;
+            letter-spacing: .02em !important;
+        }
+        #bottomEpisodeList .episode_lst li a:hover .subj { color: var(--wt-text) !important; }
+        #bottomEpisodeList .episode_lst li .on .thmb { border-radius: 10px !important; }
+        #bottomEpisodeList .episode_lst li .on .subj { color: var(--wt-accent) !important; }
+        /* Round arrow buttons centred on the 87px thumbnail row. */
+        .episode_area#bottomEpisodeList .episode_lst .pg_prev,
+        .episode_area#bottomEpisodeList .episode_lst .pg_next {
+            width: 40px !important;
+            height: 40px !important;
+            top: 35px !important;
+            border-radius: 50% !important;
+            background: var(--wt-bg-elev2) !important;
+            border: 1px solid rgba(255,255,255,.12) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,.4) !important;
+        }
+        .episode_area#bottomEpisodeList .episode_lst .pg_prev::before,
+        .episode_area#bottomEpisodeList .episode_lst .pg_next::after { font-size: 18px !important; }
+
+        /* Creator note — highlighted card with an accent edge. */
+        .comment_area .creator_note {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid rgba(255,255,255,.08) !important;
+            border-radius: 16px !important;
+            box-shadow: inset 3px 0 0 var(--wt-accent), 0 8px 24px rgba(0,0,0,.3) !important;
+            padding: 20px 22px !important;
+        }
+        .comment_area .creator_note .title {
+            color: var(--wt-text-mute) !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            letter-spacing: .1em !important;
+            text-transform: uppercase !important;
+        }
+        .comment_area .creator_note .author_area a.author_name { text-decoration: none !important; }
+        .comment_area .creator_note .author_area a.author_name:hover span { color: var(--wt-accent) !important; }
+        .comment_area .creator_note .author_text {
+            color: var(--wt-text-dim) !important;
+            font-size: 15px !important;
+            line-height: 1.6 !important;
+        }
+
+        /* Comments header: title + count chip. */
+        .comment_head { margin: 36px 0 14px !important; column-gap: 10px !important; }
+        .comment_head .title_comments {
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            letter-spacing: .02em !important;
+        }
+        .comment_head .count {
+            background: var(--wt-bg-elev2) !important;
+            color: var(--wt-text-dim) !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            line-height: 1 !important;
+            padding: 5px 10px !important;
+            border-radius: 999px !important;
+        }
+
+        /* Spoiler switch is a <button>: drop the generic button box. */
+        [class*="wcc_Spoiler__root"] { border: 0 !important; padding: 0 !important; gap: 6px !important; }
+        [class*="wcc_Spoiler__text"] { color: var(--wt-text-dim) !important; font-size: 13px !important; }
+
+        /* Composer — rounded field with an accent focus ring. */
+        [class*="wcc_Editor__root"] { background: transparent !important; }
+        [class*="wcc_Editor__editor"] {
+            border: 1px solid rgba(255,255,255,.1) !important;
+            border-radius: 14px !important;
+            overflow: hidden !important;
+            transition: border-color .15s ease, box-shadow .15s ease !important;
+        }
+        [class*="wcc_Editor__editor"]:focus-within {
+            border-color: var(--wt-accent) !important;
+            box-shadow: 0 0 0 3px rgba(0,213,100,.15) !important;
+        }
+        [class*="wcc_Editor__actionBar"] { border-top: 1px solid rgba(255,255,255,.06) !important; }
+        [class*="TextEditor_Toolbar-module__root"] button,
+        [class*="TextEditor_SubmitControlPanel-module__button"] {
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 8px !important;
+        }
+        [class*="TextEditor_Toolbar-module__root"] button:hover { background: var(--wt-bg-hover) !important; }
+
+        /* Sort tabs sit on a hairline that runs the width of the column. */
+        [class*="wcc_SortOrderTabs__root"] {
+            border-bottom: 1px solid rgba(255,255,255,.08) !important;
+            margin-top: 16px !important;
+        }
+        [class*="wcc_SortOrderTab__root"] {
+            padding: 10px 14px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            text-transform: none !important;
+        }
+
+        /* Comment list — ONE card with hairline dividers, not a stack of
+           separately bordered boxes. */
+        [class*="wcc_CommentList__list"] {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid rgba(255,255,255,.08) !important;
+            border-radius: 16px !important;
+            margin-top: 14px !important;
+            overflow: hidden !important;
+        }
+        [class*="wcc_CommentItem__root"] {
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 18px 22px !important;
+            transition: background-color .15s ease !important;
+        }
+        [class*="wcc_CommentItem__root"] + [class*="wcc_CommentItem__root"] {
+            border-top: 1px solid rgba(255,255,255,.06) !important;
+        }
+        [class*="wcc_CommentItem__root"]:hover { background: rgba(255,255,255,.02) !important; }
+        [class*="wcc_CommentHeader__name"] {
+            color: var(--wt-text) !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+        }
+        [class*="wcc_CommentHeader__createdAt"] { font-size: 12px !important; }
+        [class*="wcc_TextContent__content"] {
+            color: var(--wt-text) !important;
+            font-size: 15px !important;
+            line-height: 1.6 !important;
+        }
+        /* Actions: ghost pills — quiet until hovered. */
+        [class*="wcc_CommentReaction__action"],
+        [class*="wcc_ReplyFolderToggle__root"] {
+            background: transparent !important;
+            border: 1px solid rgba(255,255,255,.1) !important;
+            min-height: 30px !important;
+            font-size: 13px !important;
+        }
+        [class*="wcc_CommentReaction__action"]:hover,
+        [class*="wcc_ReplyFolderToggle__root"]:hover {
+            background: var(--wt-bg-hover) !important;
+            border-color: rgba(255,255,255,.2) !important;
+        }
+        [class*="wcc_ReplyFolderToggle__root"] { color: var(--wt-text-dim) !important; }
+        [class*="wcc_ReplyFolder__root"] {
+            background: var(--wt-bg-elev2) !important;
+            border-radius: 12px !important;
+            margin-top: 12px !important;
+        }
+        /* "More" — full pill button under the card, not a boxed link. */
+        [class*="wcc_CommentMore__root"] { padding: 18px 0 4px !important; text-align: center !important; }
+        [class*="wcc_CommentMore__more"] {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            height: auto !important;
+            padding: 10px 26px !important;
+            border: 1px solid rgba(255,255,255,.12) !important;
+            border-radius: 999px !important;
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text) !important;
+            font-weight: 600 !important;
+        }
+        [class*="wcc_CommentMore__more"]:hover {
+            background: var(--wt-bg-hover) !important;
+            border-color: var(--wt-accent) !important;
+            color: var(--wt-accent) !important;
+        }
+
+        /* CANVAS Weekly round-up — rounded tiles with a bottom gradient so
+           the overlaid title/author stay readable on any artwork (the base
+           24% flat black .skin let bright covers swallow the white text). */
+        .viewer .challenge_spot { border-top-color: rgba(255,255,255,.06) !important; }
+        .viewer .challenge_spot_inner h3 { color: var(--wt-text) !important; font-weight: 700 !important; }
+        .challenge_spot_list a,
+        .challenge_spot_list .img_area { border-radius: 12px !important; overflow: hidden !important; }
+        .challenge_spot_list .skin {
+            background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.85) 100%) !important;
+            opacity: 1 !important;
+        }
+        .challenge_spot_list a:hover .skin { opacity: 0 !important; }
+        .challenge_spot_list .info_area .subj { font-size: 18px !important; font-weight: 700 !important; }
+        .challenge_spot_list .info_area .author { font-size: 13px !important; color: rgba(255,255,255,.8) !important; }
+        .viewer .challenge_spot_inner .paging .num [class*="ico"],
+        .viewer .challenge_spot_inner .paging .num a,
+        .viewer .challenge_spot_inner .paging .num span {
+            border-radius: 50% !important;
+        }
+
         /* Footer */
         #footer, .footer {
             background-color: var(--wt-bg-elev) !important;
@@ -2192,7 +2510,7 @@
         /* Episode list column — .detail_body .detail_list_area is float:left,
            761px wide, base background:#fff. Base padding-bottom (66px, or
            175px on .banner pages) reserves room for an absolutely-positioned
-           pager; our .paginate:not(.v2) rule puts the pager back in normal
+           pager; our .paginate:not(.v2):not(.episode_lst *) rule puts the pager back in normal
            flow, so that reserved space would just be an empty white-ish gap. */
         .detail_body .detail_list_area {
             background: var(--wt-bg-elev) !important;
@@ -2537,7 +2855,7 @@
            flex row (display:block turned the prev arrow into a full-width
            block line and pushed the numbers below the card's clip edge);
            allow wrapping so 10+ pages never overflow the column. */
-        .paginate:not(.v2) {
+        .paginate:not(.v2):not(.episode_lst *) {
             position: static !important;
             display: flex !important;
             flex-wrap: wrap !important;
@@ -2548,7 +2866,7 @@
             clear: both !important;
             margin: 24px 0 4px !important;
         }
-        .paginate:not(.v2) .pg_page + .pg_page,
+        .paginate:not(.v2):not(.episode_lst *) .pg_page + .pg_page,
         .detail_body .paginate .pg_prev { margin-left: 0 !important; }
         .paginate a, .paginate strong, .paginate span,
         .paginate.v2 [class^="pg_"] {
@@ -2609,17 +2927,17 @@
         /* Base CSS draws the arrow sprite on ::before (both prev AND next)
            as a display:block 20px box. Neutralise that box on both sides,
            then draw text chevrons: ‹ on prev::before, › on next::after. */
-        .paginate:not(.v2) .pg_prev::before, .paginate:not(.v2) .pg_next::before {
+        .paginate:not(.v2):not(.episode_lst *) .pg_prev::before, .paginate:not(.v2):not(.episode_lst *) .pg_next::before {
             display: inline !important;
             background: none !important;
             width: auto !important;
             height: auto !important;
             margin: 0 !important;
         }
-        .paginate:not(.v2) .pg_next::before { content: none !important; }
+        .paginate:not(.v2):not(.episode_lst *) .pg_next::before { content: none !important; }
         .paginate .pg_next::after, .paginate a[class*="next"]::after { content: '\\203A' !important; font-size: 20px !important; line-height: 1 !important; }
         .paginate .pg_prev::before, .paginate a[class*="prev"]::before { content: '\\2039' !important; font-size: 20px !important; line-height: 1 !important; }
-        .paginate:not(.v2) .pg_prev, .paginate:not(.v2) .pg_next {
+        .paginate:not(.v2):not(.episode_lst *) .pg_prev, .paginate:not(.v2):not(.episode_lst *) .pg_next {
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -2685,8 +3003,16 @@
         }
         .paginate.v2 .pg_prev::before { content: '\\276E' !important; }
         .paginate.v2 .pg_next::after  { content: '\\276F' !important; }
+        /* Base CSS draws the dark arrow sprite on .pg_prev::before (a 20×20
+           box with background-position) — the same pseudo we reuse for ❮.
+           Without clearing the sprite and the fixed box, the dark sprite
+           showed behind a squashed glyph ("<‹"). ::after (next) has no sprite. */
         .paginate.v2 .pg_prev::before,
         .paginate.v2 .pg_next::after {
+            background: none !important;
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
             position: absolute !important;
             inset: 0 !important;
             display: flex !important;
