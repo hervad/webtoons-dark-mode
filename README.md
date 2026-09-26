@@ -1,125 +1,102 @@
 # Webtoons Dark Mode
 
-A targeted dark theme for [Webtoons](https://www.webtoons.com) — desktop and mobile. No global filter inversion, no white-text-on-white-panel bugs, no per-frame JavaScript work. Just CSS.
+A dark theme for [WEBTOON](https://www.webtoons.com) that leaves the comics alone.
+
+Most dark-mode extensions invert the whole page, which also inverts the artwork: skin tones go blue, pinks turn green. This userscript does the opposite. It restyles only the site around the comic (header, menus, episode lists, comments, sidebars, popups) and never touches the comic panels, so every page looks exactly as the artist drew it.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-<!-- After publishing on Greasyfork, replace SCRIPT_ID with the assigned ID and uncomment:
-[![Greasyfork version](https://img.shields.io/greasyfork/v/SCRIPT_ID.svg)](https://greasyfork.org/en/scripts/SCRIPT_ID-webtoons-dark-mode)
-[![Greasyfork installs](https://img.shields.io/greasyfork/dt/SCRIPT_ID.svg)](https://greasyfork.org/en/scripts/SCRIPT_ID-webtoons-dark-mode)
--->
-
-## What it does
-
-Applies a dark theme to Webtoons by overriding background, text, border, and surface colors on the actual containers the site uses — header, sub-nav, cards, episode lists, viewer, carousel arrows, comments, footer, popups, inputs. Built around a small CSS-variable palette so the whole look can be re-skinned by editing a handful of values.
-
-On the viewer page, the comic panel strip renders as a single elevated card — rounded corners, hairline outline, soft halo on all sides — without inserting any extra DOM elements (one container `box-shadow` does the lift, so there are no per-image seams). Homepage, series detail, `/canvas` (home + genre tabs), and `/rankings` pages get matching three-level elevation (page → section card → comic card), per-card depth shadows, and a `:hover` darken that makes title overlays readable. Active GNB and SNB tabs render in accent green at the base font size; carousel prev/next arrows are centered SVG chevrons with a green hover tint.
-
-An optional **reader dim** mode (`Alt+Shift+N`) lowers comic-panel brightness for late-night reading without affecting the rest of the page.
-
-WCAG-aware: contrast ratios verified for text and UI components (border 3:1, body text 14:1, accent 9:1 against the base surface, dim text 9.1:1). A `:focus-visible` ring is drawn on every interactive control so keyboard navigation is usable — the base site ships no visible focus indicator.
-
-## Why not just use [a global `filter: invert()` userstyle](https://en.wikipedia.org/wiki/Filter_(higher-order_function))?
-
-Two reasons:
-
-1. Inverting the whole page also inverts comic panels — colors look wrong and tones are off.
-2. Inversion shifts hues (`hue-rotate(180deg)`) so pinks turn green and brand colors look broken.
-
-This script does the opposite: scoped overrides on the chrome, comic images left untouched.
+[![Latest release](https://img.shields.io/github/v/release/hervad/webtoons-dark-mode)](https://github.com/hervad/webtoons-dark-mode/releases/latest)
 
 ## Install
 
-**Recommended (with auto-updates):**
-
-[Install from Greasyfork](https://greasyfork.org/en/scripts/) — open the link in a browser that has a userscript manager installed, then click **Install this script**.
-
-**Manual:**
-
-1. Install a userscript manager:
-   - [Tampermonkey](https://www.tampermonkey.net/) — Chrome, Edge, Firefox, Safari, Opera
+1. **Install a userscript manager** in your browser:
+   - [Tampermonkey](https://www.tampermonkey.net/) — Chrome, Edge, Firefox, Opera, Safari
    - [Violentmonkey](https://violentmonkey.github.io/) — Chrome, Edge, Firefox
-   - [Greasemonkey](https://www.greasespot.net/) — Firefox
-2. Open the [raw `.user.js` file](https://raw.githubusercontent.com/hervad/webtoons-dark-mode/main/webtoons-dark-mode.user.js) and confirm the install prompt.
+2. **Click [Install Webtoons Dark Mode](https://raw.githubusercontent.com/hervad/webtoons-dark-mode/main/webtoons-dark-mode.user.js).** Your userscript manager opens an install page; confirm it.
+3. **Open or reload [webtoons.com](https://www.webtoons.com).**
 
-> **Chrome users:** since Manifest V3, Tampermonkey requires Developer Mode to be enabled in `chrome://extensions/` for userscripts to actually run. Flip the toggle in the top-right of that page once.
+Updates install automatically; your userscript manager checks this repository for new versions.
 
-## Usage
+> **Chrome / Edge + Tampermonkey:** Chrome needs an extra permission before any userscript can run. Open `chrome://extensions`, click **Details** on Tampermonkey, and turn on **Allow User Scripts**. On Chrome versions before 138, turn on **Developer mode** (top-right of `chrome://extensions`) instead.
 
-Once installed, the theme is on by default. To toggle:
+## Using it
 
-- **Tampermonkey/Violentmonkey menu** → *Toggle Webtoons dark mode* / *Toggle reader dim*
-- **Keyboard:** `Alt + Shift + T` (theme), `Alt + Shift + N` (night-reading dim)
+On first run the theme follows your system setting: dark if your OS is in dark mode, light otherwise. After that, your choice is remembered.
 
-State persists across pages and reloads via `GM_setValue`.
+| Action | Shortcut | Backup shortcut |
+|---|---|---|
+| Turn dark mode on / off | `Alt + Shift + T` | `Ctrl + Alt + D` |
+| Dim comic panels for night reading | `Alt + Shift + N` | `Ctrl + Alt + Shift + D` |
+
+Both toggles are also in the userscript manager's menu (click the Tampermonkey / Violentmonkey icon while on webtoons.com). The backup shortcuts exist because `Alt + Shift` switches keyboard layouts on Windows machines with more than one input language.
+
+**Reader dim** lowers the brightness of the comic panels only, which is easier on the eyes in a dark room. It's off by default.
+
+## What it covers
+
+- **Home, Originals, Categories, Rankings, Canvas:** dark section cards, readable genre colours, green active tabs, dark carousels and pagination.
+- **Series page:** the cover artwork stays visible behind a dark episode list. Episodes you've already read are shown slightly muted, so the next one stands out.
+- **Reader:** the comic strip sits on a dark page as one card with a soft shadow; there are no seams between panels. The episode strip, toolbar, sidebar rankings and comments are all dark.
+- **Comments, search, login, popups, footer:** dark, with visible hover and keyboard-focus states.
+
+Text meets WCAG AA contrast: body text is 12–14:1 against the page and cards, secondary text 6.6–9:1, and the green accent 6.7–9:1. There's a visible focus ring for keyboard navigation, which the site itself doesn't provide. Animations are turned off if your system asks for reduced motion.
 
 ## How it works
 
-A single `<style>` element is injected at `document-start` (before paint, so no flash of light theme). The CSS targets the actual container classes Webtoons uses — `.gnb`, `.detail_list_area`, `.viewer_lst`, the WCC comment widget (`[class*="wcc_*"]`), etc. — and overrides background, color, and border properties. Comic panels (`img._images`) are explicitly excluded with `filter: none`, so they render exactly as the artist intended.
+The script adds one stylesheet to the page before anything is drawn, so there's no white flash while a page loads. Instead of using a colour filter, that stylesheet overrides the specific elements Webtoons uses (the episode list, sidebar, comment widget and so on) with a small colour palette. The comic images are explicitly excluded.
 
-A small amount of JavaScript runs to handle Webtoons' SPA navigation: a `<head>` `MutationObserver` re-injects the `<style>` if Webtoons swaps stylesheets, `pushState` / `popstate` hooks sync three body classes (`wt-viewer`, `wt-detail`, `wt-home`) that scope page-specific CSS, and `fixViewerBanners()` clears rogue background colors that Webtoons sets via JS inside the viewer column. All listeners are bounded — no `requestAnimationFrame` loops, no per-frame work.
+The comment section is a separate widget that already has a dark colour set built in, but the website never turns it on. The script switches that built-in set on with this theme's colours.
 
-The script uses three Greasemonkey grants (`GM_getValue`, `GM_setValue`, `GM_registerMenuCommand`) for persistence and the toggle menu — nothing network-facing, nothing that could exfiltrate data.
+A little JavaScript handles the parts CSS can't:
 
-## Configuration
+- It re-adds the stylesheet if Webtoons swaps its own styles while you move between pages without a reload.
+- It detects those in-page navigations and marks the page as reader, series or listing, so page-specific styles apply.
+- It clears a few background colours Webtoons sets directly on elements in the reader.
+- It listens for the keyboard shortcuts and saves your toggle settings.
 
-The palette is the first block in the script. Edit any of these CSS variables to re-skin:
+There are no animation loops and no scroll handlers, and nothing runs while you're reading. The script uses three userscript permissions: `GM_getValue` and `GM_setValue` to remember your settings, and `GM_registerMenuCommand` for the menu entries. It makes no network requests and collects no data.
+
+## Customising the colours
+
+The palette is the first block in the script. In Tampermonkey or Violentmonkey, open the script's editor and change any of these values:
 
 ```css
-:root {
-    --wt-bg:             #15171a;  /* page background */
-    --wt-bg-elev:        #22262b;  /* cards, header */
-    --wt-bg-elev2:       #2c313a;  /* secondary cards, hover */
-    --wt-bg-hover:       #30353c;  /* interactive hover surface */
-    --wt-bg-input:       #2a2e35;  /* form fields */
-    --wt-border:         #4a5360;  /* subtle dividers, card borders */
-    --wt-border-strong:  #5a6472;  /* focus rings, selected outlines */
-    --wt-text:           #e6e6e6;
-    --wt-text-dim:       #b5b9c0;  /* metadata, dates */
-    --wt-text-mute:      #7b828d;  /* placeholders */
-    --wt-text-on-accent: #0a0a0a;  /* text on accent-colored surfaces */
-    --wt-link:           #7cb6ff;
-    --wt-accent:         #00d564;  /* Webtoons brand green */
-    --wt-accent-soft:    #4ade80;  /* desaturated companion for hover tints */
-    --wt-shadow:         0 1px 2px rgba(0,0,0,.6);
-}
+--wt-bg:            #15171a;  /* page background */
+--wt-bg-elev:       #22262b;  /* cards, header, episode list */
+--wt-bg-elev2:      #2c313a;  /* buttons, inner surfaces */
+--wt-bg-hover:      #30353c;  /* hover highlight */
+--wt-bg-input:      #2a2e35;  /* text fields */
+--wt-border:        #4a5360;  /* dividers, card edges */
+--wt-text:          #e6e6e6;  /* main text */
+--wt-text-dim:      #b5b9c0;  /* dates, authors, metadata */
+--wt-text-mute:     #878e99;  /* least important text */
+--wt-text-read:     #9aa1ab;  /* titles of episodes you've read */
+--wt-link:          #7cb6ff;  /* links, commenter names */
+--wt-accent:        #00d564;  /* WEBTOON green: active tabs, highlights */
+--wt-accent-like:   #f06868;  /* heart icons */
 ```
 
-To change the keybindings, edit the `handleKey` function. The script accepts both `Alt+Shift+T` / `Alt+Shift+N` and `Ctrl+Alt+D` / `Ctrl+Alt+Shift+D` as backup combos (the Alt+Shift family conflicts with the Windows input-language switcher on multi-keyboard setups).
+Edits made this way are overwritten when the script auto-updates. To keep them, turn off updates for this script in your userscript manager.
 
 ## Compatibility
 
-- Tampermonkey, Violentmonkey, Greasemonkey
-- Chromium browsers: Chrome, Edge, Brave, Opera, Vivaldi
-- Firefox (stable + ESR)
-- Safari (with Userscripts app or Tampermonkey)
-- Desktop site (`www.webtoons.com`) and mobile site (`m.webtoons.com`)
+- **Browsers:** Chrome, Edge, Brave, Opera, Vivaldi, Firefox, and Safari with Tampermonkey.
+- **Userscript managers:** Tampermonkey and Violentmonkey. Greasemonkey 4 is **not** supported, because it doesn't provide the `GM_getValue` / `GM_setValue` functions the script uses to store settings.
+- **Sites:** the desktop site `www.webtoons.com`, which is fully styled. The mobile site `m.webtoons.com` has basic support.
 
-## Performance
+## Something still looks white?
 
-The script keeps runtime cost low:
+Webtoons occasionally renames parts of its pages, which can make an area light again. Please [open an issue](https://github.com/hervad/webtoons-dark-mode/issues) with:
 
-- One `<style>` element insert at `document-start` (~60 KB of CSS, parsed once).
-- One global `keydown` listener (capture phase) that early-exits on non-modifier keys.
-- A `<head>` `MutationObserver` watching only direct `childList` changes — fires when Webtoons swaps stylesheets and re-injects the theme if it's been removed. No work on attribute or text changes.
-- SPA-navigation hooks on `history.pushState` / `replaceState` / `popstate` schedule three short callbacks (sync body classes, wrap viewer sidebar sections, normalize viewer banners) on a `[200, 800, 2000]ms` retry cohort, then go idle until the next navigation.
-- No `requestAnimationFrame` loops, no scroll handlers on the comic strip.
-- No global CSS transitions (an earlier draft used `body * { transition: ... }` — removed because it makes the browser track transitions on every descendant of `<body>`, including comic panels).
-- `@noframes` set, so the script doesn't re-run inside ad iframes or embedded frames.
+- the page URL
+- a screenshot
+- if you can, the element's class name (right-click it → **Inspect**)
 
-## Known issues
+These are usually quick fixes.
 
-- **Selector drift.** Webtoons occasionally renames classes when they redesign sections. If a panel goes white again, please open an issue with the URL and a screenshot — the fix is usually a one-line selector add.
-- **WCC comment widget** (Webtoon Comment Component) uses CSS-module class names of the form `wcc_<Component>__<element>` that occasionally gain hashes. Wildcard attribute selectors are used (`[class*="wcc_CommentItem__root"]`) to survive minor renames, but a major widget refactor will need follow-up.
+## Development
 
-## Contributing
-
-Issues and pull requests welcome. For "this surface is still light" bug reports, please include:
-
-- The page URL where it reproduces
-- The element class/ID (right-click → Inspect)
-- A screenshot if possible
-
-For local development setup (Fedora + VS Code recommended), see [SETUP.md](SETUP.md). The short version: `git clone`, `npm install`, open in VS Code, install Tampermonkey in your browser. The repo includes ESLint config (with userscript-metadata validation), helper scripts to grep Webtoons' minified CSS bundles, and a metadata validator.
+Everything lives in one file, [`webtoons-dark-mode.user.js`](webtoons-dark-mode.user.js), with no build step. To test changes, paste the file into a new Tampermonkey script, or point Tampermonkey at your local copy. [`CLAUDE.md`](CLAUDE.md) documents the architecture, Webtoons' page structure, known pitfalls, and the release checklist. [`CHANGELOG.md`](CHANGELOG.md) lists every release.
 
 ## License
 
