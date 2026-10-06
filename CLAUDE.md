@@ -176,6 +176,8 @@ There is no automated test suite — this is a DOM-manipulation script. Manual t
 - [ ] Toggle persists after page reload (GM storage)
 - [ ] Reader dim toggle (`Alt+Shift+N`) dims comic panels only
 - [ ] Edge-shading toggle (`Alt+Shift+V`) removes / restores the side vignette; the choice survives a reload
+- [ ] Every menu entry is labelled with its action and relabels after each change, including via shortcuts (e.g. Alt+Shift+T flips "Turn off dark mode" ↔ "Turn on dark mode"); entry order stays the same
+- [ ] Menu "Hide scroll-to-top button in reader" hides the button and the entry then reads "Show scroll-to-top button in reader" (and back); it hides / restores the round arrow button on episode pages only (still visible on home / detail / /canvas); the choice survives a reload
 - [ ] Reader, below the comic: end card, episode strip card, creator note, one-card comment list and round-up tiles all match the "Reader — everything after the last comic panel" block
 - [ ] Episode-strip thumbnails load (no grey placeholders), including with Windows "Animation effects" OFF (`prefers-reduced-motion: reduce`)
 - [ ] Episode-strip and toolbar prev/next arrows: one clean ❮ ❯, no dark sprite behind them

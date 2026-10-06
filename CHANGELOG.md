@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-06
+
+### Added
+
+- **Option to hide the scroll-to-top button while reading** ([#2](https://github.com/hervad/webtoons-dark-mode/issues/2)). Pick **Hide scroll-to-top button in reader** in the Tampermonkey / Violentmonkey menu to hide the round arrow button on episode pages. The entry then reads **Show scroll-to-top button in reader**, so it always says how to bring the button back. The choice is remembered. The button stays visible by default, and other pages are unaffected. You can still jump to the top with the `Home` key.
+
+### Changed
+
+- **Menu entries say what they'll do.** Instead of "Toggle …", each Tampermonkey / Violentmonkey menu entry shows the action a click performs and updates after every change, including changes made with the keyboard shortcuts: **Turn off dark mode** / **Turn on dark mode**, **Turn off reader dim** / **Turn on reader dim**, **Hide edge shading** / **Show edge shading**. Your userscript manager may ask you to approve one new permission (`GM_unregisterMenuCommand`) with this update.
+
 ## [1.6.4] - 2026-09-26
 
 ### Changed

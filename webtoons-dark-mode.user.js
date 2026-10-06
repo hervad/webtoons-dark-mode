@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.6.4
+// @version      1.7.0
 // @description  Dark theme for WEBTOON (webtoons.com) that never touches the comic art — dark site, original colours in every panel. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -11,6 +11,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
+// @grant        GM_unregisterMenuCommand
 // @noframes
 // @license      MIT
 // @homepageURL  https://github.com/hervad/webtoons-dark-mode
@@ -25,7 +26,8 @@
     const KEY_THEME = 'wt_dark_enabled';
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
-    const VERSION = '1.6.4';
+    const KEY_TOP_BTN = 'wt_top_button';
+    const VERSION = '1.7.0';
 
     // Retry cohort for SPA-navigation work (vignette class sync, viewer cards,
     // banner cleanup, panel glow). Webtoons renders the new page asynchronously
@@ -2885,6 +2887,10 @@
             transition: filter .15s ease !important;
         }
         .go_top .btn_top:hover { filter: invert(.82) hue-rotate(180deg) !important; }
+        /* Optional: some readers find the button distracting over the comic
+           (issue #2). toggleTopButton() sets html[data-wt-top-btn="off"];
+           reader only — on listing pages it covers nothing. */
+        html[data-wt-top-btn="off"] body.wt-viewer .go_top { display: none !important; }
 
         /* "Recently viewed" floating bar on the right edge. */
         .recently_area {
@@ -3638,6 +3644,9 @@
     const applyVignette = (on) => {
         document.documentElement.dataset.wtVignette = on ? 'on' : 'off';
     };
+    const applyTopButton = (on) => {
+        document.documentElement.dataset.wtTopBtn = on ? 'on' : 'off';
+    };
 
     // First-run default follows the OS preference — once the user toggles, their
     // choice persists and OS changes are ignored.
@@ -3647,10 +3656,12 @@
     let darkOn = GM_getValue(KEY_THEME, themeDefault);
     let dimOn = GM_getValue(KEY_DIM, false);
     let vignetteOn = GM_getValue(KEY_VIGNETTE, true);
+    let topBtnOn = GM_getValue(KEY_TOP_BTN, true);
 
     applyTheme(darkOn);
     applyDim(dimOn);
     applyVignette(vignetteOn);
+    applyTopButton(topBtnOn);
 
     // SPA / late-loading bundle defense: if our <style> ever gets removed
     // (Webtoons swaps stylesheets on some chapter transitions), put it back.
@@ -3674,25 +3685,57 @@
         GM_setValue(KEY_THEME, darkOn);
         applyTheme(darkOn);
         console.info('[webtoons-dark-mode] theme →', darkOn ? 'dark' : 'light');
+        registerMenu();
     }
     function toggleDim() {
         dimOn = !dimOn;
         GM_setValue(KEY_DIM, dimOn);
         applyDim(dimOn);
         console.info('[webtoons-dark-mode] reader dim →', dimOn ? 'on' : 'off');
+        registerMenu();
     }
     function toggleVignette() {
         vignetteOn = !vignetteOn;
         GM_setValue(KEY_VIGNETTE, vignetteOn);
         applyVignette(vignetteOn);
         console.info('[webtoons-dark-mode] edge vignette →', vignetteOn ? 'on' : 'off');
+        registerMenu();
+    }
+    function toggleTopButton() {
+        topBtnOn = !topBtnOn;
+        GM_setValue(KEY_TOP_BTN, topBtnOn);
+        applyTopButton(topBtnOn);
+        console.info('[webtoons-dark-mode] reader scroll-to-top button →', topBtnOn ? 'shown' : 'hidden');
+        registerMenu();
     }
 
-    if (typeof GM_registerMenuCommand === 'function') {
-        GM_registerMenuCommand('Toggle Webtoons dark mode', toggleTheme);
-        GM_registerMenuCommand('Toggle reader dim', toggleDim);
-        GM_registerMenuCommand('Toggle edge shading (vignette)', toggleVignette);
+    // Menu entries say what a click will do ("Turn off dark mode" / "Turn on
+    // dark mode"), so someone who changed a setting long ago can still see
+    // how to undo it. Every toggle — menu or keyboard shortcut — relabels.
+    // All entries are re-added, not just the changed one, because a re-added
+    // entry lands at the bottom of the list. Without GM_unregisterMenuCommand
+    // labels can't change, so they stay neutral ("Toggle …") instead of going
+    // stale or piling up duplicates.
+    const canRelabel = typeof GM_unregisterMenuCommand === 'function';
+    let menuIds = [];
+    function registerMenu() {
+        if (typeof GM_registerMenuCommand !== 'function') return;
+        if (menuIds.length) {
+            if (!canRelabel) return;
+            menuIds.forEach(id => GM_unregisterMenuCommand(id));
+        }
+        const entries = [
+            // [state, label while on, label while off, neutral label, action]
+            [darkOn, 'Turn off dark mode', 'Turn on dark mode', 'Toggle Webtoons dark mode', toggleTheme],
+            [dimOn, 'Turn off reader dim', 'Turn on reader dim', 'Toggle reader dim', toggleDim],
+            [vignetteOn, 'Hide edge shading', 'Show edge shading', 'Toggle edge shading (vignette)', toggleVignette],
+            [topBtnOn, 'Hide scroll-to-top button in reader', 'Show scroll-to-top button in reader',
+                'Toggle scroll-to-top button in reader', toggleTopButton],
+        ];
+        menuIds = entries.map(([on, whenOn, whenOff, neutral, action]) =>
+            GM_registerMenuCommand(canRelabel ? (on ? whenOn : whenOff) : neutral, action));
     }
+    registerMenu();
 
     // Keyboard shortcuts. Multiple combos so the user can use whichever doesn't
     // conflict with their OS / browser / keyboard-layout switcher:

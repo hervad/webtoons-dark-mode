@@ -16,7 +16,9 @@ On first run the theme follows your system setting: dark if your OS is in dark m
 - **Dim comic panels for night reading:** `Alt + Shift + N` (backup: `Ctrl + Alt + Shift + D`)
 - **Dark edge shading on / off:** `Alt + Shift + V` (backup: `Ctrl + Alt + Shift + V`)
 
-All three toggles are also in the Tampermonkey / Violentmonkey menu. The backup shortcuts exist because `Alt + Shift` switches keyboard layouts on Windows machines with more than one input language.
+All three toggles are also in the Tampermonkey / Violentmonkey menu. Each entry says what clicking it will do, e.g. **Turn off dark mode** while the theme is on. The backup shortcuts exist because `Alt + Shift` switches keyboard layouts on Windows machines with more than one input language.
+
+**Scroll-to-top button** in the episode reader can be hidden from the same menu (**Hide scroll-to-top button in reader**; the entry then reads **Show…** to bring it back). It's shown by default; the `Home` key still jumps to the top when it's hidden.
 
 **Reader dim** lowers the brightness of the comic panels only, which is easier on the eyes in a dark room. It's off by default.
 
