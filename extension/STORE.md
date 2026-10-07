@@ -1,21 +1,22 @@
 # Publishing Toonlight
 
-How to put the extension on the three stores. Build first:
+How to put the extension on the three stores. Build first, then zip the source for AMO (in this order: the build deletes every zip in `dist/`):
 
 ```bash
 node tools/build-extension.mjs
+git archive --format=zip -o dist/toonlight-<version>-source.zip HEAD
 ```
 
-This writes `dist/toonlight-<version>-chrome.zip` (Chrome and Edge) and `dist/toonlight-<version>-firefox.zip` (Firefox). The version is the userscript's `@version`; a store rejects an upload whose version isn't higher than the published one.
+This writes `dist/toonlight-<version>-chrome.zip` (Chrome and Edge), `dist/toonlight-<version>-firefox.zip` (Firefox) and the source zip (the repository at `HEAD`, for AMO's reviewers; commit first). The version is the userscript's `@version`; a store rejects an upload whose version isn't higher than the published one.
 
 ## Listing text (all stores)
 
 **Name:** Toonlight: Dark Mode for WEBTOON
 
-**Short description** (Chrome allows 132 characters; it's already in the manifest):
+**Short description / summary** (Chrome allows 132 characters; it's already in the manifest, and Chrome takes it from there):
 > A dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Not affiliated with NAVER WEBTOON.
 
-**Description:**
+**Description** (paste only the text, not this guide; AMO accepts Markdown, so `-` bullets work there):
 > Toonlight gives WEBTOON a carefully designed dark theme without touching the art.
 >
 > Most dark-mode extensions invert the whole page, which also inverts the comics: skin tones go blue, pinks turn green. Toonlight restyles only the site around the comic (header, menus, episode lists, comments, sidebars, popups) and never filters or recolours a comic panel.
@@ -31,41 +32,102 @@ This writes `dist/toonlight-<version>-chrome.zip` (Chrome and Edge) and `dist/to
 >
 > Source code and changelog: https://github.com/hervad/webtoons-dark-mode
 
-**Screenshots:** 1280 × 800 PNG or JPEG (at least one for Chrome, up to five). The current set is in `dist/store/`: `1-series.png`, `2-reader-end.png`, `3-comments.png` (commenter names replaced with neutral ones), `4-originals.png`, `5-reader-popup.png`, plus `promo-tile-440x280.png` (Chrome's optional small promo tile). They are build output and stay out of git (`dist/` is ignored); the README's smaller copies are in `docs/screenshots/`.
+**Images:** the current set is in `dist/store/`, all 24-bit PNG without alpha (Chrome refuses alpha):
 
-**Support / homepage:** https://github.com/hervad/webtoons-dark-mode (issues: …/issues)
+- `1-series.png`, `2-reader-end.png`, `3-comments.png` (commenter names replaced with neutral ones), `4-originals.png`, `5-reader-popup.png`: 1280 × 800, up to five.
+- `promo-tile-440x280.png`: Chrome's optional small promo tile. The marquee tile (1400 × 560) is left out; Google only uses it when it features the item.
+- Store icon: `extension/icons/icon-128.png`.
+
+They are build output and stay out of git (`dist/` is ignored); the README's smaller copies are in `docs/screenshots/`.
+
+Captions, where a store asks:
+
+1. Series page: episode list, sidebar and synopsis
+2. The end of an episode: like, subscribe and the episode strip
+3. Comments in one clean panel
+4. Originals: cover cards with genre colours
+5. The toolbar popup with the reader settings
+
+**URLs:**
+
+- Homepage: https://github.com/hervad/webtoons-dark-mode
+- Support: https://github.com/hervad/webtoons-dark-mode/issues
+- Privacy policy: https://github.com/hervad/webtoons-dark-mode/blob/main/PRIVACY.md
+
+**License:** MIT.
 
 ## Chrome Web Store
 
-1. Register at https://chrome.google.com/webstore/devconsole (one-time US$5 per developer account, then unlimited extensions).
-2. **New item** → upload `toonlight-<version>-chrome.zip`.
-3. **Store listing:** the text above; category Accessibility (or the closest "Make Chrome Yours" category); language English; icon is taken from the zip (128 px); screenshots.
-4. **Privacy practices:**
-   - Single purpose: "Applies a dark theme to webtoons.com."
-   - `storage` justification: "Saves the user's theme settings (dark mode on/off, reader dim, edge shading, scroll-to-top button)."
-   - Host access (webtoons.com content script) justification: "The theme's stylesheet and settings have to run on webtoons.com pages, the only site the extension changes."
-   - Remote code: **No.**
-   - Data usage: tick nothing (no data collected); certify the three statements.
-5. Submit for review (usually a few days for a new item, faster for updates).
+**One-time account setup** (https://chrome.google.com/webstore/devconsole; US$5 once per developer account, then unlimited extensions):
+
+- **Trader declaration:** non-trader (a free hobby project). A trader's address, phone and email are shown on the listing.
+- **Settings → Contact email:** required before anything can be submitted, and it must be verified (Google emails a link). It is shown publicly with the items.
+- **Address:** leave it empty; only traders need one, and it would be shown on the listing.
+- **Notifications:** turn on email for "Item review completed" and "Item published".
+
+**New item:**
+
+1. **Add new item** → upload `toonlight-<version>-chrome.zip` (the zip itself, not the folder).
+2. **Store listing:**
+   - Description: the text above.
+   - Category: Accessibility (or the closest one offered). Language: English.
+   - Store icon, screenshots and small promo tile as listed above; no promo video.
+   - Official URL: None (it needs a site verified in Search Console). Homepage and support URLs as above.
+   - Mature content: off (the extension has none, whatever some comics contain).
+   - Item support: off (GitHub issues do that job).
+3. **Privacy:**
+   - Single purpose: "Applies a dark theme to the WEBTOON website (www.webtoons.com and m.webtoons.com). It restyles the site's pages (menus, lists, comments, sidebars) and never alters the comic images."
+   - `storage` justification: "Saves the user's own theme settings on their device: dark mode on/off, reader dim on/off, edge shading on/off, and whether the reader's scroll-to-top button is hidden. Nothing is sent anywhere."
+   - Host permission justification: "The extension's only function is to restyle webtoons.com, so its content script (a stylesheet plus a small script that applies it before the page first paints, avoiding a white flash) must run on www.webtoons.com and m.webtoons.com. It runs on no other site and makes no network requests."
+   - Remote code: **No** (check it; the form can come up with Yes selected).
+   - Data usage: tick none of the data types; tick all three certifications.
+   - Privacy policy URL: as above (required).
+   - The yellow "Host Permission … in-depth review" warning is normal for any content script on a site; nothing to change.
+4. **Distribution:** free, public, all regions.
+5. **Submit for review**, with "publish automatically after it has passed review" ticked. A new item takes a few days, up to a couple of weeks with the host-permission review; updates are faster. If Submit stays grey, **Why can't I submit?** lists what's missing.
 
 ## Microsoft Edge Add-ons
 
 1. Register at https://partner.microsoft.com/dashboard/microsoftedge (free).
 2. **Create new extension** → upload the same `toonlight-<version>-chrome.zip`.
-3. Fill in the same listing text and screenshots, category Accessibility, and the privacy answers (no personal data).
+3. Fill in the same listing text, images and URLs, category Accessibility, and the privacy answers (no personal data; the privacy policy URL).
 4. Submit (review usually takes a few days).
 
 ## Firefox (addons.mozilla.org)
 
-1. Sign in at https://addons.mozilla.org/developers/ (free).
-2. **Submit a New Add-on** → On this site → upload `toonlight-<version>-firefox.zip`.
-3. The add-on ID is `toonlight@hervad` and can never change after the first upload.
-4. **Source code:** the extension's `content.js` is the userscript joined with a header by `tools/build-extension.mjs`, not minified. If the reviewer asks for sources, upload a zip of the repository and say: "Run `node tools/build-extension.mjs` (Node 22+, no dependencies); the output is in dist/firefox/."
-5. Data collection: the manifest declares none (`data_collection_permissions: required: none`).
-6. Listing: the same text and screenshots; category Appearance; also offer it for Firefox for Android (it works on m.webtoons.com).
+1. Sign in at https://addons.mozilla.org/developers/ (free) → **Submit Your First Add-on** (not "Theme": that's a browser colour scheme). Accept the agreement and the review policies; the display name is `hervad`.
+2. **On this site** → upload `toonlight-<version>-firefox.zip`. It should validate with no errors or warnings.
+   - Compatibility: Firefox, and Firefox for Android ticked and greyed out. The manifest's `gecko_android` sets it; that's expected.
+   - The add-on ID is `toonlight@hervad` and can never change after the first upload.
+3. **Do you need to submit source code?** **Yes:** `content.js` is generated from the userscript by `tools/build-extension.mjs`, which counts as "a tool that generates code", although nothing is minified. Upload `toonlight-<version>-source.zip`.
+4. **Describe add-on:**
+   - Summary and description: the text above. Add-on URL: the default slug (`toonlight-dark-mode-for-webtoon`) is fine.
+   - Not experimental; doesn't require payment.
+   - Category: Appearance.
+   - Support email: optional (shown publicly). Support website: the issues URL. License: MIT.
+   - **This add-on has a Privacy Policy:** ticked. AMO wants the text itself, not a link: paste a plain-text copy of `PRIVACY.md`, ending with its URL.
+   - Data collection: the manifest declares none (`data_collection_permissions: required: none`), so there is no form for it.
+   - **Notes to Reviewer** (AMO asks for step-by-step build instructions):
+
+     ```text
+     content.js is webtoons-dark-mode.user.js (in the source zip, also at https://github.com/hervad/webtoons-dark-mode) with its userscript metadata block replaced by a two-line header. Nothing is minified, bundled or transpiled; gm-shim.js, popup.* and the icons are copied as they are.
+
+     Build steps (Windows, macOS or Linux):
+     1. Install Node.js 22 or newer (no npm packages are needed).
+     2. Unzip the source and run, from its root: node tools/build-extension.mjs
+     3. The add-on is written to dist/firefox/ (and dist/toonlight-<version>-firefox.zip).
+
+     To test: open any page on www.webtoons.com; the theme is on by default. Alt+Shift+T turns it off and on; the toolbar popup lists the same settings.
+     ```
+
+5. **Submit Version.** Publication usually takes up to 24 hours (longer if picked for manual review); AMO emails when it's live.
+6. **Manage Listing → Edit Product Page → Images:** the icon and the five screenshots with their captions. They aren't part of the submission form.
 
 ## Each new version
 
-1. Bump `@version` in the userscript as usual (the extension takes it from there).
-2. `node tools/build-extension.mjs`.
-3. Upload the new zips: Chrome Web Store → Package → Upload new package; Edge → Update; AMO → Upload new version.
+1. Bump `@version` in the userscript as usual (the extension takes it from there), and commit.
+2. `node tools/build-extension.mjs`, then the `git archive` line above for the source zip.
+3. Upload the new zips:
+   - Chrome Web Store: the item → **Package** → Upload new package → Submit for review.
+   - Edge: the extension → Update.
+   - AMO: the add-on → **Upload New Version**; answer Yes to source code, upload the new source zip, and reuse the reviewer notes with the new version number.
