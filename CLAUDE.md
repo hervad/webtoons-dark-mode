@@ -297,13 +297,14 @@ Each rule's comment holds its full spec. These are the constraints a session mus
     - Change heights only (150 px for 2-line titles).
     - Fewer than 9 episodes are centred; `ul:has(> li:nth-child(9))` restores start alignment, so paging stays pixel-identical.
   - **Tiles:** change only by `transform`. `a.on` is reset to `margin: 0; width: 92px` (same effective width), and its ring is an **inset** shadow on `.mask` (an outer ring is clipped on the first tile).
-  - **Arrows:** a disabled (`.off`) arrow stays faint; both hide only when both are `.off`. Strip rules are prefixed `.episode_area#bottomEpisodeList`; `#topEpisodeList` is the toolbar dropdown's strip.
+  - **Arrows:** slim 30 × 87 px glass tabs in the side gutters (`top: 12px`, `left / right: -8px`), as tall and as rounded as the covers; round discs looked pasted on (the user's call). A disabled (`.off`) arrow stays faint; both hide only when both are `.off`. Strip rules are prefixed `.episode_area#bottomEpisodeList`; `#topEpisodeList` is the toolbar dropdown's strip.
 - **App banner (`.induce_app_area`):** don't clip `.img_area`, because the `.preview` badge hangs off its edge. The QR code keeps a white tile so it stays scannable.
 - **Creator card (`.creator_note`):** a grid with `.author_area { display: contents }`; `--wt-avatar-none` without a `.profile`; one linked creator stretches the link's `::before` over the card (its `::after` is the verified sprite).
 
 ### Comments (WCC)
 
 - **Tokens first:** the theme re-declares WCC's dark `--wcc-*` / `--wte-*` set at `html:root` (it beats WCC's light `:root`). Per-element rules only shape and lay out.
+- **Comment count** (`.comment_head .count`): a neutral glass pill with the figure in amber (the user's call).
 - **Font:** `.wcc_App__root`, all its descendants and their pseudo-elements use the system UI face, not Hind.
 - **asurascans model** (the user's reference): one panel (`.wcc_CommentList__list`) of flat rows split by hairlines, no per-comment cards. Text 18 px `#eef0f3`, names 17 px, dates 14 px on a shared baseline, 48 px avatars (replies 17 / 16 / 40 px). Long text is clipped at `8em`.
 - **Votes and Reply:** grey icon buttons under the text, votes first (`.wcc_CommentReaction__root { order: -1; margin-left: -10px }`), green up / red down on hover and when cast. A toggle with replies (`data-wt-replies` > 0) is a neutral glass pill (green was too loud).
@@ -350,8 +351,9 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 ### Community app (`/p/community/…`)
 
 - **Scoping:** `#app[class*="BaseLayout_container"]` (popovers, toasts and tooltips are portalled outside it). The button reset is `button:where(:not(#wcc_root *))`: unscoped it beat WCC's vote colours, and a bare `:not(#wcc_root *)` adds ID weight and beat the Follow rules. Small muted text uses `--wt-text-read`.
-- **Series / Followers tiles** (`CreatorBriefMetric_*`): violet (wash, hairline, `#c4b5fd` figure, `#ddd6fe` label), the user's call: grey read as filler, amber blended into the Follow / Following key.
-- **Social link button** (`SocialLinkTrigger_icon`): the network's brand fill (`--wt-sns`, picked by `:has(img[src*="instagram"])` etc.; other networks a brighter glass disc), so it stands out beside the key.
+- **Profile card layout** (the user's call): `HomeProfile_root` is a grid (`1fr auto auto 1fr`); `HomeProfile_actions` is `display: contents`, so the social button (`SocialLinkTrigger_root`, a 30 px disc) sits in row 2 after the name (`HomeProfile_nickname`, row 2 col 2) and Follow / Following spans the full width. The avatar, bio, link and metric span all columns and auto-place. An unknown direct child would auto-place into the empty cell beside the name: give it `grid-column: 1 / -1`.
+- **Series / Followers tiles** (`CreatorBriefMetric_*`, full width, `flex: 1 1 0`): violet (wash, hairline, `#ddd6fe` label) with amber `#ffc233` figures, the user's call: grey read as filler, all-amber tiles blended into the Follow / Following key.
+- **Social link button** (`SocialLinkTrigger_icon`): the network's brand fill (`--wt-sns`, picked by `:has(img[src*="instagram"])` etc.; other networks a brighter glass disc), so it stands out beside the key. It needs `background-origin: border-box`: from the padding box the gradient repeated under the 1 px border (coloured rims at the top and bottom).
 - **Post ⋮** (`MoreActionMenu_button`): its dots are filled `var(--gw-icon-05)` in the SVG, so `svg path { fill: currentColor }`; a 36 px glass disc with bright dots.
 - **Follow** (`ProfileActionButton_follow__`, double underscore so "following" can't match) is an **amber key**, the user's choice. Following (`…following__`) is an amber outline with a tick.
 - **Series swiper:** Swiper measures slide CSS widths, so `swiper-slide` is `calc((100% - 36px) / 3)`; `CreatorTitles_content` and `swiper-container` need `height: auto`. The type · genre line (`CreatorTitleItem_textWrap`) wraps, so a long genre (SUPERHERO) drops to its own line instead of being cut mid-word.
@@ -493,7 +495,7 @@ There is no automated suite. Check the pages a change touches, logged out unless
 - [ ] Account: Delete turns red on hover and Redeem stays amber; one of Check / Save at a time.
 - [ ] My Comments: tiles two to a row, the vote chips and trash at each tile's foot; your own chips static, a cast vote ringed. /mycreator, /favorite: Edit hides in edit mode.
 - [ ] Dashboard: dark sidebar and fields, light icons, an open dropdown joins its field.
-- [ ] Creator profile: amber Follow, Following as an outline with a tick, a dark toast, three equal series tiles, a folded bio ending on a whole word with a green "... more", a long genre (SUPERHERO) on its own line; ⋮ opens a narrow menu that hugs Share / Report / Block. Feeds: separate post cards. Post page: comments the card's width, votes grey.
+- [ ] Creator profile: the social button sits after the name and opens its menu under it; Series / Followers and Follow span the card. Amber Follow, Following as an outline with a tick, a dark toast, three equal series tiles, a folded bio ending on a whole word with a green "... more", a long genre (SUPERHERO) on its own line; ⋮ opens a narrow menu that hugs Share / Report / Block. Feeds: separate post cards. Post page: comments the card's width, votes grey.
 
 ### Mobile (`m.webtoons.com`)
 

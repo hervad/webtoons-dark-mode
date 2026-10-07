@@ -8,6 +8,17 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.8.4] - 2026-10-07
+
+### Changed
+
+- **Reader:** the episode strip's ‹ › arrows are slim tabs as tall as the covers instead of round buttons, and the comment count is amber.
+- **Creator profiles:** the Series and Followers figures are amber on their violet tiles. The social button (Instagram, …) sits right after the creator's name, and the Series / Followers tiles and the Follow button span the full width of the profile card.
+
+### Fixed
+
+- **Creator profiles:** the Instagram button's gradient no longer shows coloured rims along its top and bottom edges.
+
 ## [1.8.3] - 2026-10-07
 
 ### Changed
@@ -1042,7 +1053,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.3...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.4...HEAD
+[1.8.4]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.2...v1.8.3
 [1.8.2]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.0...v1.8.1

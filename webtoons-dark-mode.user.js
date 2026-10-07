@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.8.3
+// @version      1.8.4
 // @description  Dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -30,7 +30,7 @@
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
-    const VERSION = '1.8.3';
+    const VERSION = '1.8.4';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -2872,52 +2872,55 @@
             box-shadow: 0 2px 8px rgba(0,0,0,.5) !important;
         }
         #bottomEpisodeList .episode_lst li .on .subj { color: var(--wt-accent-soft) !important; font-weight: 700 !important; }
-        /* A matched pair of glass discs, one in each of the card's 66px
-           side gutters (centred: .episode_lst starts 26px in, so -13px), at
-           the covers' height. Discs straddling the card's edges looked
-           pasted on. A disabled arrow (.off: first / last page) stays as a
-           faint disc: hiding it left one gutter empty, and the row read as
+        /* Prev / next: a slim tab in each of the card's 66px side gutters,
+           exactly as tall as the covers (12px in, 87px) and rounded like
+           them, so the arrows read as the ends of the cover row. Round discs
+           beside the square covers looked pasted on (the user's call). The
+           tab is a faint glass column with a chevron; hover lights it
+           green. 30px wide, centred in the gutter: .episode_lst starts 26px
+           in, so -8px. A disabled arrow (.off: first / last page) stays as
+           a faint tab: hiding it left one gutter empty, and the row read as
            pushed to one side. Both hide only when there is nothing to page
            (a short series). */
         .episode_area#bottomEpisodeList .episode_lst .pg_prev,
         .episode_area#bottomEpisodeList .episode_lst .pg_next {
-            width: 40px !important;
-            height: 40px !important;
-            top: 36px !important;  /* covers: 12px in, 87px tall */
-            border-radius: 50% !important;
-            background: linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.04)) !important;
-            border: 1px solid rgba(255,255,255,.14) !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 6px 16px rgba(0,0,0,.4) !important;
-            color: #fff !important;
-            transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, opacity .18s ease !important;
+            width: 30px !important;
+            height: 87px !important;
+            top: 12px !important;
+            border-radius: 14px !important;
+            background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)) !important;
+            border: 1px solid rgba(255,255,255,.1) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+            color: var(--wt-text-dim) !important;
+            transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease, opacity .18s ease !important;
         }
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev { left: -13px !important; }
-        .episode_area#bottomEpisodeList .episode_lst .pg_next { right: -13px !important; left: auto !important; }
+        .episode_area#bottomEpisodeList .episode_lst .pg_prev { left: -8px !important; }
+        .episode_area#bottomEpisodeList .episode_lst .pg_next { right: -8px !important; left: auto !important; }
         .episode_area#bottomEpisodeList .episode_lst .pg_prev:hover,
         .episode_area#bottomEpisodeList .episode_lst .pg_next:hover,
         .episode_area#bottomEpisodeList .episode_lst .pg_prev:focus-visible,
         .episode_area#bottomEpisodeList .episode_lst .pg_next:focus-visible {
-            background: rgba(0,213,100,.16) !important;
-            border-color: rgba(0,213,100,.6) !important;
-            box-shadow: 0 0 0 4px rgba(0,213,100,.12), 0 8px 20px rgba(0,0,0,.45) !important;
+            background: linear-gradient(180deg, rgba(0,213,100,.18), rgba(0,213,100,.08)) !important;
+            border-color: rgba(0,213,100,.5) !important;
+            box-shadow: 0 0 0 3px rgba(0,213,100,.1), 0 6px 16px rgba(0,0,0,.35) !important;
             color: var(--wt-accent-soft) !important;
         }
         .episode_area#bottomEpisodeList .episode_lst .pg_prev.off,
         .episode_area#bottomEpisodeList .episode_lst .pg_next.off {
-            opacity: .3 !important;
+            opacity: .35 !important;
             box-shadow: none !important;
             pointer-events: none !important;
         }
         .episode_area#bottomEpisodeList .episode_lst:has(.pg_prev.off):has(.pg_next.off) :is(.pg_prev, .pg_next) { opacity: 0 !important; }
         /* text-indent:0 — the pseudo inherits the site's text-indent:100%
-           hidden-label trick, which shoved ❮ to the circle's right edge. */
+           hidden-label trick, which shoved the chevron to the button's right edge. */
         .episode_area#bottomEpisodeList .episode_lst .pg_prev::before,
         .episode_area#bottomEpisodeList .episode_lst .pg_next::after {
             content: '' !important;
             inset: 0 !important;
             margin: auto !important;
-            width: 14px !important;
-            height: 14px !important;
+            width: 16px !important;
+            height: 16px !important;
             padding: 0 !important;
             font-size: 0 !important;
             text-indent: 0 !important;
@@ -3356,7 +3359,7 @@
             border-radius: 999px !important;
             background: rgba(255,255,255,.09) !important;
             border: 1px solid rgba(255,255,255,.18) !important;
-            color: #fff !important;
+            color: #ffc233 !important;  /* the figure in amber (the user's call); pill and icon stay neutral */
             font-size: 15px !important;
             font-weight: 700 !important;
             line-height: 1 !important;
@@ -9067,9 +9070,10 @@
         /* Series / Followers: the figures creators care most about, so
            they are the card's largest numbers: two equal tiles, a 26px
            figure over a small uppercase label (the site's label comes
-           first in the markup; order puts the figure on top). In violet
-           (the user's call): grey tiles read as filler, and amber ones
-           blended into the amber Follow / Following key below them. */
+           first in the markup; order puts the figure on top). Violet
+           tiles with amber figures (the user's call): grey tiles read as
+           filler, and all-amber ones blended into the amber Follow /
+           Following key below them. */
         #app[class*="BaseLayout_container"] [class*="HomeProfile_metric"] { margin-top: 20px !important; }
         #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_root"] {
             display: flex !important;
@@ -9095,7 +9099,7 @@
         #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_count"] {
             order: -1 !important;
             margin: 0 !important;
-            color: #c4b5fd !important;
+            color: #ffc233 !important;
             font-size: 26px !important;
             font-weight: 800 !important;
             line-height: 1 !important;
@@ -9232,6 +9236,10 @@
             height: 44px !important;
             border-radius: 50% !important;
             background: var(--wt-sns, rgba(255,255,255,.12)) !important;
+            /* From the outer edge: from the padding box the gradient
+               repeated under the 1px border, a blue rim along the bottom
+               and a yellow one along the top. */
+            background-origin: border-box !important;
             border: 1px solid rgba(255,255,255,.28) !important;
             box-shadow: 0 6px 16px rgba(0,0,0,.35) !important;
             transition: filter .15s ease, box-shadow .15s ease, border-color .15s ease !important;
@@ -9247,6 +9255,47 @@
             box-shadow: 0 0 0 4px rgba(255,255,255,.12), 0 8px 20px rgba(0,0,0,.4) !important;
         }
         #app[class*="BaseLayout_container"] [class*="SocialLinkIcon_root"] { background: transparent !important; border-radius: 50% !important; }
+        /* Card layout (the user's call): the social button sits after the
+           creator's name, sized to it, and the stat tiles and the Follow /
+           Following key span the card's full width. The card is a grid
+           whose name row centres name + button together; the actions row is
+           dissolved (display: contents) so its two children can be placed
+           apart. Everything else spans all columns and auto-places. */
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_root"] {
+            display: grid !important;
+            grid-template-columns: 1fr auto auto 1fr !important;
+            align-items: center !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_root"] > :is([class*="HomeProfile_profileImageWrap"], [class*="ExpandableProfileBio_root"], [class*="HomeProfile_metric"]),
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] > button {
+            grid-column: 1 / -1 !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_root"] > a[class*="HomeProfile_promotionLink"] {
+            grid-column: 1 / -1 !important;
+            justify-self: center !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_root"] > [class*="HomeProfile_nickname"] { grid-row: 2 !important; grid-column: 2 !important; }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] { display: contents !important; }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] > [class*="SocialLinkTrigger_root"] {
+            grid-row: 2 !important;
+            grid-column: 3 !important;
+            margin: 19px 0 0 10px !important;
+            line-height: 0 !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] button[class*="SocialLinkTrigger_icon"] {
+            width: 30px !important;
+            height: 30px !important;
+            box-shadow: 0 3px 10px rgba(0,0,0,.35) !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] [class*="SocialLinkIcon_root"] { width: auto !important; height: auto !important; }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] [class*="SocialLinkIcon_root"] img { width: 16px !important; height: 16px !important; }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] > button[class*="ProfileActionButton_button"] {
+            justify-self: stretch !important;
+            width: auto !important;
+            min-width: 0 !important;
+            margin-top: 20px !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_wrap"] { flex: 1 1 0 !important; min-width: 0 !important; }
 
         /* "Series" / "Feed": section headings behind the green bar, both
            with their text on one left edge (the card content's), so the
