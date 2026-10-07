@@ -31,7 +31,7 @@ This writes `dist/toonlight-<version>-chrome.zip` (Chrome and Edge) and `dist/to
 >
 > Source code and changelog: https://github.com/hervad/webtoons-dark-mode
 
-**Screenshots:** 1280 × 800 PNG or JPEG (at least one for Chrome, up to five). Good choices are the reader with its end card, a series page, the comments, the /canvas home and the popup.
+**Screenshots:** 1280 × 800 PNG or JPEG (at least one for Chrome, up to five). The current set is in `dist/store/`: `1-series.png`, `2-reader-end.png`, `3-comments.png` (commenter names replaced with neutral ones), `4-originals.png`, `5-reader-popup.png`, plus `promo-tile-440x280.png` (Chrome's optional small promo tile). They stay out of git: they show WEBTOON's artwork, which isn't ours to publish in the repository.
 
 **Support / homepage:** https://github.com/hervad/webtoons-dark-mode (issues: …/issues)
 
