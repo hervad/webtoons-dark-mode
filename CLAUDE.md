@@ -126,7 +126,7 @@ Before the October 2026 audit, every DOM change restyled the whole document (rea
   - White must be at least 4.5:1 on every stop (B5). No `brightness()` on key hovers.
   - Never black text on bright green (the user rejected it).
   - Selected tabs, the pager's current page and sort switches are a green-**tinted** chip (`rgba(0,213,100,.14)`, `--wt-accent-soft` text, green ring), never solid green.
-- **Amber** (`#ffc233`; text on amber `#fff1d0`, hover `#ffd666`) means "heads up": NOTE, age-rating notes, the NOTICE chip, hiatus, TOP comments, the CANVAS reader age strip. Keep it off actions, except the user's picks: the profile Follow key, Redeem Free Coins and the comment send icon.
+- **Amber** (`#ffc233`; text on amber `#fff1d0`, hover `#ffd666`) means "heads up": NOTE, age-rating notes, the NOTICE chip, hiatus, TOP comments, the CANVAS reader age strip. Keep it off actions, except the user's picks: the profile Follow key (and the Series / Followers tiles beside it), Redeem Free Coins and the comment send icon.
 - **Coral** is Patreon. The **orange flame** (`#ff6a24`, core `#ffd25e`) is likes. **Red** is destructive or a downvote.
 - **`::selection`** is blue `rgba(84,140,230,.5)` with white text (the user's call).
 - **Gone:** `--wt-text-on-accent`, `--wt-name`, `--wt-heart` and `--wt-neon-dim` were removed.
@@ -236,7 +236,7 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 - **Genre labels** on lists and the rail get their `g_*` class from `tagGenreLabels()`.
 - **Home:** `.discover_lst` is a 6-column grid; Popular By Category hides the other genres inline, so it needs the `[style*="none"]` guard. The cards grow outward (−24 px side margins) so the site's tiles keep their place, 24 px apart.
 - **"Recommended series":** never change the 1130 px `.discover_spot_rolling` width (the flicking JS pages by it). Prev / dots / next (`.paging`) are one capsule on the header row (the user's request).
-- **Cover chips:** `.badge_discover` is a solid `#14171b` chip. The status sprites beside it (`.discover_badge_area > [class^="txt_ico"]`: END, hiatus) are white discs, inverted to dark (`invert(.9) hue-rotate(180deg)`). `.badge_new*` gets the gold filter chain (`brightness(.62)` → sepia → saturate, no hue step) with a trailing `drop-shadow()`, since a box-shadow would be filtered. `.badge_up*` must **not** be filtered.
+- **Cover chips:** `.badge_discover` is a solid `#14171b` chip. The status sprites beside it (`.discover_badge_area > [class^="txt_ico"]`: END, hiatus) are white discs, inverted to dark (`invert(.9) hue-rotate(180deg)`, then `brightness(1.7) saturate(1.6) contrast(1.15)` so END reads bright green: the user's call; the profile's END badges use the same chain). `.badge_new*` gets the gold filter chain (`brightness(.62)` → sepia → saturate, no hue step) with a trailing `drop-shadow()`, since a box-shadow would be filtered. `.badge_up*` must **not** be filtered.
 - **Weekly round-up** (`#_challengeRoundUp`, in the reader): never change the 1032 px `.challenge_spot_rolling`, 188 px tiles or 23 px gaps (the carousel relies on them). The card is `.challenge_spot_inner` (1200 px, 84 px side padding); the viewport clips, so hover rings are inset.
 
 ### Ranking cards (reader sidebar + /canvas rail)
@@ -350,6 +350,7 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 ### Community app (`/p/community/…`)
 
 - **Scoping:** `#app[class*="BaseLayout_container"]` (popovers, toasts and tooltips are portalled outside it). The button reset is `button:where(:not(#wcc_root *))`: unscoped it beat WCC's vote colours, and a bare `:not(#wcc_root *)` adds ID weight and beat the Follow rules. Small muted text uses `--wt-text-read`.
+- **Series / Followers tiles** (`CreatorBriefMetric_*`): amber (wash, hairline, `#ffc233` figure, `#f0d79a` label) to match the Follow key, the user's call.
 - **Follow** (`ProfileActionButton_follow__`, double underscore so "following" can't match) is an **amber key**, the user's choice. Following (`…following__`) is an amber outline with a tick.
 - **Series swiper:** Swiper measures slide CSS widths, so `swiper-slide` is `calc((100% - 36px) / 3)`; `CreatorTitles_content` and `swiper-container` need `height: auto`. The type · genre line (`CreatorTitleItem_textWrap`) wraps, so a long genre (SUPERHERO) drops to its own line instead of being cut mid-word.
 - **Folded bio** (`ExpandableProfileBio_folded.LinesEllipsis--clamped`): the site's `-webkit-line-clamp` is lifted (the app already cut the text; in our wider font "... more" could wrap under the clamp and vanish), and `.LinesEllipsis-ellipsis` is a green text button.

@@ -8,6 +8,13 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.8.2] - 2026-10-07
+
+### Changed
+
+- **Creator profiles:** the Series and Followers counts are amber, matching the Follow button.
+- **END badges** on covers (CANVAS lists, creator profiles) are brighter.
+
 ## [1.8.1] - 2026-10-07
 
 ### Changed
@@ -1029,7 +1036,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.1...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.2...HEAD
+[1.8.2]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.6.4...v1.7.0

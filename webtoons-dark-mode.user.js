@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.8.1
+// @version      1.8.2
 // @description  Dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -30,7 +30,7 @@
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
-    const VERSION = '1.8.1';
+    const VERSION = '1.8.2';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -5382,7 +5382,7 @@
            keeps END green. */
         .discover_badge_area > [class^="txt_ico"] {
             border-radius: 50% !important;
-            filter: invert(.9) hue-rotate(180deg) drop-shadow(0 1px 3px rgba(0,0,0,.5)) !important;
+            filter: invert(.9) hue-rotate(180deg) brightness(1.7) saturate(1.6) contrast(1.15) drop-shadow(0 1px 3px rgba(0,0,0,.5)) !important;
         }
         /* Popular By Category genre switch: each genre is a pill in its own
            colour (color-mix off currentColor, so every .g_* hue works); the
@@ -9067,7 +9067,9 @@
         /* Series / Followers: the figures creators care most about, so
            they are the card's largest numbers: two equal tiles, a 26px
            figure over a small uppercase label (the site's label comes
-           first in the markup; order puts the figure on top). */
+           first in the markup; order puts the figure on top). In amber,
+           the Follow key's colour (the user's call): grey tiles read as
+           filler beside the amber key. */
         #app[class*="BaseLayout_container"] [class*="HomeProfile_metric"] { margin-top: 20px !important; }
         #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_root"] {
             display: flex !important;
@@ -9086,14 +9088,14 @@
             margin: 0 !important;
             padding: 0 22px !important;
             border-radius: 14px !important;
-            background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)) !important;
-            border: 1px solid rgba(255,255,255,.1) !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+            background: linear-gradient(180deg, rgba(255,194,51,.13), rgba(255,194,51,.04)) !important;
+            border: 1px solid rgba(255,194,51,.3) !important;
+            box-shadow: inset 0 1px 0 rgba(255,214,102,.12) !important;
         }
         #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_count"] {
             order: -1 !important;
             margin: 0 !important;
-            color: #fff !important;
+            color: #ffc233 !important;
             font-size: 26px !important;
             font-weight: 800 !important;
             line-height: 1 !important;
@@ -9101,7 +9103,7 @@
             font-variant-numeric: tabular-nums !important;
         }
         #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_title"] {
-            color: var(--wt-text-dim) !important;
+            color: #f0d79a !important;
             font-size: 12px !important;
             font-weight: 700 !important;
             line-height: 1 !important;
@@ -9355,7 +9357,7 @@
            turn keeps the letters green. */
         #app[class*="BaseLayout_container"] [class*="CreatorTitleItem_badges"] > img {
             border-radius: 50% !important;
-            filter: invert(.9) hue-rotate(180deg) drop-shadow(0 1px 3px rgba(0,0,0,.5)) !important;
+            filter: invert(.9) hue-rotate(180deg) brightness(1.7) saturate(1.6) contrast(1.15) drop-shadow(0 1px 3px rgba(0,0,0,.5)) !important;
         }
         #app[class*="BaseLayout_container"] a[class*="CreatorTitleItem_link"]:hover [class*="CreatorTitleItem_image"] { filter: brightness(.7) !important; }
         #app[class*="BaseLayout_container"] [class*="CreatorTitleItem_type"] {
