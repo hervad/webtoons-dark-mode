@@ -31,12 +31,12 @@ The toggles are also in your userscript manager's menu. Each entry says what cli
 ## What it covers
 
 - **Header and menus:** the page you're on lights up in the main menu like a green neon sign. When you're logged in, your name shows straight away instead of a LOG IN button flashing first.
-- **Home, Originals, Categories, Rankings, Canvas:** dark section cards, readable genre colours, clear sort switches and tabs, dark carousels and page numbers.
+- **Home, Originals, Categories, Rankings, Canvas:** dark section cards, readable genre colours, clear sort switches and tabs, dark carousels, and page numbers that are easy to spot. On CANVAS lists, Top CANVAS and Up & Coming show each series on its own tile with its rank on the cover.
 - **Series page:** the title sits right on the cover art, readable on light and dark covers. Unread episodes have a green dot, episodes you've read are muted, and like counts are shown with a flame. Long synopses fold up.
-- **Reader:** the comic strip sits on a dark page as one card with a soft shadow, with no seams between panels. Under the last panel, the like / subscribe / share card, the episode strip and the app banner share one card style. The rankings sit in a row of large covers above the comments, and the comments use the full width of the page with large, easy-to-read text.
+- **Reader:** the comic strip sits on a dark page as one card with a soft shadow, with no seams between panels. Under the last panel, the like / subscribe / share card, the episode strip and the app banner share one card style. The episode strip has slim arrows at both ends, the rankings sit in a row of large covers above the comments, and the comments use the full width of the page with large, easy-to-read text.
 - **Comments:** one dark panel with letter avatars, highlighted top comments, clear reply threads and a dark comment box, emoji picker and GIF picker.
-- **Your account:** login, sign-up, account settings, My Comments, followed creators and subscriptions.
-- **Creators:** creator profile pages, community feeds and the CANVAS Creator Dashboard.
+- **Your account:** login, sign-up, account settings, My Comments (your comments as tiles, with their likes and dislikes), followed creators and subscriptions.
+- **Creators:** creator profile pages (a profile card with the creator's social link next to their name, their series and follower counts, and a clear Follow button), community feeds and the CANVAS Creator Dashboard.
 - **Popups, search and footer:** dark, with visible hover and keyboard-focus states, including the mature-content notice and the age check.
 - **Mobile site (m.webtoons.com):** pages, the reader and its toolbar, share buttons and comments are dark. The top bar keeps the site's own look.
 
@@ -44,7 +44,7 @@ Main and secondary text, the labels on green buttons and the keyboard focus ring
 
 ## How it works
 
-The script adds one stylesheet before the page is drawn, so there's no white flash while a page loads. Instead of using a colour filter, that stylesheet overrides the specific elements Webtoons uses with a small colour palette; no filter or colour change ever reaches the comic panels. A little JavaScript marks the page type, touches up a few things Webtoons adds later (commenter avatars, genre colours, a fold-out button for long synopses), loads sharper ranking covers in the reader and handles the shortcuts. There are no scroll handlers and no endless animations, and the theme was tuned so pages open with much less extra work.
+The script adds one stylesheet before the page is drawn, so there's no white flash while a page loads. Instead of using a colour filter, that stylesheet overrides the specific elements Webtoons uses with a small colour palette; no filter or colour change ever reaches the comic panels. A little JavaScript marks the page type, touches up a few things Webtoons adds later (commenter avatars, genre colours, a fold-out button for long synopses, creator bios that were cut off mid-word), loads sharper ranking covers in the reader and handles the shortcuts. There are no scroll handlers and no endless animations, and the theme was tuned so pages open with much less extra work.
 Measured in Chrome with the theme on, the browser's styling work while a page loads went down by about 50–85 % (home 124 → 21 ms, reader 199 → 61 ms), an idle Originals page no longer restyles itself 60 times a second, and scrolling the reader takes about half the drawing work.
 
 **Privacy:** the script stores only its own settings (dark mode, reader dim, edge shading, the scroll-to-top choice, and whether you were logged in on the last page, for the LOG IN fix). It uses `GM_getValue` / `GM_setValue` (and `GM.getValue` / `GM.setValue`) for that, and `GM_registerMenuCommand` / `GM_unregisterMenuCommand` for the menu entries. It makes no requests of its own and sends no data anywhere. The one change to what the page loads: in the reader, the ranking covers are swapped for a sharper size of the same images from Webtoons' own image server.
