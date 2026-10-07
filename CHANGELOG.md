@@ -1,9 +1,104 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version numbers follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) from 1.3.0 on; before that, new features sometimes shipped in patch versions.
+
+Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here; the [commit history](https://github.com/hervad/webtoons-dark-mode/commits/main) describes them. Some 1.1.x versions were never published on their own, and their links point to the release that included them.
+
+## [Unreleased]
+
+## [1.8.0] - 2026-10-07
+
+### Added
+
+- **More pages are dark:**
+  - creator profile pages and community feeds (`webtoons.com/p/community/…`), including posts, their comments, the share / report menu, the emoji reactions and the "Followed …" message;
+  - the CANVAS Creator Dashboard (Series, Create Series and the other dashboard pages);
+  - the login page, the sign-up consent card and e-mail sign-up form, the "e-mail verified" page, Account settings and Account Delete;
+  - My Comments, followed creators (/mycreator) and Subscriptions (/favorite), including their edit mode;
+  - the mature-content notice ("Proceed to view content?"), now a dialog with an amber warning badge and clear No / Yes buttons.
+- **Works in Greasemonkey (Firefox) and Userscripts (Safari).** Before, the theme didn't load at all there. These managers have no menu for the script; the shortcuts work. Your manager may list two extra permissions with this update, `GM.getValue` and `GM.setValue`: the same settings storage, in the form these managers offer.
+- **Windows High Contrast:** while a contrast theme is on, the theme steps aside so your system colours apply, and it comes back when you turn High Contrast off.
+- **No LOG IN flash:** when you're logged in, the header no longer shows LOG IN for a moment before your name. The script remembers whether you were logged in on the last page to do this.
+- **Long synopses fold up:** a series description longer than 8 lines shows its first 6 with a soft fade and a small arrow button; click the button or the text to read the rest. The button is labelled in the page's language for screen readers.
+
+### Changed
+
+- **Faster pages.** The theme was reworked so the browser does much less extra work: it no longer restyles the whole page each time a comment, menu or popup appears, nothing keeps animating in the background, and the script's page fixes run at most once per screen refresh.
+  Measured in Chrome with the theme on, the browser's styling work while a page loads went down by about 50–85 % (home 124 → 21 ms, reader 199 → 61 ms), an idle Originals page no longer restyles itself 60 times a second, and scrolling the reader takes about half the drawing work.
+- **Contrast:** the keyboard focus ring is brighter, the green buttons are a deeper green with white text (no button label is black on bright green any more), and small text on creator pages is lighter. The focus ring, main and secondary text and the button labels meet WCAG AA.
+- **Reduced motion:** with "reduce motion" on in your system, the theme's own hover lifts, zooms and other motion are now reliably switched off (some were missed before); the burst of flames on Like only fades in place.
+- **Edge shading** only darkens the empty margins beside the page on wide windows. Before, on windows narrower than about 1,670 px it also darkened page content, and below about 1,280 px the comic itself.
+- **Comic strip:** still one card with 16 px rounded corners, now with a single, lighter drop shadow instead of a halo and an outline.
+- **Text selection** is a soft blue with white text instead of neon green.
+- **Header:**
+  - The page you're on in the main menu (Originals / Categories / Rankings / Canvas) lights up like a green neon sign with a small green flower on each side. It flickers on when the page loads, then stays lit.
+  - The main menu is back at the site's own size. Everything in the bar is the same height on one line: WEBTOON SHOP and CREATORS are quieter links, and DASHBOARD, Log In and search are matching dark buttons.
+  - Logged in, your name is a matching header button, and its menu (Subscriptions … Logout) is a dark panel.
+- **Day and category tabs:** hovering a tab shows a rounded highlight instead of a full-height grey block, and the ‹ › scroll arrows are round buttons with a centred chevron.
+- **Home page section headers** (Trending & Popular, Popular by Category, Daily, More stories from indie creators): bigger titles, "View all" as a clear button, and larger filter tabs that light up on hover. The selected tab is a green-tinted pill.
+- **Originals and Categories lists:** the sort (by Popularity / Likes / Date) is a full-width switch with three equal options, the current one green-tinted; the series count is a small note under it; the list starts a little below the tabs.
+- **"New Series" badges** are gold on a dark chip, so they are easy to tell apart from the green "New Episode" badges.
+- **Page numbers:** the current page is a green-outlined pill with bright green digits; the other pages are larger and light up on hover. The ‹ › arrows are centred in their pills.
+- **CANVAS home:**
+  - "Recommended series", Weekly HOT and Popular By Category are matching cards, 24 px apart. Recommended series' ‹ ›, and its page dots, are one small pager on the title row instead of arrows over the first and last covers.
+  - Tiles are compact: a rounded cover that darkens on hover, then genre and likes on one line, then the title. The subscriber count is a small pill on the cover.
+  - The category switch is a row of pills in each genre's colour, "more ›" is a small button inside the card, and promo banners are rounded cards without mismatched side strips.
+- **CANVAS genre lists:**
+  - The sort is a switch with all three options visible; choosing one reloads the list in that order, starting from page 1.
+  - The grid is one rounded card of compact tiles (cover, genre and likes, title, author).
+  - The banner, Top CANVAS and Up & Coming line up as one column of equal-width cards, 16 px apart. Top CANVAS and Up & Coming look the same.
+  - Genre names use the same colour per genre as the CANVAS home page instead of grey, also in Top CANVAS and Up & Coming.
+  - The Top CANVAS genre filter is a green chip with a chevron, and its menu covers the list behind it.
+- **Series page:**
+  - **Header:** the genre, title, authors and ⓘ sit right on the cover art over a soft, edgeless dark glow, so they stay readable on light covers without hiding the characters. The title is larger and bold, and the genre is a pill in its genre colour. The share buttons are dark round buttons that light up in each network's colour, and Subscribe is a matching pill that turns green on hover and shows a green tick once you've subscribed.
+  - **CANVAS header:** the genres, subscriber count, title and author sit on a dark card beside the cover, readable on bright flat background colours.
+  - **Creator info popup** (the ⓘ): a compact dark card with each role as a small green label over the name, round social buttons and a round ×.
+  - **Sidebar:** views and subscribers are two equal tiles; the update day ("EVERY FRIDAY", "COMPLETED") is a full-width green band, amber for a series on hiatus. The synopsis is larger and brighter. **First episode** is a full-width green button with a ▶; when **Continue reading** shows, it takes the green and First episode becomes a smaller outline button.
+  - **CANVAS sidebar:** "Become a Patron" is a tidy panel with the patron count and a coral button, and the age-rating note is a small amber callout.
+  - **Episode list:** every episode is its own faint rounded tile. Unread episodes have a solid green dot and a bright release date; episodes you've read have a hollow grey ring, a muted title and a dimmed date. Titles are larger, and long ones end in "…" (hover to read them in full). Like counts have an orange flame (grey on episodes you've read). The episode number (#N) is a small badge on the thumbnail. Hovering a row lights its tile, shows a ▶ badge on the thumbnail and turns the title green.
+  - **NOTE about free episodes:** an amber banner with a megaphone icon.
+  - **"You may also like":** one card with three tiles (rounded cover, title, author, views).
+- **Reader, under the last panel:**
+  - **End card:** a filled card with the update day, the prompt as a heading and two large buttons that sink when pressed and spring back. Like has an orange flame that flickers on hover; once you've liked, it turns solid orange, and a burst of flames rises when you press it. Subscribe is the green button, and its "+" turns on hover. The share buttons are monochrome icons on their own row that light up in each network's colour; a network without its own icon shows a link icon.
+  - **Report** is a small button in the end card's corner that turns red on hover.
+  - **Patreon card** (CANVAS episodes): a card of the same width with the patron count on the left and a coral "Become a Patron" button on the right. A "$0" amount is hidden when the creator doesn't share earnings.
+  - **Creator card:** a profile card with a ringed avatar, a green "Creator" label and the name in large type; a creator's note for the episode shows as a speech bubble.
+  - **Episode strip:** a card lined up with the comments below, with rounded covers that lift on hover and titles on two lines. The episode you're reading has a green ring and a ▶ badge. The ‹ › arrows are round buttons in the card's margins; one with nothing to page to stays faint. Series with only a few episodes are centred.
+  - **"Want more? … WEBTOON App" banner:** a dark card with the QR code on a white tile so it still scans.
+  - **"CANVAS Weekly round-up":** a card with round ‹ › buttons and page dots; hovering a series zooms its cover and keeps its title visible.
+  - **Rankings above the comments:** Trending & Popular and Top Originals are two cards side by side, each showing its top 5 as large covers with the same dark rank badge on every cover. The covers load in a sharper size.
+- **Reader toolbar:** Subscribe and the share buttons are matching round buttons; the CANVAS age notice under the bar is an amber strip.
+- **Comments:**
+  - The comments use the full width of the page as one panel of flat rows, with larger, near-white text in a wider font. Names are white.
+  - Votes are small grey icons under the text that tint green or red on hover; a vote you cast keeps its colour. "Replies N" is a light pill, and a reply thread hangs off one thin line, each reply on its own faint tile.
+  - Top comments are amber blocks with a TOP chip after the name; their open reply thread stays inside the block on a fainter amber.
+  - Top / Newest sit in the panel's header, "More" is a full-width bar at the bottom, and long comments are cut after five whole lines with a green "More".
+  - The comment count next to COMMENTS is a light pill; the ⋮ menu is one rounded panel.
+  - Logged out, the comment box is a bar with a chat icon and a round green arrow button. Logged in, it is a dark card with Spoiler (green when on), the emoji / sticker / GIF buttons and an amber send button in one bar. The emoji, GIF and series pickers are dark.
+- **Popups:** "URL copied", "Subscribed" and similar messages are light text in a rounded dark box.
+- **Login popup:** one dark card on a dimmed, blurred page. The Email, Apple and X icons are visible, the labels line up after their icons, and the e-mail step has clean fields, a visible show-password eye and a green Log In button.
+- **Heads-up notes are amber:** the NOTICE bar above the footer, the age-rating notes and the status of a series on hiatus, so notices look different from buttons and links.
+- **Footer:** links underline in green on hover, Facebook / Instagram / X / YouTube are round icon buttons in their brand colour on hover, and the app-store badges lift.
+- **Mobile site (m.webtoons.com):** comments are laid out for a phone screen, and the top bar shows the site's own design instead of half-applied desktop styles.
+
+### Fixed
+
+- **Hiding the scroll-to-top button** now also works with dark mode off. In 1.7.0 the button came back when the theme was off.
+- **With dark mode off,** the script no longer changes the page: in 1.7.0 it still cleared a few backgrounds in the reader and added an extra arrow to CANVAS carousels.
+- **Edge shading and page-specific styles** are there from the first frame instead of popping in a moment after the page appears.
+- **Keyboard shortcuts:** `Ctrl + Alt + D` no longer swallows a letter on layouts where it types one (such as Đ or ð); holding a shortcut down toggles once; shortcuts are ignored while you compose text with an input method.
+- **Script icon:** userscript managers and Greasy Fork show the WEBTOON icon again (the old icon address no longer worked).
+- **Series page:** the stray line along the top of the episode list is gone.
+- **Search:** the clear button is a visible × instead of a plain grey circle, and results no longer show a stray space after the highlighted part of a title.
+- **Footer** links now react to hovering (they ignored it), and the Facebook icon is no longer a blank disc.
+- **Mobile site (m.webtoons.com):** the reader toolbar's ◀ #N ▶ stay inside the bar, the share icons show again, the MY tab is back on screen, section titles no longer overlap their carousels, the home category strip is one row, the comments are no longer squeezed into a narrow column, and the login buttons are dark.
+
+### Removed
+
+- **Coloured commenter names, the coloured edge on each comment card and the curved reply elbows** (from 1.5.1–1.6.3): comments are now flat rows with white names and one thread line.
+- **The narrow rankings column beside the comments** in the reader: the rankings now sit in a row above the comments.
 
 ## [1.7.0] - 2026-10-06
 
@@ -134,7 +229,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Search dropdown drew stacked frames**, and the recent-search row highlighted white. `.search_cont` (the button wrapper) and `.ly_autocomplete` no longer get their own box. The input pill shows focus with an accent ring via `:focus-within`. Recent-search (`.lst_history`) rows and autocomplete rows highlight dark.
 - **Scroll-to-top button** was a white disc on `/canvas`. It had only looked dark elsewhere because the vignette layer covered it. It is now an inverted dark disc placed above the vignette.
 
-### Improved
+### Changed
 
 - Comments: TOP / NEWEST are underline tabs instead of boxed buttons; like / dislike / Reply are rounded pills; the editor toolbar and kebab-menu icons lost their square boxes.
 - Comments: the WCC widget's own `--wcc-*` / `--wte-*` design tokens are re-declared with its dark set (greys remapped to our palette), so every icon fill, divider, loader and popover the per-element rules don't name also renders dark.
@@ -144,7 +239,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `prefers-reduced-motion` is honoured: hover lifts and transitions are dropped for users who ask for less motion.
 - SPA route changes are also detected through the Navigation API (`navigatesuccess`). This works even when the userscript manager runs the script in an isolated world, where the `history.pushState` wrapper never sees the page's calls.
 
-### Cleaned up
+### Removed
 
 - Removed selectors for markup Webtoons no longer ships: `.detail_lst`, the legacy `u_cbox` comment widget block, `.card_lst` / `.daily_lst` / `.genre_lst` / `._popularList` / `._dailyList` / `.spot_lst`, `#gnbWrap` / `.gnb_wrap` / `.header_bn`, `.search_box`, `._listInfo`, `.layer_popup` / `.pop_layer` / `.tooltip` / `.balloon`, `.viewer_header` / `.viewer_footer` / `._toolBox` / `.ly_episode`, `.viewer_dsc_area` / `.viewer_bnr` / `._patronArea`, `.aside_item` / `.aside_wrap` / `.section_wrap` / `.ranking_wrap`, and a few others. Each was checked against the live desktop and mobile bundles before removal.
 - Removed `buildViewerCards()` and its SPA re-wrap bookkeeping.
@@ -154,14 +249,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Duplicate `.sort_box` rule block: the second definition (intended for the detail-page "Latest / Oldest" episode sort) was clobbering the canvas filter dropdown's elevated styling. Both sets now coexist — the detail-page block is scoped to `.detail_body .sort_box`.
-- `--wt-text-mute` raised from `#7b828d` to `#878e99` so comment dates, episode numbers, and other muted text clear the WCAG AA 4.5:1 contrast floor on `--wt-bg-elev2`.
+- `--wt-text-mute` raised from `#7b828d` to `#878e99` so comment dates, episode numbers, and other muted text clear the WCAG AA 4.5:1 contrast floor on `--wt-bg-elev2`. (Correction: `#878e99` clears 4.5:1 on the page and card backgrounds, but measures about 4.0:1 on `--wt-bg-elev2`.)
 - Hard-coded `#e05252` heart-count red replaced with a new palette token `--wt-accent-like: #f06868` — slightly brighter, themeable, and reused for the heart sprite filter target.
 - Panel-strip text-metrics reset: anything Webtoons injects between comic panels (ads, chapter links) was rendering invisible because `font-size: 0` cascaded from the strip wrapper. Added a `> :not(img)` rule that restores normal text metrics on non-image children.
 - `[class*="cta" i]` / `[class*="Continue" i]` substring traps replaced with tighter selectors (`a[class~="cta"]`, `a.lk_continue`, `a._btn_enter`, `a[class*="_cta_" i]`). Prevents the button-hover override from firing on unrelated classes that happen to contain the substring "cta" (e.g. `tactical`, `practical`).
 - Canvas filter dropdown z-index lifted from `9999` to `10001` so the panel always paints above the vignette gradient (`body::before` at `9999`) at the right viewport edge.
 - Generic `.lst_type1 li` background scoped to `.detail_other` — viewer/canvas sidebars no longer get a double-elevation row inside their already-elevated card.
 
-### Cleaned up
+### Changed
 
 - Removed dead JS hooks that the current Webtoons bundle no longer ships: `._btnMore`, `._monthSelect`, `._loginComponentParent`, `.emailLoginComponent`, `._emailLoginButton`, `._backToDefaultLoginButton`. The `.lk_more` / `.lk_month` replacements remain.
 - Collapsed the duplicate `.spi_area .bx` selector list (`.viewer_lst .spi_area .bx, .spi_area .bx` → `.spi_area .bx`).
@@ -363,9 +458,6 @@ Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and acces
 ### Fixed
 
 - Truly eliminate inter-panel horizontal seams: v1.1.11 used `spread=-18, blur=22` which left a 4px y-bleed (visible as a faint line between stacked panels). Changed to `spread=-22` so `spread = -blur` exactly — vertical bleed is now zero, only side shadows render.
-
-### Recovered
-
 - v1.1.7→v1.1.11 changes (shadow refinement chain, JS panel-glow disable) were re-applied after the userscript file was truncated to 0 bytes by an external save.
 
 ## [1.1.11] - 2026-05-11
@@ -388,13 +480,13 @@ Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and acces
 
 ## [1.1.8] - 2026-05-11
 
-### Changed (experimental)
+### Changed
 
 - Replaced per-image white side glow with container-level "card volume": `.viewer_img._img_viewer_area` / `#_imageList` get `display: inline-block` so the box matches image width, plus a 1px white hairline outline and a large soft dark drop shadow underneath. Treats the whole comic strip as one lifted card — no white side glow, no inter-panel seam artifacts.
 
 ## [1.1.7] - 2026-05-11
 
-### Changed (experimental — testing shadow approach for panel elevation)
+### Changed
 
 - Comic panels now use per-image CSS `box-shadow` for edge elevation, replacing the JS fixed-position glow divs. Formula: `±22px 0 22px -22px` (spread = -blur) cancels y-axis bleed entirely, so stacked panels show no horizontal lines at panel-to-panel boundaries (the v1.0.97 trick). Adds a subtle white side-glow plus a soft bottom drop shadow that matches the homepage card treatment.
 - `.viewer_lst` and `.viewer_img._img_viewer_area` set to `overflow: visible` so the shadow renders past the image bounds (was clipped by default).
@@ -731,7 +823,7 @@ Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and acces
 
 ## [1.0.16] - 2026-05-10
 
-### Diagnostic
+### Changed
 - **Moved the console-info banner to the very first line of the IIFE** so it logs *before* any other code that could throw. Previously it was at the end — so a single error anywhere upstream would silently kill the banner, making it impossible to tell whether the script "wasn't running" vs "was running but errored out."
 - The startup banner now also reports the type of `GM_getValue` / `GM_setValue` / `GM_registerMenuCommand` so we can see whether Tampermonkey is granting them.
 - The end-of-IIFE banner now says "fully loaded" — if you only see "starting" but not "fully loaded", an error happened in between and we can see exactly which line in the console.
@@ -772,7 +864,8 @@ Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and acces
 ### Changed
 - **Skin-image dimming removed entirely.** Earlier versions stepped from `.55` → `.7` → `.9`; v1.0.12 sets `filter: none` so the per-series artwork on the sides matches its light-mode brightness exactly. The artwork was designed by the artist for that brightness — there's no real reason to dim it for dark mode beyond initial caution that turned out to be unnecessary.
 
-### Filter scope (unchanged)
+Unchanged filter scope:
+
 - Filter is still applied to ranking-number digits (`.ico_n1` … `.ico_n10`) — those ARE plain dark glyphs designed for white bg.
 - Footer brand social icons (`.btn_foot_*`) keep their separate `.75` opacity filter.
 
@@ -868,7 +961,8 @@ Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and acces
 - **`html[data-wt-dark]` hook.** When the theme is on, `<html>` gets `data-wt-dark="on"`; when off, `data-wt-dark="off"`. Power users can write personal CSS like `html[data-wt-dark="on"] .my-thing { ... }` and have it scoped to only the dark state.
 - **SPA-resilience MutationObserver.** A small observer watches `<head>` for direct childList changes. If our `<style>` element is ever removed (Webtoons swaps stylesheets on some chapter transitions, and external bundles can race with our injection), it's re-applied. The observer only fires on direct head-child mutations, so its overhead is negligible.
 
-### Not done (intentional)
+Not done (intentional):
+
 - The "split `theme` into named chunks" refactor item was reconsidered and skipped. The existing section comments already act as a TOC, the planned v1.1 preset switcher only swaps the palette (not the theme), and the diff churn (~330 lines moved) doesn't pay back. If we hit a real maintainability problem later, we can revisit.
 
 ## [1.0.3] - 2026-05-10
@@ -901,7 +995,7 @@ Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and acces
 - White "Download WEBTOON now!" promo band in the footer (`.foot_app`, `.foot_cont`, `.foot_down_msg`, `.footapp_icon_cont`, `.btn_google`, `.btn_ios`).
 - QR code in the app-download strip is now placed on a small white tile so it remains scannable against the dark surrounding band.
 
-### Notes
+### Changed
 - Active tab indicators now follow the site's `aria-current="true"` / `aria-current="page"` and `.is_selected` class instead of the legacy `.on` class.
 
 ## [1.0.0] - 2026-05-10
@@ -918,3 +1012,115 @@ Major pass over /canvas (genre tabs + sidebar), /rankings, pagination, and acces
 - `@updateURL` / `@downloadURL` for auto-updates from GitHub `main`.
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
+
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.6.4...v1.7.0
+[1.6.4]: https://github.com/hervad/webtoons-dark-mode/compare/v1.6.3...v1.6.4
+[1.6.3]: https://github.com/hervad/webtoons-dark-mode/compare/v1.6.2...v1.6.3
+[1.6.2]: https://github.com/hervad/webtoons-dark-mode/compare/v1.6.1...v1.6.2
+[1.6.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.6.0...v1.6.1
+[1.6.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.5.4...v1.6.0
+[1.5.4]: https://github.com/hervad/webtoons-dark-mode/compare/v1.5.3...v1.5.4
+[1.5.3]: https://github.com/hervad/webtoons-dark-mode/compare/v1.5.2...v1.5.3
+[1.5.2]: https://github.com/hervad/webtoons-dark-mode/compare/v1.5.1...v1.5.2
+[1.5.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.3.1...v1.4.0
+[1.3.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.2.4...v1.3.0
+[1.2.4]: https://github.com/hervad/webtoons-dark-mode/compare/v1.2.3...v1.2.4
+[1.2.3]: https://github.com/hervad/webtoons-dark-mode/compare/v1.2.2...v1.2.3
+[1.2.2]: https://github.com/hervad/webtoons-dark-mode/compare/v1.2.1...v1.2.2
+[1.2.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.1.28...v1.2.0
+[1.1.28]: https://github.com/hervad/webtoons-dark-mode/compare/v1.1.27...v1.1.28
+[1.1.27]: https://github.com/hervad/webtoons-dark-mode/compare/14230d7...v1.1.27
+[1.1.26]: https://github.com/hervad/webtoons-dark-mode/compare/14230d7...v1.1.27
+[1.1.23]: https://github.com/hervad/webtoons-dark-mode/compare/v1.1.21...14230d7
+[1.1.22]: https://github.com/hervad/webtoons-dark-mode/compare/v1.1.21...14230d7
+[1.1.21]: https://github.com/hervad/webtoons-dark-mode/compare/14c82ba...v1.1.21
+[1.1.20]: https://github.com/hervad/webtoons-dark-mode/compare/14c82ba...v1.1.21
+[1.1.19]: https://github.com/hervad/webtoons-dark-mode/compare/14c82ba...v1.1.21
+[1.1.18]: https://github.com/hervad/webtoons-dark-mode/compare/14c82ba...v1.1.21
+[1.1.17]: https://github.com/hervad/webtoons-dark-mode/compare/14c82ba...v1.1.21
+[1.1.16]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.15]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.14]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.13]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.12]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.11]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.10]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.9]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.8]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.7]: https://github.com/hervad/webtoons-dark-mode/compare/9a45ea5...14c82ba
+[1.1.6]: https://github.com/hervad/webtoons-dark-mode/compare/5618154...9a45ea5
+[1.1.5]: https://github.com/hervad/webtoons-dark-mode/compare/5618154...9a45ea5
+[1.1.4]: https://github.com/hervad/webtoons-dark-mode/compare/93c2eb1...5618154
+[1.1.3]: https://github.com/hervad/webtoons-dark-mode/compare/9908090...93c2eb1
+[1.1.2]: https://github.com/hervad/webtoons-dark-mode/compare/0fd0751...9908090
+[1.1.1]: https://github.com/hervad/webtoons-dark-mode/compare/55135a7...0fd0751
+[1.1.0]: https://github.com/hervad/webtoons-dark-mode/compare/0993edd...55135a7
+[1.0.99]: https://github.com/hervad/webtoons-dark-mode/compare/374a09e...0993edd
+[1.0.98]: https://github.com/hervad/webtoons-dark-mode/compare/8d742e6...374a09e
+[1.0.97]: https://github.com/hervad/webtoons-dark-mode/compare/f95a956...8d742e6
+[1.0.96]: https://github.com/hervad/webtoons-dark-mode/compare/fae8be7...f95a956
+[1.0.95]: https://github.com/hervad/webtoons-dark-mode/compare/abebd2b...fae8be7
+[1.0.94]: https://github.com/hervad/webtoons-dark-mode/compare/642e5eb...abebd2b
+[1.0.93]: https://github.com/hervad/webtoons-dark-mode/compare/6a0e1e9...642e5eb
+[1.0.92]: https://github.com/hervad/webtoons-dark-mode/compare/4ab87b4...6a0e1e9
+[1.0.91]: https://github.com/hervad/webtoons-dark-mode/compare/2fd472a...4ab87b4
+[1.0.90]: https://github.com/hervad/webtoons-dark-mode/compare/0b10061...2fd472a
+[1.0.89]: https://github.com/hervad/webtoons-dark-mode/compare/e28253f...0b10061
+[1.0.88]: https://github.com/hervad/webtoons-dark-mode/compare/8f50e97...e28253f
+[1.0.87]: https://github.com/hervad/webtoons-dark-mode/compare/2b6e9d7...8f50e97
+[1.0.86]: https://github.com/hervad/webtoons-dark-mode/compare/47b74aa...2b6e9d7
+[1.0.85]: https://github.com/hervad/webtoons-dark-mode/compare/f934f6a...47b74aa
+[1.0.84]: https://github.com/hervad/webtoons-dark-mode/compare/40359d3...f934f6a
+[1.0.83]: https://github.com/hervad/webtoons-dark-mode/compare/c27007c...40359d3
+[1.0.82]: https://github.com/hervad/webtoons-dark-mode/compare/2189599...c27007c
+[1.0.81]: https://github.com/hervad/webtoons-dark-mode/compare/76c59da...2189599
+[1.0.80]: https://github.com/hervad/webtoons-dark-mode/compare/3d34d6b...76c59da
+[1.0.79]: https://github.com/hervad/webtoons-dark-mode/compare/6520765...3d34d6b
+[1.0.78]: https://github.com/hervad/webtoons-dark-mode/compare/6904f9d...6520765
+[1.0.77]: https://github.com/hervad/webtoons-dark-mode/compare/2b5b2b5...6904f9d
+[1.0.76]: https://github.com/hervad/webtoons-dark-mode/compare/477344c...2b5b2b5
+[1.0.75]: https://github.com/hervad/webtoons-dark-mode/compare/5beacf5...477344c
+[1.0.74]: https://github.com/hervad/webtoons-dark-mode/compare/9e1b190...5beacf5
+[1.0.73]: https://github.com/hervad/webtoons-dark-mode/compare/85fdd6d...9e1b190
+[1.0.72]: https://github.com/hervad/webtoons-dark-mode/compare/c192816...85fdd6d
+[1.0.71]: https://github.com/hervad/webtoons-dark-mode/compare/e9244b7...c192816
+[1.0.70]: https://github.com/hervad/webtoons-dark-mode/compare/86d5f17...e9244b7
+[1.0.69]: https://github.com/hervad/webtoons-dark-mode/compare/aafed46...86d5f17
+[1.0.68]: https://github.com/hervad/webtoons-dark-mode/compare/38e4ef2...aafed46
+[1.0.67]: https://github.com/hervad/webtoons-dark-mode/compare/b4b5a7f...38e4ef2
+[1.0.66]: https://github.com/hervad/webtoons-dark-mode/compare/c54e39e...b4b5a7f
+[1.0.65]: https://github.com/hervad/webtoons-dark-mode/compare/0baf522...c54e39e
+[1.0.64]: https://github.com/hervad/webtoons-dark-mode/compare/433f220...0baf522
+[1.0.63]: https://github.com/hervad/webtoons-dark-mode/compare/30a1fd7...433f220
+[1.0.62]: https://github.com/hervad/webtoons-dark-mode/compare/a64ad7a...30a1fd7
+[1.0.61]: https://github.com/hervad/webtoons-dark-mode/compare/b0a9cb4...a64ad7a
+[1.0.60]: https://github.com/hervad/webtoons-dark-mode/compare/6be4aff...b0a9cb4
+[1.0.59]: https://github.com/hervad/webtoons-dark-mode/compare/78f65e7...6be4aff
+[1.0.58]: https://github.com/hervad/webtoons-dark-mode/compare/1fd9658...78f65e7
+[1.0.51]: https://github.com/hervad/webtoons-dark-mode/compare/2b75e5a...afe0edd
+[1.0.50]: https://github.com/hervad/webtoons-dark-mode/compare/5fb5abd...2b75e5a
+[1.0.49]: https://github.com/hervad/webtoons-dark-mode/compare/c682b2b...5fb5abd
+[1.0.48]: https://github.com/hervad/webtoons-dark-mode/compare/dd92d1c...c682b2b
+[1.0.16]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.15...v1.0.16
+[1.0.15]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.14...v1.0.15
+[1.0.14]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.13...v1.0.14
+[1.0.13]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.12...v1.0.13
+[1.0.12]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.11...v1.0.12
+[1.0.11]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.10...v1.0.11
+[1.0.10]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.9...v1.0.10
+[1.0.9]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.8...v1.0.9
+[1.0.8]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.7...v1.0.8
+[1.0.7]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.6...v1.0.7
+[1.0.6]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.5...v1.0.6
+[1.0.5]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.4...v1.0.5
+[1.0.4]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.3...v1.0.4
+[1.0.3]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/hervad/webtoons-dark-mode/releases/tag/v1.0.0
