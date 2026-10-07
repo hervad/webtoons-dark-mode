@@ -20,3 +20,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Browser extension builds (tools/build-extension.mjs)
+dist/

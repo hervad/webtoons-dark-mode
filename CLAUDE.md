@@ -389,6 +389,18 @@ The tools are in `.claude/tools/`, which is gitignored, so they exist on this ma
 - `.claude/tools/perf/` holds lower-level probes (`probe.mjs`, `summ.mjs`, `layers.mjs`, …).
 - **Chrome is only ever launched with `--headless=new` and a throwaway `--user-data-dir`.** On Windows even `chrome.exe --version` opens the user's real browser. Read the version with `(Get-Item 'C:/Program Files/Google/Chrome/Application/chrome.exe').VersionInfo.ProductVersion`.
 
+## Browser extension
+
+The same theme also ships as a browser extension, **Toonlight: Dark Mode for WEBTOON** (short name Toonlight), for Chrome, Edge and Firefox, built from the userscript. Unlike the userscript, the extension starts dark on first run (the user's call): `gm-shim.js` seeds an empty localStorage mirror with `true`.
+
+- `node tools/build-extension.mjs` writes `dist/chrome/` (Chrome and Edge: the same package), `dist/firefox/` and a zip of each for the stores. `dist/` is not committed.
+- The extension runs `extension/gm-shim.js` and then the userscript body **unchanged**, as a `document_start` content script on www and m.webtoons.com. The shim provides `GM.getValue` / `GM.setValue` on `chrome.storage.local` and no `GM_getValue`, so the script takes its async path: the first paint uses the localStorage mirror, as in Greasemonkey 4. It also collects `GM_registerMenuCommand` entries for the toolbar popup (`extension/popup.*`), which lists and runs them in the open tab.
+- **Never put extension-only code in the userscript.** Extension needs go in the shim or the popup.
+- The Firefox manifest adds `browser_specific_settings.gecko`: an ID (`toonlight@hervad`; it can never change once the add-on is on AMO), `data_collection_permissions: { required: ["none"] }` (required by AMO) and `strict_min_version` 142.
+- Icons: `python -I tools/make-icons.py` (Pillow) redraws `extension/icons/`.
+- Name, description and add-on ID are constants at the top of `tools/build-extension.mjs`. The version is the userscript's `@version`.
+- Test: `node .claude/tools/ext-test.mjs <outDir>` loads `dist/chrome` into headless Chrome through CDP `Extensions.loadUnpacked` (branded Chrome ignores `--load-extension`), then checks the theme, the popup menu, persistence across a reload and the shortcut. Validate the Firefox build with `npx web-ext lint --source-dir dist/firefox`.
+
 ## Release workflow
 
 Release only when the user asks.
