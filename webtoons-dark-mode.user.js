@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.8.0
+// @version      1.8.1
 // @description  Dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -30,7 +30,7 @@
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
-    const VERSION = '1.8.0';
+    const VERSION = '1.8.1';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -208,7 +208,8 @@
             html .wcc_Spoiler__slider,
             html .wcc_Spoiler__slider::before { transition: none !important; }
             html .ly_creator .title:has(> a.link:hover)::after,
-            html .section_header .button_view_all:hover::after { transform: rotate(45deg) !important; }
+            html .section_header .button_view_all:hover::after,
+            html .discover_cont_area .popular_genre_area .lk_more:hover .ico_arr::after { transform: rotate(45deg) !important; }
             html #header .lnb a[aria-current="true"],
             html #header .lnb a[aria-current="true"]::before, html #header .lnb a[aria-current="true"]::after { animation: none !important; }
             html #bottomEpisodeList .episode_lst li a:hover .thmb,
@@ -1020,26 +1021,31 @@
         }
         /* "more ›" link (a.lk_more, /canvas Popular By Category): the
            chevron is a dark sprite in a child <span class="ico_arr">. Strip
-           the sprite and draw a text chevron in the link's colour. */
+           the sprite and draw a border chevron in the link's colour (a
+           "›" glyph sat on the baseline, low and glued to the label). */
         .lk_more {
             color: var(--wt-text-dim) !important;
         }
         .lk_more .ico_arr {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 10px !important;
+            height: 10px !important;
+            margin-left: 4px !important;
             background: none !important;
-            width: auto !important;
-            height: auto !important;
             text-indent: 0 !important;
             overflow: visible !important;
-            white-space: normal !important;
-            display: inline-block !important;
             vertical-align: middle !important;
-            margin-left: 4px !important;
         }
         .lk_more .ico_arr::after {
-            content: '\\203A' !important;
-            color: inherit !important;
-            font-size: 18px !important;
-            line-height: 1 !important;
+            content: '' !important;
+            width: 6px !important;
+            height: 6px !important;
+            margin-left: -3px !important;
+            border-top: 2px solid currentColor !important;
+            border-right: 2px solid currentColor !important;
+            transform: rotate(45deg) !important;
         }
 
         /* Comic cards within section containers: flat tiles. The parent
@@ -4913,16 +4919,85 @@
             font-weight: 700 !important;
             line-height: 1 !important;
         }
-        /* Rail rows (Top CANVAS / Up & Coming): the rows stacked two
-           paddings (li 6px + link 8px) into 92px each, so five titles took
-           most of a screen. One 8px padding, a 56px cover: 72px rows. The
-           rank sits in a fixed column so titles line up. */
+        /* Rail cards (Top CANVAS / Up & Coming), in the theme's card
+           language: a heading behind the green bar like every section
+           title, and the rows as the series page's episode tiles (a faint
+           surface each, 6px apart, a lighter tile with a green hairline on
+           hover). The rank is the reader ranking tiles' dark badge on the
+           cover's corner, so the cover moves to the edge and the titles
+           get two lines (one line cut most of them). Bare grey numbers in
+           a column beside plain rows read as a different, older list. */
+        .aside.challenge .ranking_lst.viewer > .lst_area { padding: 16px 12px 12px !important; }
+        .aside.challenge .ranking_lst.viewer > .lst_area > .title_area { margin: 0 4px 10px !important; }
+        .aside.challenge .ranking_lst.viewer > .lst_area > .title_area h2::before {
+            content: '' !important;
+            flex: none !important;
+            width: 4px !important;
+            height: 18px !important;
+            margin-right: 8px !important;
+            border-radius: 2px !important;
+            background: var(--wt-accent) !important;
+        }
+        /* With the bar, a long genre in the filter pill (HEARTWARMING,
+           SUPERNATURAL) cut the title to "Top CANVA". These headers are a
+           plain <span>, not a link, so their "›" promised a click that did
+           nothing: it goes, and with a tighter pill both fit in the 262px
+           header. */
+        .aside.challenge .ranking_lst.viewer > .lst_area > .title_area h2 > span ~ .ico_arr1 { display: none !important; }
+        .aside.challenge .ranking_lst.viewer > .lst_area > .title_area .sort_area._filterArea .checked {
+            padding: 5px 23px 5px 10px !important;
+            letter-spacing: .02em !important;
+        }
+        .aside.challenge .ranking_lst.viewer > .lst_area > .title_area .sort_area._filterArea .checked::after { right: 8px !important; }
         .aside.challenge .ranking_lst.viewer .lst_type1 > li { padding: 0 !important; }
-        .aside.challenge .ranking_lst.viewer .lst_type1 > li > a { gap: 12px !important; padding: 8px 8px 8px 2px !important; }
-        .aside.challenge .ranking_lst.viewer .lst_type1 .pic_area { width: 56px !important; height: 56px !important; }
-        .aside.challenge .ranking_lst.viewer .lst_type1 .num_area { width: 20px !important; }
-        .aside.challenge .ranking_lst.viewer > .lst_area { padding: 16px 14px 10px !important; }
-        .aside.challenge .ranking_lst.viewer > .lst_area > .title_area { margin: 0 2px 6px !important; }
+        .aside.challenge .ranking_lst.viewer .lst_type1 > li + li { margin-top: 6px !important; }
+        .aside.challenge .ranking_lst.viewer .lst_type1 > li > a {
+            position: relative !important;
+            gap: 12px !important;
+            padding: 8px !important;
+            background: rgba(255,255,255,.025) !important;
+            transition: background-color .15s ease, box-shadow .15s ease !important;
+        }
+        .aside.challenge .ranking_lst.viewer .lst_type1 > li > a:hover,
+        .aside.challenge .ranking_lst.viewer .lst_type1 > li > a:focus-visible {
+            background: rgba(255,255,255,.055) !important;
+            box-shadow: inset 0 0 0 1px rgba(0,213,100,.3) !important;
+        }
+        .aside.challenge .ranking_lst.viewer .lst_type1 .pic_area {
+            width: 60px !important;
+            height: 60px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,.35) !important;
+        }
+        .aside.challenge .ranking_lst.viewer .lst_type1 .num_area {
+            position: absolute !important;
+            top: 11px !important;
+            left: 11px !important;
+            z-index: 3 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-sizing: border-box !important;
+            width: auto !important;
+            min-width: 20px !important;
+            height: 20px !important;
+            padding: 0 5px !important;
+            border-radius: 6px !important;
+            background: #14171b !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,.45) !important;
+        }
+        .aside.challenge .ranking_lst.viewer .lst_type1 .num_area [class^="ico_n"] {
+            color: #fff !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+        }
+        .aside.challenge .ranking_lst.viewer .lst_type1 .info_area .subj {
+            display: -webkit-box !important;
+            -webkit-box-orient: vertical !important;
+            -webkit-line-clamp: 2 !important;
+            overflow: hidden !important;
+            white-space: normal !important;
+            line-height: 19px !important;
+        }
 
         /* Right rail: the promo banner gets the card corners; the genre
            filter pill on Top CANVAS is a green-tinted chip with a chevron
@@ -5132,33 +5207,40 @@
             box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 8px 32px rgba(0,0,0,.35) !important;
         }
         /* "more ›": the site pins it to the block's top-right corner, which
-           became the card's rounded corner. Inside the padding instead, as
-           a small ghost pill on the heading row. */
+           became the card's rounded corner. Inside the padding instead, on
+           the heading row (centred on its 30px line), as the same ghost
+           pill as the home page's "View all": label, a gap, a border
+           chevron that slides on hover, green on hover. */
         .discover_cont_area .popular_genre_area .lk_more {
             position: absolute !important;
-            top: 24px !important;
+            top: 22px !important;
             right: 24px !important;
             display: inline-flex !important;
             align-items: center !important;
-            gap: 2px !important;
-            height: 30px !important;
-            padding: 0 10px 0 14px !important;
+            gap: 6px !important;
+            box-sizing: border-box !important;
+            height: 34px !important;
+            padding: 0 14px 0 18px !important;
             border-radius: 999px !important;
             background: rgba(255,255,255,.05) !important;
-            border: 1px solid rgba(255,255,255,.12) !important;
-            font-size: 13px !important;
+            border: 1px solid rgba(255,255,255,.14) !important;
+            color: var(--wt-text-body) !important;
+            font-size: 14px !important;
             font-weight: 600 !important;
             line-height: 1 !important;
             white-space: nowrap !important;
+            text-decoration: none !important;
             transition: background-color .15s ease, color .15s ease, border-color .15s ease !important;
         }
-        .discover_cont_area .popular_genre_area .lk_more:hover {
-            background: rgba(255,255,255,.09) !important;
-            border-color: rgba(255,255,255,.2) !important;
-            color: #fff !important;
+        .discover_cont_area .popular_genre_area .lk_more:hover,
+        .discover_cont_area .popular_genre_area .lk_more:focus-visible {
+            background: rgba(0,213,100,.14) !important;
+            border-color: rgba(0,213,100,.55) !important;
+            color: var(--wt-accent-soft) !important;
         }
         .discover_cont_area .popular_genre_area .lk_more .ico_arr { margin: 0 !important; }
-        .discover_cont_area .popular_genre_area .lk_more .ico_arr::after { display: block !important; font-size: 17px !important; line-height: 1 !important; transform: translateY(-1px) !important; }
+        .discover_cont_area .popular_genre_area .lk_more .ico_arr::after { transition: transform .15s ease !important; }
+        .discover_cont_area .popular_genre_area .lk_more:hover .ico_arr::after { transform: translateX(3px) rotate(45deg) !important; }
         .discover_cont_area .discover_lst li,
         .discover_cont_area a.discover_item,
         .discover_cont_area a.discover_item:hover {
@@ -5292,6 +5374,15 @@
             background: #14171b !important;
             border: 1px solid rgba(0,213,100,.45) !important;
             color: var(--wt-accent-soft) !important;
+        }
+        /* Status badges on the cover (.txt_ico_completed "END",
+           .txt_ico_hiatus pause; /canvas home and lists): 30px white sprite
+           discs, glaring next to the dark subscriber chip. Inverted to dark
+           discs, the creator profile's END badge treatment; the hue turn
+           keeps END green. */
+        .discover_badge_area > [class^="txt_ico"] {
+            border-radius: 50% !important;
+            filter: invert(.9) hue-rotate(180deg) drop-shadow(0 1px 3px rgba(0,0,0,.5)) !important;
         }
         /* Popular By Category genre switch: each genre is a pill in its own
            colour (color-mix off currentColor, so every .g_* hue works); the
@@ -6415,13 +6506,17 @@
            (.type_reply when it answers someone, a "└" sprite) ·
            .my_comment_date, then .my_comment_button_wrap (like /
            dislike / delete, sprite icons on boxed white buttons). Base: a
-           white sheet. Now the reader's comments panel: one card of flat
-           rows split by hairlines, the episode as a bold title that turns
-           green on hover, the comment in the comments' 18px near-white
-           text, then the votes as green / red stat chips and Delete as a
-           red trash button apart at the right (details below). */
+           white sheet. Now one card holding the comments as tiles, two to a
+           row: full-width rows of mostly short comments left the 1200px
+           card two-thirds empty (the user's call). Each tile is the series
+           page's episode tile (a faint surface, a lighter one on hover):
+           the episode as a bold title that turns green on hover, the
+           comment in the comments' 18px near-white text, the date, and at
+           the tile's foot the votes as green / red stat chips with Delete
+           as a red trash button at the right (details below). Tiles in a
+           row share a height and keep their foot on the bottom edge. */
         .my_comments {
-            padding: 4px 30px !important;
+            padding: 20px !important;
             background: var(--wt-bg-elev) !important;
             border: 1px solid rgba(255,255,255,.08) !important;
             border-top-color: rgba(255,255,255,.14) !important;
@@ -6429,8 +6524,29 @@
             box-shadow: 0 12px 32px rgba(0,0,0,.35) !important;
             overflow: hidden !important;
         }
-        .my_comments .my_comment_item { padding: 22px 0 14px !important; }
-        .my_comments .my_comment_item + .my_comment_item,
+        .my_comments ul:has(> .my_comment_item) {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .my_comments .my_comment_item {
+            display: flex !important;
+            flex-direction: column !important;
+            min-width: 0 !important;
+            padding: 18px 20px 16px !important;
+            background: rgba(255,255,255,.03) !important;
+            border: 1px solid rgba(255,255,255,.07) !important;
+            border-radius: 14px !important;
+            transition: background-color .15s ease, border-color .15s ease !important;
+        }
+        .my_comments .my_comment_item:hover {
+            background: rgba(255,255,255,.05) !important;
+            border-color: rgba(255,255,255,.12) !important;
+        }
+        .my_comments .my_comment_item > .my_comment_button_wrap { margin-top: auto !important; padding-top: 14px !important; }
+        .my_comments .my_comment_item + .my_comment_item { border-top-color: rgba(255,255,255,.07) !important; }
         .my_comments .my_comment_reply_item,
         .my_comments .my_comment_reply_button { border-top-color: rgba(255,255,255,.07) !important; }
         .my_comments .my_comment_name,
@@ -6566,14 +6682,14 @@
             justify-content: center !important;
             margin-left: auto !important;
             padding: 0 !important;
-            width: 42px !important;
-            height: 42px !important;
+            width: 38px !important;
+            height: 38px !important;
             border-radius: 12px !important;
             background: rgba(240,104,104,.1) !important;
             border: 1px solid rgba(240,104,104,.45) !important;
             color: #ff8a8a !important;
         }
-        .my_comments .my_comment_button.type_delete::before { width: 19px !important; height: 19px !important; }
+        .my_comments .my_comment_button.type_delete::before { width: 18px !important; height: 18px !important; }
         .my_comments .my_comment_button.type_delete:not(:disabled):hover,
         .my_comments .my_comment_button.type_delete:focus-visible {
             background: #d64545 !important;
@@ -8481,38 +8597,47 @@
            with near-black digits, which read as a warning label rather than
            "you are here". It now follows the dark-theme selected-tab
            pattern: a green-tinted pill with bright green bold digits, a
-           green ring and a soft glow. The other pages are quieter, lighter
-           pills that lift onto a tile on hover. Pills are 32px (was 28px),
-           an easier target. */
+           green ring and a soft glow. The other pages are buttons too:
+           bright semibold digits on a glass pill with a hairline (plain
+           grey digits were easy to miss; the user asked for them brighter),
+           lighter on hover. 36px pills, an easy target. */
+        div.paginate:not(.v2):not(.episode_lst *) { gap: 6px !important; }
         div.paginate:not(.v2):not(.episode_lst *) a,
         div.paginate:not(.v2):not(.episode_lst *) strong,
         div.paginate:not(.v2):not(.episode_lst *) .pg_prev,
         div.paginate:not(.v2):not(.episode_lst *) .pg_next {
-            min-width: 32px !important;
-            height: 32px !important;
+            min-width: 36px !important;
+            height: 36px !important;
+            margin: 0 !important;
             border-radius: 10px !important;
-            font-size: 14px !important;
+            font-size: 15px !important;
             font-variant-numeric: normal !important;
         }
-        div.paginate:not(.v2):not(.episode_lst *) a {
-            color: var(--wt-text-dim) !important;
-            font-weight: 500 !important;
+        div.paginate:not(.v2):not(.episode_lst *) .pg_prev,
+        div.paginate:not(.v2):not(.episode_lst *) .pg_next { width: 36px !important; }
+        div.paginate:not(.v2):not(.episode_lst *) a,
+        div.paginate:not(.v2):not(.episode_lst *) .pg_prev,
+        div.paginate:not(.v2):not(.episode_lst *) .pg_next {
+            color: var(--wt-text) !important;
+            font-weight: 600 !important;
+            background-color: rgba(255,255,255,.06) !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.12) !important;
         }
         /* The current page is an <a> too (a.pg_page[aria-current]): without
            the :not() this hover / focus tile replaced its green pill. */
         div.paginate:not(.v2):not(.episode_lst *) a:not([aria-current="true"]):hover,
         div.paginate:not(.v2):not(.episode_lst *) a:not([aria-current="true"]):focus-visible {
-            color: var(--wt-text) !important;
-            background-color: rgba(255,255,255,.07) !important;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,.14) !important;
+            color: #fff !important;
+            background-color: rgba(255,255,255,.13) !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.3) !important;
         }
         div.paginate:not(.v2):not(.episode_lst *) strong,
         div.paginate:not(.v2):not(.episode_lst *) .on,
         div.paginate:not(.v2):not(.episode_lst *) [aria-current="true"] {
             color: var(--wt-accent-soft) !important;
-            background-color: rgba(0,213,100,.14) !important;
-            font-weight: 700 !important;
-            box-shadow: inset 0 0 0 1px rgba(0,213,100,.55), 0 0 14px rgba(0,213,100,.18) !important;
+            background-color: rgba(0,213,100,.2) !important;
+            font-weight: 800 !important;
+            box-shadow: inset 0 0 0 1.5px var(--wt-accent), 0 0 16px rgba(0,213,100,.28) !important;
         }
 
         /* Viewer toolbar prev/next-episode buttons (.paginate.v2 around #N).
@@ -8800,10 +8925,10 @@
             justify-content: center !important;
             box-sizing: border-box !important;
             width: 100% !important;
-            min-width: 152px !important;
+            min-width: 0 !important;  /* a 152px floor left short labels (Share / Report / Block) in a sea of padding */
             min-height: 40px !important;
             margin: 0 !important;
-            padding: 0 12px !important;
+            padding: 0 24px !important;
             background: transparent !important;
             border: 0 !important;
             border-radius: 8px !important;
@@ -8887,6 +9012,31 @@
             color: var(--wt-text-body) !important;
             font-size: 15px !important;
             line-height: 22px !important;
+        }
+        /* Folded bio. The app's clamp (react-lines-ellipsis) already cuts
+           the text to two lines, and trimBioCut() (JS) drops the half word
+           it ended on ("…Webtoon, Scholas"). "... more" was a 12px grey
+           underlined label glued to the cut; it is the theme's green text
+           button. The site's own 2-line clamp is lifted from the folded
+           text: measured in the site's narrower font, "... more" could
+           wrap to a third line in ours and vanish under it, leaving no
+           way to open the bio. */
+        #app[class*="BaseLayout_container"] [class*="ExpandableProfileBio_folded"].LinesEllipsis--clamped {
+            display: block !important;
+            -webkit-line-clamp: none !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="ExpandableProfileBio_bio"] .LinesEllipsis-ellipsis {
+            margin-left: 2px !important;
+            color: var(--wt-accent-soft) !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="ExpandableProfileBio_bio"] .LinesEllipsis-ellipsis:hover {
+            color: var(--wt-accent) !important;
+            text-decoration: underline !important;
+            text-underline-offset: 3px !important;
         }
         /* The website link: green with a link icon (the global link rule
            had made it plain text). */
@@ -9172,12 +9322,24 @@
             width: auto !important;
             padding: 0 !important;
         }
+        /* Type · genre: a long genre ("ORIGINALS SUPERHERO") was cut off
+           mid-word at the tile's edge. It wraps onto its own line instead,
+           and only a genre too long even for that ends in "…". */
         #app[class*="BaseLayout_container"] [class*="CreatorTitleItem_textWrap"] {
             display: flex !important;
+            flex-wrap: wrap !important;
             align-items: center !important;
+            column-gap: 6px !important;
+            row-gap: 2px !important;
             width: auto !important;
             overflow: hidden !important;
             white-space: nowrap !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="CreatorTitleItem_textWrap"] > :is([class*="CreatorTitleItem_type"], [class*="CreatorTitleItem_genre"]) {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }
         #app[class*="BaseLayout_container"] [class*="CreatorTitleItem_thumbnail"] {
             flex: none !important;
@@ -9203,7 +9365,7 @@
             letter-spacing: .06em !important;
         }
         #app[class*="BaseLayout_container"] [class*="CreatorTitleItem_genre"] {
-            margin-left: 6px !important;
+            margin-left: 0 !important;
             font-size: 11px !important;
             font-weight: 700 !important;
             letter-spacing: .06em !important;
@@ -10083,6 +10245,31 @@
             if (box) box.toggleAttribute('data-wt-zero', ZERO_AMOUNT.test(a.textContent.trim()));
         });
     }
+    // Creator bio (community app): its two-line clamp cuts letter by
+    // letter, so a folded bio ended mid-word ("…for publishers such as
+    // Webtoon, Scholas... more"). Drop the partial word, and the comma or
+    // space before it, from the text in front of the ellipsis. The full bio
+    // is only rendered once expanded, so nothing is lost; the original text
+    // is kept so turning the theme off can put it back.
+    const bioCuts = new Map();  // text node → { original, trimmed }
+    function trimBioCut() {
+        if (!ON_COMMUNITY) return;
+        for (const t of bioCuts.keys()) if (!t.isConnected) bioCuts.delete(t);
+        document.querySelectorAll('.LinesEllipsis--clamped > .LinesEllipsis-ellipsis').forEach(el => {
+            let t = el.previousSibling;
+            if (t && t.nodeName === 'WBR') t = t.previousSibling;
+            if (!t || t.nodeType !== 3) return;
+            const seen = bioCuts.get(t);
+            if (seen && seen.trimmed === t.data) return;
+            // Cut on a word boundary already: only tidy the trailing space.
+            const trimmed = /\s$/.test(t.data)
+                ? t.data.replace(/[\s,;:]+$/, '')
+                : t.data.replace(/\s+\S*$/, '').replace(/[\s,;:]+$/, '');
+            if (!trimmed || trimmed === t.data) return;
+            bioCuts.set(t, { original: t.data, trimmed });
+            t.data = trimmed;
+        });
+    }
     // The emoji picker (<em-gw-emoji-picker>, emoji-mart) paints its
     // bottom category bar #fff from a stylesheet inside its open shadow
     // root, which no page CSS can reach (its other colours inherit, see
@@ -10116,6 +10303,7 @@
         upgradeRankingThumbs();
         tagGenreLabels();
         tagPatronAmount();
+        trimBioCut();
         darkenEmojiPickers();
         tuneContestBanners();
         // The synopsis is measured once, complete: not while it is parsing.
@@ -10130,6 +10318,8 @@
             if (key) p.classList.remove('g_' + (GENRE_ALIAS[key] || key));
             delete p.dataset.wtGenre;
         });
+        bioCuts.forEach((v, t) => { if (t.isConnected && t.data === v.trimmed) t.data = v.original; });
+        bioCuts.clear();
         darkenEmojiPickers();
     }
     const PRELOADER_BUBBLE = '__wt_preloader_status';

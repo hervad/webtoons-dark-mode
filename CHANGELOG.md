@@ -8,6 +8,22 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-10-07
+
+### Changed
+
+- **Page numbers are easier to spot:** every page number and arrow is now a button with bright text; the current page is a clearer green.
+- **Top CANVAS and Up & Coming** (CANVAS lists) match the rest of the theme: headings with the green bar, each series on its own tile, the rank on the cover's corner, and titles on up to two lines.
+- **My Comments** shows your comments as tiles, two to a row, instead of long rows with mostly empty space.
+
+### Fixed
+
+- **CANVAS "more" button** (Popular By Category): the arrow sat low and touched the label; it's now a pill like "View all".
+- **Top CANVAS:** a long genre in the filter (SUPERNATURAL, HEARTWARMING) no longer cuts the title to "Top CANVA". The "›" after the title is gone: the title isn't a link there.
+- **CANVAS covers:** the END and "on hiatus" badges were white discs; they're dark now, like the rest of the cover badges.
+- **Creator profiles:** a folded bio no longer ends mid-word ("Scholas... more"), and "... more" is a green link that can't slip out of view.
+- **Creator profiles:** a long genre (SUPERHERO) is no longer cut off mid-word in the series list, and the Share / Report / Block menu is no wider than it needs to be.
+
 ## [1.8.0] - 2026-10-07
 
 ### Added
@@ -1013,7 +1029,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.6.4...v1.7.0
 [1.6.4]: https://github.com/hervad/webtoons-dark-mode/compare/v1.6.3...v1.6.4

@@ -60,10 +60,11 @@
   | `upgradeRankingThumbs()` | Rewrites the reader's ranking images from `type=a92` to `type=a210` (the CDN has no `a160`). |
   | `tagGenreLabels()` | Adds `g_*` classes from the label text and records them in `data-wt-genre`. |
   | `tagPatronAmount()` | Sets `data-wt-zero` on a "$0" amount. |
+  | `trimBioCut()` | Community app only: drops the half word a folded creator bio was cut on (react-lines-ellipsis cuts letter by letter), keeping the original in `bioCuts`. |
   | `darkenEmojiPickers()` | Puts `EMOJI_NAV_CSS` into each emoji picker's shadow root. |
 
 - **`domPass()`:** runs the helpers above plus `tuneContestBanners()`, and `clampSynopsis()` once parsing is done, only while `themeActive()`. One MutationObserver on `<html>` from document-start drives it at most once per frame (rAF), skipping records about the preloader bubble; it runs again at DOMContentLoaded.
-- **`undoDomTweaks()`:** removes the added `g_*` classes and the emoji style. The leftover `data-wt-*` attributes and the hidden button have no effect without the theme.
+- **`undoDomTweaks()`:** removes the added `g_*` classes and the emoji style, and restores trimmed bio text. The leftover `data-wt-*` attributes and the hidden button have no effect without the theme.
 
 **There is no SPA handling.** Every www route change, including episode links, is a full page load. `scheduleSpa`, `_navGen`, `onSpaNav` and the history / navigation hooks were deleted; don't re-add them.
 
@@ -86,7 +87,7 @@
 - **No global inversion.** The theme never filters comic panels; only the optional dim does.
 - **The generic rules box everything.** `button, .btn, input[type=button|submit]`, inputs, `a` / `a:hover` (`--wt-link` blue) and `h1–h6, p, label, em, strong, …` (`--wt-text`) all apply site-wide, so a component with its own look must reset them. Button-like anchors are already excluded from the `a:hover` blue.
 - **Never override site-wide timing** (`* { transition-duration }`), not even for reduced motion. The reader's episode-strip thumbnails lazy-load from JS that waits for the site's transitions.
-- **Draw chevrons:** a rotated 6–7 px box with `border-top` + `border-right`, or a `--wt-ico-chevron-*` mask. Text glyphs never centre in a pill. The only remaining glyph is `.lk_more .ico_arr::after`.
+- **Draw chevrons:** a rotated 6–7 px box with `border-top` + `border-right`, or a `--wt-ico-chevron-*` mask. Text glyphs never centre in a pill; none are left (`.lk_more .ico_arr::after`, the last one, is a border chevron now).
 - **Site sprites live on `::before` / `::after`** (pager arrows, verified badges, rank digits). Reusing such a pseudo-element means resetting `background`, `width`, `height` and `margin`.
 - **`:visited` can only change colours.** A read / unread difference must be a colour of something present on every row.
 
@@ -235,20 +236,20 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 - **Genre labels** on lists and the rail get their `g_*` class from `tagGenreLabels()`.
 - **Home:** `.discover_lst` is a 6-column grid; Popular By Category hides the other genres inline, so it needs the `[style*="none"]` guard. The cards grow outward (−24 px side margins) so the site's tiles keep their place, 24 px apart.
 - **"Recommended series":** never change the 1130 px `.discover_spot_rolling` width (the flicking JS pages by it). Prev / dots / next (`.paging`) are one capsule on the header row (the user's request).
-- **Cover chips:** `.badge_discover` is a solid `#14171b` chip. `.badge_new*` gets the gold filter chain (`brightness(.62)` → sepia → saturate, no hue step) with a trailing `drop-shadow()`, since a box-shadow would be filtered. `.badge_up*` must **not** be filtered.
+- **Cover chips:** `.badge_discover` is a solid `#14171b` chip. The status sprites beside it (`.discover_badge_area > [class^="txt_ico"]`: END, hiatus) are white discs, inverted to dark (`invert(.9) hue-rotate(180deg)`). `.badge_new*` gets the gold filter chain (`brightness(.62)` → sepia → saturate, no hue step) with a trailing `drop-shadow()`, since a box-shadow would be filtered. `.badge_up*` must **not** be filtered.
 - **Weekly round-up** (`#_challengeRoundUp`, in the reader): never change the 1032 px `.challenge_spot_rolling`, 188 px tiles or 23 px gaps (the carousel relies on them). The card is `.challenge_spot_inner` (1200 px, 84 px side padding); the viewport clips, so hover rings are inset.
 
 ### Ranking cards (reader sidebar + /canvas rail)
 
 - **One component** for Trending & Popular, Top Originals, Top CANVAS and Up & Coming: `.ranking_lst.viewer > .lst_area`, styled only in the "Ranking sidebar cards" block. **No id-scoped rules** (`#challengeGenreRanking`, …): they made Top CANVAS differ from Up & Coming (B7). Never wrap a card in JS elements.
-- **Header:** the link is stretched over the h2 (`z-index: 1`). /canvas headers are a `<span>`: no pointer, no hover cue.
-- **Rail rows:** rank · 56 px cover · text in one flex row.
+- **Header:** the link is stretched over the h2 (`z-index: 1`). /canvas headers are a `<span>`: no pointer, no hover cue, and no `.ico_arr1` chevron (it promised a link; hiding it also makes room for the green bar and a long genre pill such as SUPERNATURAL in the 262 px header).
+- **Rail rows** (all `.aside.challenge`-prefixed): the episode list's tiles (`.025` surface, 6 px apart, `.055` + green hairline on hover); the rank is the reader's solid `#14171b` badge on the 60 px cover's corner (`.num_area` absolute in the `position: relative` link); titles clamp to 2 lines; headings get the green bar on `h2::before`.
 - **Reader:** `#_bottomDisplay > .aside.viewer` (`order: -1`) puts the cards in a row above the comments, each a 5-column grid of covers with solid `#14171b` rank badges; `.ranking_lst.viewer` gets `width: 100%`. Every horizontal rule is prefixed `.aside.viewer`, so the rail stays vertical.
 
 ### Series page
 
 - **Layout:** `.detail_bg + .cont_box` stays transparent (or the artwork is hidden). `.aside.detail` is pinned at `box-sizing: border-box; width: 389px`: any wider and it drops under the list.
-- **Pager** (`div.paginate:not(.v2):not(.episode_lst *)`): stays `display: flex` (`block` turned the sprite `::before` into a full-width line); no `position` / `clear` rules; hover is `a:not([aria-current="true"])` so the current page keeps its pill; the hide rule is `> :not(.blind)` so the accessible names survive.
+- **Pager** (`div.paginate:not(.v2):not(.episode_lst *)`): stays `display: flex` (`block` turned the sprite `::before` into a full-width line); no `position` / `clear` rules; hover is `a:not([aria-current="true"])` so the current page keeps its pill; idle pages and arrows are 36 px glass pills with bright 600 digits (grey digits were easy to miss, the user's call); the hide rule is `> :not(.blind)` so the accessible names survive.
 - **Episode rows** (`li.detail_list_item > a.detail_list_link`):
   - Rows are faint tiles (`.025`) with no dividers.
   - The title is 19 px, capped at `30ch`. On hover it unwraps to 3 lines × 24 px, which fits beside the 73 px thumbnail, so the row never changes height.
@@ -335,7 +336,7 @@ Each rule's comment holds its full spec. These are the constraints a session mus
   - `.btn_lineset` is a switch whose knob is a `radial-gradient` layer slid by `background-position`; a `::before` knob never rendered.
   - The generic glass `:hover` list excludes `.delete_btn` (red) and `.register_btn` (amber key, the user's call). Keep any button with its own hover out of that list.
   - The nickname check / save buttons swap inline, so they need the `[style*="none"]` guard.
-- **My Comments:** your own vote chips (`:disabled` / `.unable_alert`) stay visible as chips and static on hover (the user's call). A cast vote (`aria-pressed="true"`) gets a stronger fill plus a ring.
+- **My Comments:** the items are tiles in a 2-column grid (`.my_comments ul:has(> .my_comment_item)`), each a flex column with the button row pinned to the foot (`margin-top: auto`): full-width rows of short comments left the card two-thirds empty (the user's call). Your own vote chips (`:disabled` / `.unable_alert`) stay visible as chips and static on hover (the user's call). A cast vote (`aria-pressed="true"`) gets a stronger fill plus a ring.
 - **/mycreator, /favorite:** `.my_wrap.edit_mode` toggles Edit / Select All, so `.edit_mode .right .edit` and `:not(.edit_mode) .link_select_all` restate `display: none` against the pill's `inline-flex`.
 - **Testing:** logged-in and coin / redeem / invite pages can't be crawled. Check them on the user's saved HTML or on injected mock markup.
 
@@ -350,7 +351,9 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 
 - **Scoping:** `#app[class*="BaseLayout_container"]` (popovers, toasts and tooltips are portalled outside it). The button reset is `button:where(:not(#wcc_root *))`: unscoped it beat WCC's vote colours, and a bare `:not(#wcc_root *)` adds ID weight and beat the Follow rules. Small muted text uses `--wt-text-read`.
 - **Follow** (`ProfileActionButton_follow__`, double underscore so "following" can't match) is an **amber key**, the user's choice. Following (`…following__`) is an amber outline with a tick.
-- **Series swiper:** Swiper measures slide CSS widths, so `swiper-slide` is `calc((100% - 36px) / 3)`; `CreatorTitles_content` and `swiper-container` need `height: auto`.
+- **Series swiper:** Swiper measures slide CSS widths, so `swiper-slide` is `calc((100% - 36px) / 3)`; `CreatorTitles_content` and `swiper-container` need `height: auto`. The type · genre line (`CreatorTitleItem_textWrap`) wraps, so a long genre (SUPERHERO) drops to its own line instead of being cut mid-word.
+- **Folded bio** (`ExpandableProfileBio_folded.LinesEllipsis--clamped`): the site's `-webkit-line-clamp` is lifted (the app already cut the text; in our wider font "... more" could wrap under the clamp and vanish), and `.LinesEllipsis-ellipsis` is a green text button.
+- **Popover menus** (`PopoverItem_button`: Share / Report / Block): no `min-width`, 24 px side padding, so the panel hugs its short labels.
 - **Post pages:** `#wcc_root`'s tabs, list and More get 15 px side margins to sit in `DetailPost_root`'s gutter.
 
 ## Diagnosing a broken selector
@@ -437,12 +440,12 @@ There is no automated suite. Check the pages a change touches, logged out unless
   - cards darken and the title turns green on hover, with no lift;
   - green counts, coloured genres;
   - the /originals sort switch is its own row; /rankings shows ranks 1–30.
-- [ ] Pager: 32 px pills, centred chevrons, and the current page keeps its pill on hover.
+- [ ] Pager: 36 px glass pills with bright digits, centred chevrons, and the current page keeps its green pill on hover.
 
 ### /canvas checks
 
-- [ ] Home: three matching cards 24 px apart. Recommended series has its ‹ • › capsule on the title row. 6-column tiles. A category click shows one row.
-- [ ] List: the sort switch re-sorts from page 1; 4 columns with no clipped border. The rail (296 px) has identical cards 16 px apart, the filter panel covers the rank numbers, and the headers have no pointer.
+- [ ] Home: three matching cards 24 px apart. Recommended series has its ‹ • › capsule on the title row. 6-column tiles; END / hiatus badges on covers are dark discs (also on the lists). A category click shows one row; "more" is a pill with a chevron, green on hover.
+- [ ] List: the sort switch re-sorts from page 1; 4 columns with no clipped border. The rail (296 px) has identical cards 16 px apart, the filter panel covers the rank numbers, and the headers have a green bar, no pointer and no chevron. Rows are faint tiles with the rank on the cover's corner and 2-line titles; a long genre (SUPERNATURAL) leaves "Top CANVAS" whole.
 
 ### Series page checks
 
@@ -485,9 +488,9 @@ There is no automated suite. Check the pages a change touches, logged out unless
 - [ ] Login popup: one dim + blur behind one card, white Email / Apple / X icons; `/member/login` matches. Age gate: a single-frame month list.
 - [ ] No green button anywhere has black text.
 - [ ] Account: Delete turns red on hover and Redeem stays amber; one of Check / Save at a time.
-- [ ] My Comments: your own chips static, a cast vote ringed. /mycreator, /favorite: Edit hides in edit mode.
+- [ ] My Comments: tiles two to a row, the vote chips and trash at each tile's foot; your own chips static, a cast vote ringed. /mycreator, /favorite: Edit hides in edit mode.
 - [ ] Dashboard: dark sidebar and fields, light icons, an open dropdown joins its field.
-- [ ] Creator profile: amber Follow, Following as an outline with a tick, a dark toast, three equal series tiles. Feeds: separate post cards. Post page: comments the card's width, votes grey.
+- [ ] Creator profile: amber Follow, Following as an outline with a tick, a dark toast, three equal series tiles, a folded bio ending on a whole word with a green "... more", a long genre (SUPERHERO) on its own line; ⋮ opens a narrow menu that hugs Share / Report / Block. Feeds: separate post cards. Post page: comments the card's width, votes grey.
 
 ### Mobile (`m.webtoons.com`)
 
