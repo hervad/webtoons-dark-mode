@@ -1,0 +1,21 @@
+name: Idea or request
+description: Suggest a change to the theme's look or a new option.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe the change, and the page it's about.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why?
+      description: What it would make easier or nicer to read.
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot or example
+      description: A screenshot of the page, or an example from another site, if it helps.

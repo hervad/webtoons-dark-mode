@@ -1,0 +1,61 @@
+name: Something looks wrong
+description: A light / white area, unreadable text, a broken layout or a button that stopped working.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Webtoons changes its pages now and then, which can make an area light again; these are usually quick fixes.
+        Tip: press **Alt + Shift + T** to turn the theme off. If the problem is still there, it's the site itself, not the theme.
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      description: The address of the page where you see the problem.
+      placeholder: https://www.webtoons.com/en/...
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What looks wrong?
+      description: What you see, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Drag an image here. It helps a lot.
+  - type: dropdown
+    id: how
+    attributes:
+      label: How do you use it?
+      options:
+        - Userscript in Tampermonkey
+        - Userscript in Violentmonkey
+        - Userscript in ScriptCat
+        - Userscript in Greasemonkey or Userscripts (Safari)
+        - Toonlight browser extension
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 154, Firefox 145, Edge, Safari, …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Theme version
+      description: Shown in your userscript manager's dashboard or the Toonlight popup, and in the browser console as "[webtoons-dark-mode] vX.Y.Z starting".
+      placeholder: 1.8.5
+  - type: checkboxes
+    id: logged
+    attributes:
+      label: Account
+      options:
+        - label: I'm logged in to webtoons.com when it happens
