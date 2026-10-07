@@ -37,7 +37,7 @@ The toggles are also in your userscript manager's menu. Each entry says what cli
 - **Comments:** one dark panel with letter avatars, highlighted top comments, clear reply threads and a dark comment box, emoji picker and GIF picker.
 - **Your account:** login, sign-up, account settings, My Comments (your comments as tiles, with their likes and dislikes), followed creators and subscriptions.
 - **Creators:** creator profile pages (a profile card with the creator's social link next to their name, their series and follower counts, and a clear Follow button), community feeds and the CANVAS Creator Dashboard.
-- **Popups, search and footer:** dark, with visible hover and keyboard-focus states, including the mature-content notice and the age check.
+- **Popups, search and footer:** dark, with visible hover and keyboard-focus states, including the mature-content notice, the age check and the cookie consent banner.
 - **Mobile site (m.webtoons.com):** pages, the reader and its toolbar, share buttons and comments are dark. The top bar keeps the site's own look.
 
 Main and secondary text, the labels on green buttons and the keyboard focus ring meet WCAG AA contrast. There's a visible focus ring for keyboard navigation, which the site itself doesn't provide. If your system asks for reduced motion, the theme's own motion is switched off. Under Windows High Contrast, the theme steps aside so your system colours apply.

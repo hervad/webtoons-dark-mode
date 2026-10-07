@@ -35,6 +35,7 @@
 
 ### JS, in source order
 
+- **One copy per page:** right after the startup log, the script returns if `html[data-wt-running]` is already set, and otherwise sets it to its version. The userscript and the Toonlight extension run the same code; with both installed, each toggled on every shortcut press. Whichever starts first runs the page; the extension's popup then says the userscript is running it (`gm-shim.js` answers `{ otherCopy: true }`).
 - **`ensureStyle(id, css, on)`:** inserts or removes a `<style>` by id. It is idempotent; the text is set only on creation.
 - **`loadPref` / `savePref`:** sync `GM_*` when present; otherwise localStorage (`wt-dark-mode:<key>`) plus `GM.setValue`, and a later `GM.getValue` pass corrects the cached values.
 - **State:** `darkOn`, `dimOn`, `vignetteOn` and `topBtnOn` are read once and cached (the theme's first-run default follows `prefers-color-scheme`). Never read storage in an observer or rAF callback.
@@ -62,6 +63,7 @@
   | `tagPatronAmount()` | Sets `data-wt-zero` on a "$0" amount. |
   | `trimBioCut()` | Community app only: drops the half word a folded creator bio was cut on (react-lines-ellipsis cuts letter by letter), keeping the original in `bioCuts`. |
   | `darkenEmojiPickers()` | Puts `EMOJI_NAV_CSS` into each emoji picker's shadow root. |
+  | `darkenConsentBanner()` | Puts `CONSENT_CSS` into the consentmanager.net cookie banner's open shadow root (`#cmpwrapper`); both screens (welcome, Cookie Settings). Colours only: Reject stays the quiet button and Accept / Save the strong one, as on the light banner. |
 
 - **`domPass()`:** runs the helpers above plus `tuneContestBanners()`, and `clampSynopsis()` once parsing is done, only while `themeActive()`. One MutationObserver on `<html>` from document-start drives it at most once per frame (rAF), skipping records about the preloader bubble; it runs again at DOMContentLoaded.
 - **`undoDomTweaks()`:** removes the added `g_*` classes and the emoji style, and restores trimmed bio text. The leftover `data-wt-*` attributes and the hidden button have no effect without the theme.

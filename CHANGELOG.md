@@ -8,6 +8,16 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.8.6] - 2026-10-07
+
+### Changed
+
+- **Cookie banner:** the "We value your privacy!" consent banner and its Cookie Settings screen are dark too. Only the colours change; the buttons, their order and their wording stay the site's.
+
+### Fixed
+
+- **Installed twice** (for example the userscript and the upcoming Toonlight browser extension): only one copy runs on a page now. With two, every shortcut press toggled twice, so `Alt + Shift + T` seemed to do nothing.
+
 ## [1.8.5] - 2026-10-07
 
 ### Changed
@@ -1059,7 +1069,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.5...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.6...HEAD
+[1.8.6]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.5...v1.8.6
 [1.8.5]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.4...v1.8.5
 [1.8.4]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.2...v1.8.3

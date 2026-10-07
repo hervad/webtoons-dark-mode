@@ -40,7 +40,9 @@ function GM_unregisterMenuCommand(id) {
 const wtMenuList = () => [...wtMenu].map(([id, e]) => ({ id, label: e.label }));
 wtApi.runtime.onMessage.addListener((msg, _sender, reply) => {
     if (!msg || typeof msg.type !== 'string') return;
-    if (msg.type === 'wt-menu') reply(wtMenuList());
+    // An empty menu with the page marked as running: the userscript copy
+    // started first and runs this page (see the guard in the userscript).
+    if (msg.type === 'wt-menu') reply(wtMenu.size || !document.documentElement.hasAttribute('data-wt-running') ? wtMenuList() : { otherCopy: true });
     else if (msg.type === 'wt-run') {
         const entry = wtMenu.get(msg.id);
         if (entry) entry.run();

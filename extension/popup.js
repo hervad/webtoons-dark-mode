@@ -24,6 +24,12 @@ let tabId;
 async function send(msg) {
     try {
         const entries = await api.tabs.sendMessage(tabId, msg);
+        if (entries && entries.otherCopy) {
+            menu.replaceChildren();
+            away.textContent = 'The Webtoons Dark Mode userscript is also installed and is running this page. Use its menu, or turn the userscript off to use Toonlight.';
+            away.hidden = false;
+            return;
+        }
         if (!Array.isArray(entries) || !entries.length) throw new Error('no menu');
         away.hidden = true;
         render(entries);

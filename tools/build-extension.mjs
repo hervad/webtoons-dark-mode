@@ -70,7 +70,11 @@ const targets = {
 
 const SRC = join(ROOT, 'extension');
 const DIST = join(ROOT, 'dist');
-rmSync(DIST, { recursive: true, force: true });
+// Clear only this script's own output: dist/store/ (the store images) stays.
+mkdirSync(DIST, { recursive: true });
+for (const f of readdirSync(DIST)) {
+    if (f === 'chrome' || f === 'firefox' || f.endsWith('.zip')) rmSync(join(DIST, f), { recursive: true, force: true });
+}
 
 function zip(files, out) {
     // A plain zip writer (deflate), so the build needs no npm packages.

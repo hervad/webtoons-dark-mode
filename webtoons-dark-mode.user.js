@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.8.5
+// @version      1.8.6
 // @description  Dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -30,12 +30,24 @@
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
-    const VERSION = '1.8.5';
+    const VERSION = '1.8.6';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
     // version Tampermonkey is serving.
     console.info(`[webtoons-dark-mode] v${VERSION} starting`);
+
+    // One copy per page. The userscript and the Toonlight extension run this
+    // same code, and someone can have both: each copy then toggled on every
+    // shortcut press (so Alt+Shift+T seemed to do nothing) and kept its own
+    // menu state. The first copy to start marks the page; any later one steps
+    // aside. (The extension's popup reads the mark to explain why its menu is
+    // empty.)
+    if (document.documentElement.hasAttribute('data-wt-running')) {
+        console.info('[webtoons-dark-mode] another copy is already running on this page; this one stays off');
+        return;
+    }
+    document.documentElement.setAttribute('data-wt-running', VERSION);
 
     /* ---------- palette: shared colour and icon tokens ---------- */
     const palette = `
@@ -10353,19 +10365,55 @@
     // root, which no page CSS can reach (its other colours inherit, see
     // the theme). Put one rule into the shadow root while the theme is on.
     const EMOJI_NAV_CSS = '#nav{background:var(--wt-bg-elev)!important;border-top-color:rgba(255,255,255,.08)!important;border-radius:0 0 13px 13px!important}';
+    // A <style> inside a shadow root, present only while the theme is on.
+    function shadowStyle(root, id, css) {
+        const st = root.getElementById(id);
+        if (themeActive() && !st) {
+            const s = document.createElement('style');
+            s.id = id;
+            s.textContent = css;
+            root.appendChild(s);
+        } else if (!themeActive() && st) st.remove();
+    }
     function darkenEmojiPickers() {
-        const on = themeActive();
         document.querySelectorAll('em-gw-emoji-picker').forEach(el => {
-            const root = el.shadowRoot;
-            if (!root) return;
-            const st = root.getElementById('wt-dark-nav');
-            if (on && !st) {
-                const s = document.createElement('style');
-                s.id = 'wt-dark-nav';
-                s.textContent = EMOJI_NAV_CSS;
-                root.appendChild(s);
-            } else if (!on && st) st.remove();
+            if (el.shadowRoot) shadowStyle(el.shadowRoot, 'wt-dark-nav', EMOJI_NAV_CSS);
         });
+    }
+    // The cookie consent banner (consentmanager.net, shown on a first visit)
+    // lives in the open shadow root of #cmpwrapper, so it stayed a large white
+    // box, the first thing a new user of the dark theme saw. Colours only: the
+    // buttons, their order, wording and relative weight stay the site's (Reject
+    // the quiet button, Accept the strong one, as in the light banner). The
+    // custom properties inherit through the shadow boundary.
+    const CONSENT_CSS = `
+        #cmpbox.cmpbox { background: var(--wt-bg-elev) !important; color: var(--wt-text-body) !important;
+            border: 1px solid rgba(255,255,255,.1) !important; box-shadow: 0 24px 64px rgba(0,0,0,.6) !important; }
+        #cmpbox .cmpboxinner, #cmpbox .cmpboxcontent, #cmpbox .cmpboxbtns, #cmpbox .cmplogo2 { background: transparent !important; }
+        #cmpbox .cmpboxhl, #cmpbox .cmpboxhl * { color: #fff !important; }
+        #cmpbox .cmpboxtxt, #cmpbox .cmpwelcomeprpstxt, #cmpbox label, #cmpbox p, #cmpbox li { color: var(--wt-text-body) !important; }
+        #cmpbox .cmpwelcomeprps::before, #cmpbox .cmpwelcomeprps::marker { color: var(--wt-text-mute) !important; }
+        #cmpbox a:not(.cmpboxbtn), #cmpbox a:not(.cmpboxbtn) * { color: var(--wt-link) !important; }
+        #cmpbox .cmpmorelink, #cmpbox .cmpmorelink * { color: var(--wt-text-dim) !important; }
+        #cmpbox .cmpmoredivider, #cmpbox .cmplogo2, #cmpbox .cmplogo2 * { color: var(--wt-text-mute) !important; }
+        #cmpbox .cmpboxbtn { background: rgba(255,255,255,.08) !important; border: 1px solid rgba(255,255,255,.18) !important; color: var(--wt-text) !important; }
+        #cmpbox .cmpboxbtn * { color: inherit !important; }
+        #cmpbox .cmpboxbtn:hover { background: rgba(255,255,255,.14) !important; }
+        #cmpbox .cmpboxbtn.cmpboxbtnyes { background: #e6e6e6 !important; border-color: #e6e6e6 !important; color: #15171a !important; }
+        #cmpbox .cmpboxbtn.cmpboxbtnyes:hover { background: #fff !important; }
+        #cmpbox .cmplangicon { filter: invert(.85) !important; }
+        /* Cookie Settings (the second screen): purpose / vendor tables. */
+        #cmpbox th, #cmpbox td { background: transparent !important; color: var(--wt-text-body) !important; border-color: rgba(255,255,255,.08) !important; }
+        #cmpbox th { color: var(--wt-text-dim) !important; }
+        #cmpbox .cmpvendname, #cmpbox .cmpvendname * { color: var(--wt-text) !important; }
+        #cmpbox td.cmpvendorbox2 { background: rgba(255,255,255,.04) !important; }
+        #cmpbox hr, #cmpbox .cmpmoredivider { background: rgba(255,255,255,.18) !important; border-color: rgba(255,255,255,.18) !important; }
+        .cmptcfcookieinfo { background: var(--wt-bg-elev2) !important; color: var(--wt-text-body) !important; border-color: rgba(255,255,255,.12) !important; }
+        .cmptcfcookieinfo * { color: inherit !important; }
+    `;
+    function darkenConsentBanner() {
+        const w = document.getElementById('cmpwrapper');
+        if (w && w.shadowRoot) shadowStyle(w.shadowRoot, 'wt-dark-cmp', CONSENT_CSS);
     }
 
     // The DOM pass: everything above that marks up the page for the theme.
@@ -10383,6 +10431,7 @@
         tagPatronAmount();
         trimBioCut();
         darkenEmojiPickers();
+        darkenConsentBanner();
         tuneContestBanners();
         // The synopsis is measured once, complete: not while it is parsing.
         if (document.readyState !== 'loading') clampSynopsis();
@@ -10399,6 +10448,7 @@
         bioCuts.forEach((v, t) => { if (t.isConnected && t.data === v.trimmed) t.data = v.original; });
         bioCuts.clear();
         darkenEmojiPickers();
+        darkenConsentBanner();
     }
     const PRELOADER_BUBBLE = '__wt_preloader_status';
     const isPreloaderRecord = (r) => r.target.id === PRELOADER_BUBBLE ||
