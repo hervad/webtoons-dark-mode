@@ -304,7 +304,7 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 ### Comments (WCC)
 
 - **Tokens first:** the theme re-declares WCC's dark `--wcc-*` / `--wte-*` set at `html:root` (it beats WCC's light `:root`). Per-element rules only shape and lay out.
-- **Comment count** (`.comment_head .count`): a neutral glass pill with the figure in amber (the user's call).
+- **Comment count** (`.comment_head .count`): a neutral glass pill with the figure and the bubble icon in amber (the user's call).
 - **Font:** `.wcc_App__root`, all its descendants and their pseudo-elements use the system UI face, not Hind.
 - **asurascans model** (the user's reference): one panel (`.wcc_CommentList__list`) of flat rows split by hairlines, no per-comment cards. Text 18 px `#eef0f3`, names 17 px, dates 14 px on a shared baseline, 48 px avatars (replies 17 / 16 / 40 px). Long text is clipped at `8em`.
 - **Votes and Reply:** grey icon buttons under the text, votes first (`.wcc_CommentReaction__root { order: -1; margin-left: -10px }`), green up / red down on hover and when cast. A toggle with replies (`data-wt-replies` > 0) is a neutral glass pill (green was too loud).

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.8.4
+// @version      1.8.5
 // @description  Dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -30,7 +30,7 @@
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
-    const VERSION = '1.8.4';
+    const VERSION = '1.8.5';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -3359,7 +3359,7 @@
             border-radius: 999px !important;
             background: rgba(255,255,255,.09) !important;
             border: 1px solid rgba(255,255,255,.18) !important;
-            color: #ffc233 !important;  /* the figure in amber (the user's call); pill and icon stay neutral */
+            color: #ffc233 !important;  /* figure and icon in amber (the user's call); the pill stays neutral */
             font-size: 15px !important;
             font-weight: 700 !important;
             line-height: 1 !important;
@@ -3371,7 +3371,7 @@
             flex: none !important;
             width: 15px !important;
             height: 15px !important;
-            background: var(--wt-text-dim) !important;
+            background: currentColor !important;
             -webkit-mask: var(--wt-bubble-mask) center / contain no-repeat !important;
             mask: var(--wt-bubble-mask) center / contain no-repeat !important;
         }
