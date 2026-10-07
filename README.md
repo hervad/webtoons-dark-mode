@@ -8,6 +8,14 @@ Most dark-mode extensions invert the whole page, which also inverts the artwork:
 [![Latest release](https://img.shields.io/github/v/release/hervad/webtoons-dark-mode)](https://github.com/hervad/webtoons-dark-mode/releases/latest)
 [![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-install-670000)](https://greasyfork.org/scripts/577859)
 
+![The same WEBTOON series page split down the middle: the site's own light look on the left, Webtoons Dark Mode on the right, with the cover art unchanged](docs/screenshots/before-after.jpg)
+
+<p align="center">
+  <img src="docs/screenshots/series.jpg" width="32%" alt="A series page: the title over the cover art, episode tiles with green unread dots and flame like counts, and the sidebar card">
+  <img src="docs/screenshots/reader.jpg" width="32%" alt="Under the comic: the end card with Like and Subscribe, the episode strip and the ranking cards">
+  <img src="docs/screenshots/comments.jpg" width="32%" alt="The comment panel with letter avatars and amber TOP comments">
+</p>
+
 ## Install
 
 1. **Install a userscript manager** in your browser:
