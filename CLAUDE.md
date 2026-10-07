@@ -126,7 +126,7 @@ Before the October 2026 audit, every DOM change restyled the whole document (rea
   - White must be at least 4.5:1 on every stop (B5). No `brightness()` on key hovers.
   - Never black text on bright green (the user rejected it).
   - Selected tabs, the pager's current page and sort switches are a green-**tinted** chip (`rgba(0,213,100,.14)`, `--wt-accent-soft` text, green ring), never solid green.
-- **Amber** (`#ffc233`; text on amber `#fff1d0`, hover `#ffd666`) means "heads up": NOTE, age-rating notes, the NOTICE chip, hiatus, TOP comments, the CANVAS reader age strip. Keep it off actions, except the user's picks: the profile Follow key (and the Series / Followers tiles beside it), Redeem Free Coins and the comment send icon.
+- **Amber** (`#ffc233`; text on amber `#fff1d0`, hover `#ffd666`) means "heads up": NOTE, age-rating notes, the NOTICE chip, hiatus, TOP comments, the CANVAS reader age strip. Keep it off actions, except the user's picks: the profile Follow key, Redeem Free Coins and the comment send icon.
 - **Coral** is Patreon. The **orange flame** (`#ff6a24`, core `#ffd25e`) is likes. **Red** is destructive or a downvote.
 - **`::selection`** is blue `rgba(84,140,230,.5)` with white text (the user's call).
 - **Gone:** `--wt-text-on-accent`, `--wt-name`, `--wt-heart` and `--wt-neon-dim` were removed.
@@ -350,7 +350,9 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 ### Community app (`/p/community/…`)
 
 - **Scoping:** `#app[class*="BaseLayout_container"]` (popovers, toasts and tooltips are portalled outside it). The button reset is `button:where(:not(#wcc_root *))`: unscoped it beat WCC's vote colours, and a bare `:not(#wcc_root *)` adds ID weight and beat the Follow rules. Small muted text uses `--wt-text-read`.
-- **Series / Followers tiles** (`CreatorBriefMetric_*`): amber (wash, hairline, `#ffc233` figure, `#f0d79a` label) to match the Follow key, the user's call.
+- **Series / Followers tiles** (`CreatorBriefMetric_*`): violet (wash, hairline, `#c4b5fd` figure, `#ddd6fe` label), the user's call: grey read as filler, amber blended into the Follow / Following key.
+- **Social link button** (`SocialLinkTrigger_icon`): the network's brand fill (`--wt-sns`, picked by `:has(img[src*="instagram"])` etc.; other networks a brighter glass disc), so it stands out beside the key.
+- **Post ⋮** (`MoreActionMenu_button`): its dots are filled `var(--gw-icon-05)` in the SVG, so `svg path { fill: currentColor }`; a 36 px glass disc with bright dots.
 - **Follow** (`ProfileActionButton_follow__`, double underscore so "following" can't match) is an **amber key**, the user's choice. Following (`…following__`) is an amber outline with a tick.
 - **Series swiper:** Swiper measures slide CSS widths, so `swiper-slide` is `calc((100% - 36px) / 3)`; `CreatorTitles_content` and `swiper-container` need `height: auto`. The type · genre line (`CreatorTitleItem_textWrap`) wraps, so a long genre (SUPERHERO) drops to its own line instead of being cut mid-word.
 - **Folded bio** (`ExpandableProfileBio_folded.LinesEllipsis--clamped`): the site's `-webkit-line-clamp` is lifted (the app already cut the text; in our wider font "... more" could wrap under the clamp and vanish), and `.LinesEllipsis-ellipsis` is a green text button.

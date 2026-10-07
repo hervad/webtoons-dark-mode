@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.8.2
+// @version      1.8.3
 // @description  Dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -30,7 +30,7 @@
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
-    const VERSION = '1.8.2';
+    const VERSION = '1.8.3';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -9067,9 +9067,9 @@
         /* Series / Followers: the figures creators care most about, so
            they are the card's largest numbers: two equal tiles, a 26px
            figure over a small uppercase label (the site's label comes
-           first in the markup; order puts the figure on top). In amber,
-           the Follow key's colour (the user's call): grey tiles read as
-           filler beside the amber key. */
+           first in the markup; order puts the figure on top). In violet
+           (the user's call): grey tiles read as filler, and amber ones
+           blended into the amber Follow / Following key below them. */
         #app[class*="BaseLayout_container"] [class*="HomeProfile_metric"] { margin-top: 20px !important; }
         #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_root"] {
             display: flex !important;
@@ -9088,14 +9088,14 @@
             margin: 0 !important;
             padding: 0 22px !important;
             border-radius: 14px !important;
-            background: linear-gradient(180deg, rgba(255,194,51,.13), rgba(255,194,51,.04)) !important;
-            border: 1px solid rgba(255,194,51,.3) !important;
-            box-shadow: inset 0 1px 0 rgba(255,214,102,.12) !important;
+            background: linear-gradient(180deg, rgba(167,139,250,.16), rgba(167,139,250,.05)) !important;
+            border: 1px solid rgba(167,139,250,.38) !important;
+            box-shadow: inset 0 1px 0 rgba(196,181,253,.14) !important;
         }
         #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_count"] {
             order: -1 !important;
             margin: 0 !important;
-            color: #ffc233 !important;
+            color: #c4b5fd !important;
             font-size: 26px !important;
             font-weight: 800 !important;
             line-height: 1 !important;
@@ -9103,7 +9103,7 @@
             font-variant-numeric: tabular-nums !important;
         }
         #app[class*="BaseLayout_container"] [class*="CreatorBriefMetric_title"] {
-            color: #f0d79a !important;
+            color: #ddd6fe !important;
             font-size: 12px !important;
             font-weight: 700 !important;
             line-height: 1 !important;
@@ -9219,22 +9219,32 @@
             border-color: #ffc233 !important;
             color: #ffd666 !important;
         }
-        /* Social link: a 44px glass disc (the site's was a grey square). */
+        /* Social link: a 44px disc in the network's own colour (the
+           icon is the site's white glyph). A faint glass disc beside the
+           amber key was easy to miss (the user's call); other networks get
+           a brighter glass disc. Hover adds a soft ring. */
         #app[class*="BaseLayout_container"] button[class*="SocialLinkTrigger_icon"] {
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
+            box-sizing: border-box !important;
             width: 44px !important;
             height: 44px !important;
             border-radius: 50% !important;
-            background: rgba(255,255,255,.06) !important;
-            border: 1px solid rgba(255,255,255,.16) !important;
-            transition: background-color .15s ease, border-color .15s ease !important;
+            background: var(--wt-sns, rgba(255,255,255,.12)) !important;
+            border: 1px solid rgba(255,255,255,.28) !important;
+            box-shadow: 0 6px 16px rgba(0,0,0,.35) !important;
+            transition: filter .15s ease, box-shadow .15s ease, border-color .15s ease !important;
         }
+        #app[class*="BaseLayout_container"] button[class*="SocialLinkTrigger_icon"]:has(img[src*="instagram"]) { --wt-sns: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%); border-color: rgba(255,255,255,.2) !important; }
+        #app[class*="BaseLayout_container"] button[class*="SocialLinkTrigger_icon"]:has(img[src*="youtube"]) { --wt-sns: #ff0033; border-color: rgba(255,255,255,.2) !important; }
+        #app[class*="BaseLayout_container"] button[class*="SocialLinkTrigger_icon"]:has(img[src*="facebook"]) { --wt-sns: #1877f2; border-color: rgba(255,255,255,.2) !important; }
+        #app[class*="BaseLayout_container"] button[class*="SocialLinkTrigger_icon"]:has(img[src*="twitter"]) { --wt-sns: #000; }
         #app[class*="BaseLayout_container"] button[class*="SocialLinkTrigger_icon"]:hover,
         #app[class*="BaseLayout_container"] button[class*="SocialLinkTrigger_icon"][data-state="open"] {
-            background: rgba(255,255,255,.12) !important;
-            border-color: rgba(255,255,255,.3) !important;
+            border-color: rgba(255,255,255,.5) !important;
+            filter: brightness(1.1) !important;
+            box-shadow: 0 0 0 4px rgba(255,255,255,.12), 0 8px 20px rgba(0,0,0,.4) !important;
         }
         #app[class*="BaseLayout_container"] [class*="SocialLinkIcon_root"] { background: transparent !important; border-radius: 50% !important; }
 
@@ -9472,6 +9482,23 @@
         #app[class*="BaseLayout_container"] button[class*="ReactionButton_triggerButton"][data-state="open"] {
             background: rgba(255,255,255,.1) !important;
             color: #fff !important;
+        }
+        /* The ⋮ was barely visible: its dots are painted from the app's
+           own grey (fill="var(--gw-icon-05)"), so the button's colour never
+           reached them. A glass disc with bright dots, a size up (the
+           user asked for it brighter); white on hover. */
+        #app[class*="BaseLayout_container"] button[class*="MoreActionMenu_button"] {
+            width: 36px !important;
+            height: 36px !important;
+            background: rgba(255,255,255,.07) !important;
+            border: 1px solid rgba(255,255,255,.14) !important;
+            color: var(--wt-text) !important;
+        }
+        #app[class*="BaseLayout_container"] button[class*="MoreActionMenu_button"] svg { width: 24px !important; height: 24px !important; }
+        #app[class*="BaseLayout_container"] button[class*="MoreActionMenu_button"] svg path { fill: currentColor !important; }
+        #app[class*="BaseLayout_container"] button[class*="MoreActionMenu_button"]:is(:hover, [data-state="open"]) {
+            background: rgba(255,255,255,.16) !important;
+            border-color: rgba(255,255,255,.3) !important;
         }
         /* Post text: the comments' near-white reading size. */
         #app[class*="BaseLayout_container"] p[class*="Text_content"] {
