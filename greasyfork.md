@@ -2,7 +2,7 @@ A dark theme for [WEBTOON](https://www.webtoons.com) that keeps the comic's colo
 
 Most dark-mode extensions invert the whole page, which also inverts the artwork: skin tones go blue, pinks turn green. This script does the opposite. It restyles the site around the comic (header, menus, episode lists, comments, sidebars, popups) and never filters or recolours the comic panels. The only thing it does to the comic itself is frame it: the strip of panels is shown as one card with rounded corners, so the outer corners of the first and last panel are rounded off.
 
-> **No userscript manager?** The same theme is also a browser extension, **Toonlight**: one click to install, with a toolbar button for the settings. [Get it for Chrome, Edge, Brave and Opera](https://chromewebstore.google.com/detail/toonlight-dark-mode-for-w/jefblpkbipgmpefdnninpnofkjckpafn). Use either the script or the extension, not both.
+> **No userscript manager?** The same theme is also a browser extension, **Toonlight**: one click to install, with a toolbar button for the settings. Get it for [Chrome, Brave and Opera](https://chromewebstore.google.com/detail/toonlight-dark-mode-for-w/jefblpkbipgmpefdnninpnofkjckpafn) or [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-dark-mode-for-/iheadalpoiialennkmndleakobiilcfm). Use either the script or the extension, not both.
 
 ## Getting started
 
