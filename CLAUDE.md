@@ -11,6 +11,7 @@
 - **"No flash of the light site"** depends on the manager injecting at real `document-start`: Tampermonkey MV3 with scripts registered in advance, or Violentmonkey MV3 in "alternative page mode".
 - **The user's Chapter Preloader** (github.com/hervad/webtoons-chapter-preloader) runs on reader pages next to this script.
   - What it does: it copies `data-url` into `src` on `#_imageList img` and appends a fixed bubble, `#__wt_preloader_status`, to `<body>`.
+  - Timing (since preloader 1.1.0): it runs at `document-start` and sets `src` while the page is parsed (a parse-time MutationObserver that disconnects at `DOMContentLoaded`). At `DOMContentLoaded` it adds the bubble and an IntersectionObserver that calls `img.decode()` on panels up to 3 screens below the viewport. Reader timings measured with it installed include that download and decode work.
   - Never restyle or hide that bubble. The DOM pass ignores its mutations (`PRELOADER_BUBBLE`).
   - **Do not add image preloading or next-chapter prefetch here.** Loading is the preloader's job, and the user wants no next-chapter prefetch in either script.
   - Test and measure reader changes with both scripts installed.
