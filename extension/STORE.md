@@ -35,10 +35,11 @@ This writes `dist/toonlight-<version>-chrome.zip` (Chrome and Edge), `dist/toonl
 **Images:** the current set is in `dist/store/`, all 24-bit PNG without alpha (Chrome refuses alpha):
 
 - `1-series.png`, `2-reader-end.png`, `3-comments.png` (commenter names replaced with neutral ones), `4-originals.png`, `5-reader-popup.png`: 1280 × 800, up to five.
-- `promo-tile-440x280.png`: Chrome's optional small promo tile. The marquee tile (1400 × 560) is left out; Google only uses it when it features the item.
-- Store icon: `extension/icons/icon-128.png`.
+- `promo-tile-440x280.png`: the small promo tile (Chrome, Edge). Chrome's marquee tile is left out; Google only uses it when it features the item.
+- `promo-large-1400x560.png`: Edge's large promo tile, used only if Microsoft features the item in a banner. It is all original: the moon icon, text in Inter (SIL OFL, which allows logo use), an abstract page sketch of plain shapes, WEBTOON only as plain grey text, and a "Not affiliated" line.
+- Store icon: `extension/icons/icon-128.png` (Chrome, AMO); Edge wants `store-logo-300.png` (300 × 300).
 
-They are build output and stay out of git (`dist/` is ignored); the README's smaller copies are in `docs/screenshots/`.
+They are build output and stay out of git (`dist/` is ignored); the README's smaller copies are in `docs/screenshots/`. `python -I tools/make-icons.py` redraws the 300 px logo; the screenshots and tiles come from local tools in `.claude/tools/` (`store-images.py`, `promo-large.py`).
 
 Captions, where a store asks:
 
@@ -88,10 +89,36 @@ Captions, where a store asks:
 
 ## Microsoft Edge Add-ons
 
-1. Register at https://partner.microsoft.com/dashboard/microsoftedge (free).
-2. **Create new extension** → upload the same `toonlight-<version>-chrome.zip`.
-3. Fill in the same listing text, images and URLs, category Accessibility, and the privacy answers (no personal data; the privacy policy URL).
-4. Submit (review usually takes a few days).
+**One-time account setup** (free):
+
+- Sign in at https://partner.microsoft.com/dashboard/microsoftedge with a personal Microsoft account. If the sign-in loops in Firefox (tracking protection blocks Microsoft's cross-site sign-in), use Edge.
+- Signing in isn't registering: a Home page with only **My access** means the account hasn't joined the Edge program. Open https://partner.microsoft.com/dashboard/microsoftedge/public/login?ref=dd and register: account type Individual, publisher display name `hervad`.
+- The form calls the address "the address you want your customers to view", but in Account settings → Legal info only the publisher name is under *Public info*; name, email, phone and address are seller contact info. Address validation fails on many Polish street addresses: **Continue** keeps the entered one.
+- Account settings → Legal info → **Verification Summary** must say *Authorized* before publishing. Payout and tax profiles are only for paid items.
+
+**New extension** (Edge workspace → **Create new extension**):
+
+1. **Packages:** upload the same `toonlight-<version>-chrome.zip`. "Languages in package" stays empty (the manifest has no `default_locale`).
+2. **Availability:** Public, all markets, future markets ticked.
+3. **Properties:** category Accessibility; website and support URLs as above; mature content unticked.
+4. **Privacy:** the same single-purpose and `storage` texts as Chrome (Edge asks no host-permission question); remote code No; no data types; privacy policy URL; all three certifications.
+5. **Store listings → English (United States) → Edit details:** description, `store-logo-300.png`, both promo tiles, the five screenshots with captions, and search terms.
+   - **Search terms:** at most 7, at most 30 characters each, 21 words in total, added **one per Add Term**. Seven terms pasted as one comma list gave "Something went wrong"; an eighth term greys out Save draft. Current set: `dark mode`, `webtoons`, `dark theme`, `night mode`, `comics`, `manhwa`, `comic reader`. No other products' names (store policy).
+   - **Save draft**, then **Close**, then reload: the row must say Complete before Publish works.
+6. **Publish → Submit your extension:** answer **Yes** to "Does a tester need … other info": with No, the notes box is disabled, and Microsoft warns that submissions without notes may be flagged. Notes for certification:
+
+   ```text
+   No account or setup needed. Open any page on https://www.webtoons.com (for example https://www.webtoons.com/en/originals or any series page and episode): the dark theme applies automatically on first run.
+
+   How to test:
+   - Alt+Shift+T turns the theme off and on; the choice is remembered across reloads.
+   - Alt+Shift+N dims only the comic panels in the episode reader.
+   - The toolbar button opens a popup with the same settings.
+
+   The extension only runs on www.webtoons.com and m.webtoons.com. It uses the "storage" permission to save these settings locally, collects no data, loads no remote code and makes no network requests of its own. Source code: https://github.com/hervad/webtoons-dark-mode
+   ```
+
+7. Review takes up to 7 business days. The listing URL appears on the Extension overview once it's published.
 
 ## Firefox (addons.mozilla.org)
 
@@ -129,5 +156,5 @@ Captions, where a store asks:
 2. `node tools/build-extension.mjs`, then the `git archive` line above for the source zip.
 3. Upload the new zips:
    - Chrome Web Store: the item → **Package** → Upload new package → Submit for review.
-   - Edge: the extension → Update.
+   - Edge: the extension → **Update** → Packages → Replace; certification notes are required again on every submission.
    - AMO: the add-on → **Upload New Version**; answer Yes to source code, upload the new source zip, and reuse the reviewer notes with the new version number.

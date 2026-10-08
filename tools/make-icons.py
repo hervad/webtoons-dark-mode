@@ -1,4 +1,5 @@
-"""Draws the extension icons (extension/icons/icon-{16,32,48,128}.png):
+"""Draws the extension icons (extension/icons/icon-{16,32,48,128}.png) and
+Edge's 300 px store logo (dist/store/store-logo-300.png):
 a green crescent moon on the theme's dark card colour. Drawn at 512px and
 scaled down, so the small sizes stay crisp.
 
@@ -29,3 +30,10 @@ d.ellipse((350, 128, 390, 168), fill=(234, 255, 242, 255))
 for size in (16, 32, 48, 128):
     img.resize((size, size), Image.LANCZOS).save(out / f'icon-{size}.png')
 print('icons written to', out)
+
+# Edge Add-ons wants a 300 x 300 store logo; it's a store image, not part of
+# the package, so it goes with the other store images in dist/store/.
+store = out.parent.parent / 'dist' / 'store'
+store.mkdir(parents=True, exist_ok=True)
+img.resize((300, 300), Image.LANCZOS).save(store / 'store-logo-300.png')
+print('store logo written to', store / 'store-logo-300.png')

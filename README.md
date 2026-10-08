@@ -7,6 +7,7 @@ Most dark-mode extensions invert the whole page, which also inverts the artwork:
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/hervad/webtoons-dark-mode)](https://github.com/hervad/webtoons-dark-mode/releases/latest)
 [![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-install-670000)](https://greasyfork.org/scripts/577859)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Toonlight-1a73e8)](https://chromewebstore.google.com/detail/toonlight-dark-mode-for-w/jefblpkbipgmpefdnninpnofkjckpafn)
 
 ![The same WEBTOON series page split down the middle: the site's own light look on the left, Webtoons Dark Mode on the right, with the cover art unchanged](docs/screenshots/before-after.jpg)
 
@@ -17,6 +18,21 @@ Most dark-mode extensions invert the whole page, which also inverts the artwork:
 </p>
 
 ## Install
+
+There are two ways to get the theme. Both run the same code; use one or the other (if both are installed, only one runs on a page).
+
+### Browser extension: Toonlight (easiest)
+
+One click, no userscript manager, and a toolbar button for the settings.
+
+- **Chrome, Edge, Brave, Opera, Vivaldi:** [Toonlight on the Chrome Web Store](https://chromewebstore.google.com/detail/toonlight-dark-mode-for-w/jefblpkbipgmpefdnninpnofkjckpafn)
+- **Firefox (also Firefox for Android):** in review on Firefox Add-ons; until it's listed, use the userscript below.
+
+The extension starts in dark mode and updates through the store.
+
+### Userscript
+
+For people who already use a userscript manager, and for Safari. Updates reach you as soon as they're published.
 
 1. **Install a userscript manager** in your browser:
    - [Tampermonkey](https://www.tampermonkey.net/): Chrome, Edge, Firefox, Opera, Safari
@@ -34,7 +50,7 @@ Updates install automatically. A copy from Greasy Fork updates from Greasy Fork,
 
 ## Using it
 
-On first run the theme follows your system setting: dark if your device is in dark mode, light otherwise. Once you switch it yourself, your choice is remembered.
+On first run the userscript follows your system setting: dark if your device is in dark mode, light otherwise (the Toonlight extension always starts dark). Once you switch it yourself, your choice is remembered. In the extension, the toolbar button lists the same settings as the userscript manager's menu.
 
 | Action | Shortcut | Backup shortcut |
 | --- | --- | --- |
