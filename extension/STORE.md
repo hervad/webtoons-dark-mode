@@ -128,7 +128,7 @@ Captions, where a store asks:
    - The add-on ID is `toonlight@hervad` and can never change after the first upload.
 3. **Do you need to submit source code?** **Yes:** `content.js` is generated from the userscript by `tools/build-extension.mjs`, which counts as "a tool that generates code", although nothing is minified. Upload `toonlight-<version>-source.zip`.
 4. **Describe add-on:**
-   - Summary and description: the text above. Add-on URL: the default slug (`toonlight-dark-mode-for-webtoon`) is fine.
+   - Summary and description: the text above. Add-on URL: the slug is `toonlight` (https://addons.mozilla.org/firefox/addon/toonlight/).
    - Not experimental; doesn't require payment.
    - Category: Appearance.
    - Support email: optional (shown publicly). Support website: the issues URL. License: MIT.

@@ -9,6 +9,7 @@ Most dark-mode extensions invert the whole page, which also inverts the artwork:
 [![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-install-670000)](https://greasyfork.org/scripts/577859)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Toonlight-1a73e8)](https://chromewebstore.google.com/detail/toonlight-dark-mode-for-w/jefblpkbipgmpefdnninpnofkjckpafn)
 [![Edge Add-ons](https://img.shields.io/badge/Edge%20Add--ons-Toonlight-0078d7)](https://microsoftedge.microsoft.com/addons/detail/toonlight-dark-mode-for-/iheadalpoiialennkmndleakobiilcfm)
+[![Firefox Add-ons](https://img.shields.io/badge/Firefox%20Add--ons-Toonlight-ff7139)](https://addons.mozilla.org/firefox/addon/toonlight/)
 
 ![The same WEBTOON series page split down the middle: the site's own light look on the left, Webtoons Dark Mode on the right, with the cover art unchanged](docs/screenshots/before-after.jpg)
 
@@ -28,7 +29,7 @@ One click, no userscript manager, and a toolbar button for the settings.
 
 - **Chrome, Brave, Opera, Vivaldi:** [Toonlight on the Chrome Web Store](https://chromewebstore.google.com/detail/toonlight-dark-mode-for-w/jefblpkbipgmpefdnninpnofkjckpafn)
 - **Edge:** [Toonlight on Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/toonlight-dark-mode-for-/iheadalpoiialennkmndleakobiilcfm)
-- **Firefox (also Firefox for Android):** in review on Firefox Add-ons; until it's listed, use the userscript below.
+- **Firefox (also Firefox for Android):** [Toonlight on Firefox Add-ons](https://addons.mozilla.org/firefox/addon/toonlight/)
 
 The extension starts in dark mode and updates through the store.
 
@@ -168,7 +169,7 @@ These are usually quick fixes.
 
 ## Also by the author
 
-[Webtoons Chapter Preloader](https://github.com/hervad/webtoons-chapter-preloader) ([Greasy Fork](https://greasyfork.org/scripts/575967)) loads every panel of the episode you open right away, instead of a few at a time as you scroll. It works alongside this theme.
+[Webtoons Chapter Preloader](https://github.com/hervad/webtoons-chapter-preloader) ([Greasy Fork](https://greasyfork.org/scripts/575967)) loads every panel of the episode you open right away, instead of a few at a time as you scroll. It works alongside this theme. It's also available as the **Toonlight Preloader** browser extension for [Chrome](https://chromewebstore.google.com/detail/toonlight-preloader-for-w/kanadpglihpekgidpopkpblcheoinekh) and [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-preloader-for-w/mpgabnfjnfleojaokcojabpcpfnnpgfd).
 
 ## Development
 

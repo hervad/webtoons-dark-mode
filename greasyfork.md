@@ -2,7 +2,7 @@ A dark theme for [WEBTOON](https://www.webtoons.com) that keeps the comic's colo
 
 Most dark-mode extensions invert the whole page, which also inverts the artwork: skin tones go blue, pinks turn green. This script does the opposite. It restyles the site around the comic (header, menus, episode lists, comments, sidebars, popups) and never filters or recolours the comic panels. The only thing it does to the comic itself is frame it: the strip of panels is shown as one card with rounded corners, so the outer corners of the first and last panel are rounded off.
 
-> **No userscript manager?** The same theme is also a browser extension, **Toonlight**: one click to install, with a toolbar button for the settings. Get it for [Chrome, Brave and Opera](https://chromewebstore.google.com/detail/toonlight-dark-mode-for-w/jefblpkbipgmpefdnninpnofkjckpafn) or [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-dark-mode-for-/iheadalpoiialennkmndleakobiilcfm). Use either the script or the extension, not both.
+> **No userscript manager?** The same theme is also a browser extension, **Toonlight**: one click to install, with a toolbar button for the settings. Get it for [Chrome, Brave and Opera](https://chromewebstore.google.com/detail/toonlight-dark-mode-for-w/jefblpkbipgmpefdnninpnofkjckpafn), [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-dark-mode-for-/iheadalpoiialennkmndleakobiilcfm) or [Firefox](https://addons.mozilla.org/firefox/addon/toonlight/). Use either the script or the extension, not both.
 
 ## Getting started
 
@@ -55,7 +55,7 @@ Measured in Chrome with the theme on, the browser's styling work while a page lo
 
 Webtoons occasionally renames parts of its pages, which can make an area light again. Please [open an issue on GitHub](https://github.com/hervad/webtoons-dark-mode/issues) (or use the Feedback tab) with the page URL and a screenshot. These are usually quick fixes.
 
-Also by the author: [Webtoons Chapter Preloader](https://greasyfork.org/scripts/575967) loads every panel of the episode you open right away. It works alongside this theme.
+Also by the author: [Webtoons Chapter Preloader](https://greasyfork.org/scripts/575967) loads every panel of the episode you open right away. It works alongside this theme. It's also available as the **Toonlight Preloader** browser extension for [Chrome](https://chromewebstore.google.com/detail/toonlight-preloader-for-w/kanadpglihpekgidpopkpblcheoinekh) and [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-preloader-for-w/mpgabnfjnfleojaokcojabpcpfnnpgfd).
 
 Source code, full changelog and colour-customisation guide: [github.com/hervad/webtoons-dark-mode](https://github.com/hervad/webtoons-dark-mode)
 
