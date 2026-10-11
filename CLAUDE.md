@@ -46,6 +46,7 @@
 - **`themeActive()`:** `darkOn` and not `(forced-colors: active)`. The theme turns itself off under Windows contrast themes (B6), and a `change` listener follows the setting.
 - **`applyTheme` / `applyDim` / `applyVignette` / `applyTopButton`:** `applyTheme` inserts `<style id="wt-dark-style">` and sets `html[data-wt-dark="on|off"]` (a hook for users' own CSS); `applyVignette` sets `html[data-wt-vignette]`.
 - **Dashboard flag:** `html[data-wt-dashboard]` is set once at document-start on `/<lang>/creators/…` and never changed. Its rules include `::before` / `::after`, so flipping it would restyle every element.
+- **Mobile flag:** `html[data-wt-mobile]` is set once at document-start on `m.webtoons.com` (from `location.hostname`) and never changed. Every mobile-site rule starts with it, so none can match www.
 - **`watchLoginState()`:** the LOG IN flash fix (`KEY_LOGGED_IN` `wt_logged_in`, `AUTH_WAIT_MS` 4 s). If the last page was logged in, `html[data-wt-auth="pending"]` hides `#btnLogin` until `#btnLoginInfo` shows or the cap passes; a `._btnLogout` click clears the memory. **Only pages with the site header** (`#btnLogin` / `#btnLoginInfo`) may update it; the reader, the community app, `/member` and mobile leave it alone.
 - **`watchHead()`:** re-inserts our `<style>`s if `<head>` loses them. Never sync page classes from it: head mutations can arrive while the previous page's DOM is still present.
 - **`toggleTheme` / `toggleDim` / `toggleVignette` / `toggleTopButton`:** each saves, applies, logs and calls `registerMenu()`. `toggleTheme` also runs `domPass()` (on) or `undoDomTweaks()` (off).
@@ -154,6 +155,7 @@ Before the October 2026 audit, every DOM change restyled the whole document (rea
 |---|---|---|
 | `body.wt-viewer` / `wt-detail` / `wt-home` | `routeBodyClass()` (URL, before first paint) + `syncBodyClasses()` | vignette, reader-only rules, `topBtnCss` |
 | `html[data-wt-dashboard]` | path at document-start, never changed | Creator Dashboard |
+| `html[data-wt-mobile]` | host at document-start, never changed | every mobile-site rule (the "Mobile site" block at the end of `theme`) |
 | `html[data-wt-vignette="off"]` / `[data-wt-auth="pending"]` | `applyVignette()` / `watchLoginState()` | vignette off / hide LOG IN |
 | `#_bottomDisplay` (server-rendered) | site | reader rankings row + comments layout |
 | `#app[class*="BaseLayout_container"]` | site | community app |
@@ -161,14 +163,23 @@ Before the October 2026 audit, every DOM change restyled the whole document (rea
 
 ### Mobile site
 
-`routeBodyClass()` sets nothing off www, so no `body.wt-*` rule applies on `m.webtoons.com`. Desktop rules that leaked broke mobile, so these scopes must stay:
+`routeBodyClass()` sets nothing off www, so no `body.wt-*` rule applies on `m.webtoons.com`. The site-wide rules (page background, text, links, buttons) do apply there; the mobile site's own surfaces are themed in the "Mobile site (m.webtoons.com)" block at the end of `theme`, every rule prefixed `html[data-wt-mobile]`.
+
+- **Why the block exists (October 2026 phone report):** text colour inherits but background doesn't. The site-wide rules made the mobile site's text light while its own white bars, footer, sheets and pills kept their backgrounds (1.03–1.25:1), and its dark text and black sprites landed on our dark page. Findings and the before / after audit: `docs/issues/mobile-dark-2026-10/FINDINGS.md`.
+- **The fix is per surface, not per text:** give a mobile surface the desktop tokens and the light text inside needs no rule. A new mobile component gets a surface rule first; text rules only where the site sets its own dark colour (`.list_trending .subject`, `.downapp_area2.viewer span`).
+- **Black glyph sprites** (search, menu, home, ⓘ, ⋮, chevrons, TOP) are inverted on the glyph's own element or pseudo-element, never on artwork. Multi-colour sprites (the /more tiles, category discs) use `invert() hue-rotate(180deg)` so their green stays green. Glyphs the palette has a mask for (chevron, mail, Apple, X) are masks.
+- **Green calls to action** (Read Episode 1, Download, Log In, end-of-episode Subscribe, app buttons) are the desktop key, the user's call; their `:hover` is restated against the global `a:hover` blue.
+- **Don't touch:** the panel wrappers `.flick-ct._imageWrap` (white behind transparent-PNG panels), the last-panel studio credits, cover badges, the `.banner_discover` backdrop (matched to its creative).
+- **Mobile footer social buttons** share the desktop `#footer .foot_sns` rules (listed beside them).
+
+Desktop rules that leaked broke mobile, so these scopes must stay:
 
 - **Header menu:** `:where(#header) .lnb …` / `#header .lnb …`. On mobile, `.gnb` / `.lnb` are the mobile header, which has no `#header`; desktop sizing pushed its MY tab off-screen.
 - **Pagers:** every generic pager rule starts with `div.paginate`. The mobile reader toolbar is `span.paginate` (◀ #N ▶) and keeps the site's styles.
 - **Login rows:** style `.login_sns .btn_sns`, never bare `.btn_sns`. Mobile draws its reader share icons and the creator sheet as `.btn_sns` sprites.
 - **Home section headers:** `.section_header…:where(:not(.main_content_wrap > *))`. Mobile headers are 42 px children of `.main_content_wrap`. The unscoped `.main_section_tab .button` only styles the mobile tabs.
 - **Comments (`.wcc_layout_mobile`):** the desktop geometry left a 182 px text column on a phone. Mobile uses 18 px panel padding, a 36 px avatar in a 46 px column and 16 px text; replies have 30 px avatars and the rail at `left: 17px`; TOP blocks are inset −10 px; the logged-out composer hides WCC's bare send button.
-- **Left as the site's look:** the mobile header (a light bar; a possible later look decision) and the app popup.
+- **The mobile header and the app popups are dark** (the user's call, October 2026; they used to be left as the site's look).
 
 ## Component invariants
 
@@ -390,8 +401,17 @@ The tools are in `.claude/tools/`, which is gitignored, so they exist on this ma
 | `perf-report.mjs [a.json] [b.json]` | Markdown tables from `perf.mjs` runs, or a comparison of two runs. |
 | `coverage.mjs` | Crawls the site to find which theme selectors still match; saves bundles and DOM snapshots. |
 | `palette-contrast.mjs <script>` | WCAG / APCA ratios of every text token on every surface token. |
+| `mobile-audit.mjs <script\|-> <outDir> <pages.json\|name=url…>` | m.webtoons.com sweep (phone viewport + UA): screenshots per screen, rendered DOM, text contrast vs AA, light boxes ≥ 120×6 px, faint icons, and which of our rules won `color` / `background`. Pages and opened states: `mobile-pages.json`. |
+| `mobile-audit-diff.mjs <on.json> <off.json>` | Classifies theme-on findings against theme off: `ours-P1`, `ours-P3`, `gap`, `site`. |
+| `mobile-components.mjs <diff.json> [--md\|--pages]` | Groups findings into components (M01…) and known false positives (occluded, artwork). |
+| `perf-swap.mjs <old> <new> <name=url[@mobile]>…` | Style cost of two versions on the same DOM: parse + match, and a whole-page restyle, ABAB blocks. Run old vs old first for the noise floor. |
+| `compare-sheet.mjs <beforeDir> <afterDir> <outDir>` | Before / after JPEG per page from two `mobile-audit.mjs` runs. |
+| `firefox-mobile.mjs <addonDir\|-> <outDir> <pages.json\|name=url…>` | The built add-on (`dist/firefox`, temporary install) on m.webtoons.com in headless Firefox over WebDriver BiDi (no geckodriver): Android user agent, meta viewport on, 390×844. Same in-page text / light-box checks as `mobile-audit.mjs`, plus screenshots. Gecko, not a phone: Android's fonts and native pickers aren't covered. |
 
 - For an "old" copy: `git show HEAD:webtoons-dark-mode.user.js > <scratch>/old.user.js`.
+- **Machines differ.** On the Fedora machine the browser is `chromium-browser`, and only the mobile tools above plus a smaller `style-diff.mjs` (old vs new, then swapped back to old to drop animation noise; `KEEP=` lists containers that must not change) exist; `shot.mjs`, `perf.mjs`, `js-checks.mjs`, `coverage.mjs` and `ext-test.mjs` are on the other machine.
+- **BiDi navigation:** wait for `interactive`, not `complete` (ad frames can keep a page from ever completing); every command needs a deadline.
+- **CDP injection runs before `<html>` exists:** the injected wrapper must wait for `document.documentElement` (managers guarantee it, CDP doesn't). `m.webtoons.com` redirects to www without a mobile user agent.
 - `.claude/tools/perf/` holds lower-level probes (`probe.mjs`, `summ.mjs`, `layers.mjs`, …).
 - **Chrome is only ever launched with `--headless=new` and a throwaway `--user-data-dir`.** On Windows even `chrome.exe --version` opens the user's real browser. Read the version with `(Get-Item 'C:/Program Files/Google/Chrome/Application/chrome.exe').VersionInfo.ProductVersion`.
 
@@ -517,6 +537,7 @@ There is no automated suite. Check the pages a change touches, logged out unless
 
 ### Mobile (`m.webtoons.com`)
 
-- [ ] The header is the site's light bar with the MY tab visible. The home category strip is one row.
+- [ ] The header, page titles and tab strips are dark, with the MY tab visible and a green underline on the selected tab. The home category strip is one row.
+- [ ] Footer, app banner, notice, "Get the app" pill, /more tiles, series (i) sheet, share sheet and the app pop-ups are dark; green buttons are the key; search category discs are dark.
 - [ ] Reader: ◀ #N ▶ inside its bar; share icons are the site's sprites.
 - [ ] Comments use phone geometry, with one send arrow when logged out.

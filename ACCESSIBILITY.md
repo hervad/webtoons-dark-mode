@@ -15,7 +15,7 @@ The theme aims to make WEBTOON comfortable to read for as many people as possibl
 
 - The comic panels are shown exactly as published; the theme can't add text descriptions the site doesn't provide.
 - Webtoons sometimes changes its pages, which can leave an area in the light theme or with low contrast until the theme is updated.
-- On `m.webtoons.com` the top bar keeps the site's own light look.
+- On `m.webtoons.com`, pages that need a login (settings, subscriptions) and the phone's own pickers (sort, date of birth) haven't been checked on a device yet.
 - Pages that need a login (account, coin and creator dashboard pages) are tested less often than public pages.
 
 ## Reporting a barrier

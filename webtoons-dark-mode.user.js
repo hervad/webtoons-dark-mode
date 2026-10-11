@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.8.6
-// @description  Dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Toggle with Alt+Shift+T; optional night-reading dim with Alt+Shift+N.
+// @version      1.9.0
+// @description  A hand-made dark theme for WEBTOON (webtoons.com): the comics stay exactly as drawn, and the reader, comments and phone site go dark. Toggle with Alt+Shift+T; night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
 // @match        https://m.webtoons.com/*
@@ -30,7 +30,7 @@
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
-    const VERSION = '1.8.6';
+    const VERSION = '1.9.0';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -5477,18 +5477,24 @@
            nudged opacity. Same treatment as the share buttons: quiet round
            buttons with one monochrome icon set (masks), filling with the
            network's colour on hover. Pinterest / LINE (other language
-           editions) have no mask yet, so they keep the filtered sprite. */
+           editions) have no mask yet, so they keep the filtered sprite.
+           m.webtoons.com's footer uses the same .foot_sns markup without
+           #footer, so it is listed beside it. */
         .btn_foot_pinterest, .btn_foot_line {
             filter: brightness(0) invert(1) opacity(.75) !important;
         }
         .btn_foot_pinterest:hover, .btn_foot_line:hover {
             filter: brightness(0) invert(1) opacity(1) !important;
         }
-        #footer .foot_sns { column-gap: 10px !important; }
+        #footer .foot_sns, html[data-wt-mobile] .foot_sns { column-gap: 10px !important; }
         #footer .foot_sns a.btn_foot_facebook,
         #footer .foot_sns a.btn_foot_instagram,
         #footer .foot_sns a.btn_foot_twitter,
-        #footer .foot_sns a.btn_foot_youtube {
+        #footer .foot_sns a.btn_foot_youtube,
+        html[data-wt-mobile] .foot_sns a.btn_foot_facebook,
+        html[data-wt-mobile] .foot_sns a.btn_foot_instagram,
+        html[data-wt-mobile] .foot_sns a.btn_foot_twitter,
+        html[data-wt-mobile] .foot_sns a.btn_foot_youtube {
             position: relative !important;
             display: block !important;
             width: 42px !important;
@@ -5507,7 +5513,11 @@
         #footer .foot_sns a.btn_foot_facebook::before,
         #footer .foot_sns a.btn_foot_instagram::before,
         #footer .foot_sns a.btn_foot_twitter::before,
-        #footer .foot_sns a.btn_foot_youtube::before {
+        #footer .foot_sns a.btn_foot_youtube::before,
+        html[data-wt-mobile] .foot_sns a.btn_foot_facebook::before,
+        html[data-wt-mobile] .foot_sns a.btn_foot_instagram::before,
+        html[data-wt-mobile] .foot_sns a.btn_foot_twitter::before,
+        html[data-wt-mobile] .foot_sns a.btn_foot_youtube::before {
             content: '' !important;
             position: absolute !important;
             inset: 0 !important;
@@ -5518,10 +5528,10 @@
             -webkit-mask: var(--wt-share) center / contain no-repeat !important;
             mask: var(--wt-share) center / contain no-repeat !important;
         }
-        #footer .foot_sns a.btn_foot_facebook  { --wt-share: var(--wt-ico-facebook);  --wt-brand: #1877f2; }
-        #footer .foot_sns a.btn_foot_instagram { --wt-share: var(--wt-ico-instagram); --wt-brand: linear-gradient(45deg, #f58529, #dd2a7b 55%, #8134af); }
-        #footer .foot_sns a.btn_foot_twitter   { --wt-share: var(--wt-ico-x);         --wt-brand: #000; }
-        #footer .foot_sns a.btn_foot_youtube   { --wt-share: var(--wt-ico-youtube);   --wt-brand: #ff0033; }
+        :is(#footer, html[data-wt-mobile]) .foot_sns a.btn_foot_facebook  { --wt-share: var(--wt-ico-facebook);  --wt-brand: #1877f2; }
+        :is(#footer, html[data-wt-mobile]) .foot_sns a.btn_foot_instagram { --wt-share: var(--wt-ico-instagram); --wt-brand: linear-gradient(45deg, #f58529, #dd2a7b 55%, #8134af); }
+        :is(#footer, html[data-wt-mobile]) .foot_sns a.btn_foot_twitter   { --wt-share: var(--wt-ico-x);         --wt-brand: #000; }
+        :is(#footer, html[data-wt-mobile]) .foot_sns a.btn_foot_youtube   { --wt-share: var(--wt-ico-youtube);   --wt-brand: #ff0033; }
         #footer .foot_sns a.btn_foot_facebook:hover,
         #footer .foot_sns a.btn_foot_instagram:hover,
         #footer .foot_sns a.btn_foot_twitter:hover,
@@ -9894,6 +9904,388 @@
             color: #fff !important;
             box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 0 0 4px rgba(0,213,100,.18), 0 12px 28px rgba(0,213,100,.3) !important;
         }
+
+        /* ===================================================================
+           Mobile site (m.webtoons.com)
+           ===================================================================
+           The site-wide text, link and button rules at the top reach these
+           pages, but the mobile site paints its own surfaces (white bars,
+           footer, sheets, pills, tab strips) and none of the desktop
+           component rules match its markup. So our light text sat on its
+           white boxes (1.03-1.25:1) and its dark text and black sprite icons
+           sat on our dark page (the October 2026 phone report). Fix: give
+           each mobile surface the desktop tokens; the text inside is already
+           light and needs no rule. Every rule starts with html[data-wt-mobile]
+           (set from the host at document-start), so none can match www.
+           Black glyph sprites are inverted on the glyph's own element (never
+           on artwork); glyphs the theme has a mask for are redrawn as masks.
+           No motion is added here, so there is nothing for reduced motion. */
+
+        /* ---------- Mobile: header bars and tab strips ---------- */
+        /* Four header variants share role="banner": the main one (.gnb logo
+           row), .sub_header (sub-pages and the reader), .sub_detail (series).
+           The reader's bar was already dark only because it has id="header"
+           and the desktop #header rule matched it. */
+        html[data-wt-mobile] header[role="banner"] {
+            background-color: var(--wt-bg-elev) !important;
+        }
+        html[data-wt-mobile] .sub_header .sub_title {
+            background: transparent !important;
+            border-bottom: 1px solid var(--wt-border) !important;
+        }
+        html[data-wt-mobile] .sub_header .sub_title .link { color: var(--wt-text) !important; font-weight: 700 !important; }
+        /* Black glyph sprites on the bars: search, menu, home, the CANVAS
+           genre-shortcut chevron. */
+        html[data-wt-mobile] .gnb .btn_search::before,
+        html[data-wt-mobile] .gnb .btn_menu::before,
+        html[data-wt-mobile] .sub_header .btn_home::after,
+        html[data-wt-mobile] .sub_detail .btn_home,
+        html[data-wt-mobile] .btn_shortcut::after {
+            filter: invert(.9) !important;
+        }
+        /* Tab strips under the header (Originals weekdays, MY, CANVAS genres,
+           category and ranking tabs): one component, .category_tab_wrap. The
+           selected tab is bright with the green underline of the comment
+           tabs; the others are the readable muted grey. */
+        html[data-wt-mobile] .category_tab_wrap {
+            background: var(--wt-bg-elev) !important;
+            border-bottom-color: var(--wt-border) !important;
+        }
+        html[data-wt-mobile] .category_tab .link { color: var(--wt-text-read) !important; }
+        html[data-wt-mobile] .category_tab .on .link { color: var(--wt-text) !important; }
+        html[data-wt-mobile] .category_tab .on .link::after {
+            content: '' !important;
+            position: absolute !important;
+            left: 8px !important;
+            right: 8px !important;
+            bottom: 0 !important;
+            height: 3px !important;
+            border-radius: 3px 3px 0 0 !important;
+            background: var(--wt-accent) !important;
+        }
+        html[data-wt-mobile] .btn_shortcut { background-color: var(--wt-bg-elev) !important; }
+        html[data-wt-mobile] .btn_shortcut::before { border-color: var(--wt-border) !important; }
+        /* "154 series" and the sort <select> under the tabs: the count was
+           #666 on our page (3.1:1); the select drops the generic input box
+           (the site draws it as plain text with a chevron). */
+        html[data-wt-mobile] .category_tab_sort .daily_count { color: var(--wt-text-read) !important; }
+        html[data-wt-mobile] .category_tab_sort .daily_count .count { color: var(--wt-text) !important; }
+        html[data-wt-mobile] .category_tab_sort .btn_sort {
+            background: transparent !important;
+            border: 0 !important;
+            color: var(--wt-text-dim) !important;
+        }
+        html[data-wt-mobile] .category_tab_sort .btn_sort_area::after { filter: invert(.9) !important; }
+
+        /* ---------- Mobile: series header (.sub_detail) ---------- */
+        /* The generic button box turned the info and share icon buttons into
+           grey squares around black glyphs (1.7:1). The site's own look is a
+           bare glyph. */
+        html[data-wt-mobile] .sub_detail .button_area .btn_info,
+        html[data-wt-mobile] .sub_detail .button_area .btn_more {
+            background-color: transparent !important;
+            border: 0 !important;
+            filter: invert(.9) !important;
+        }
+        html[data-wt-mobile] .sub_detail .btn_subscribe::before { filter: brightness(0) invert(1) !important; }
+        /* Subscribed: the desktop's quiet outline instead of a second key
+           (untested: needs a logged-in reader). */
+        html[data-wt-mobile] .sub_detail .btn_subscribe[aria-pressed="true"] {
+            background: rgba(255,255,255,.06) !important;
+            border-color: rgba(255,255,255,.2) !important;
+            color: var(--wt-text-dim) !important;
+        }
+
+        /* ---------- Mobile: footer, app promo, notice ---------- */
+        html[data-wt-mobile] footer._footer {
+            background: var(--wt-bg-elev) !important;
+            box-shadow: 0 -1px 0 var(--wt-border) !important;
+        }
+        /* The characters are the block's background-image (a transparent
+           PNG): only the colour under them changes. */
+        html[data-wt-mobile] .downapp_area2:not(.viewer) {
+            background-color: var(--wt-bg) !important;
+            border-bottom-color: var(--wt-border) !important;
+        }
+        html[data-wt-mobile] .downapp_area2 .downapp_text { color: var(--wt-text-dim) !important; }
+        html[data-wt-mobile] .downapp_area2 .downapp_bold { color: var(--wt-accent-soft) !important; }
+        /* Notice: the desktop pill, with its amber chip. #noticeArea already
+           gets the desktop strip rule (transparent, 20px padding). */
+        html[data-wt-mobile] #noticeArea {
+            height: auto !important;
+            margin: 20px 16px 0 !important;
+            padding: 6px 0 !important;
+            border-radius: 999px !important;
+            background: var(--wt-bg) !important;
+            border: 1px solid rgba(255,255,255,.08) !important;
+        }
+        html[data-wt-mobile] #noticeArea .link { line-height: 36px !important; color: var(--wt-text) !important; }
+        html[data-wt-mobile] #noticeArea .link:first-child { padding-left: 8px !important; }
+        html[data-wt-mobile] #noticeArea .notice_title {
+            padding: 0 10px !important;
+            border-radius: 999px !important;
+            background: rgba(255,194,51,.13) !important;
+            color: #ffc233 !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            line-height: 26px !important;
+            letter-spacing: .06em !important;
+            text-transform: uppercase !important;
+        }
+        html[data-wt-mobile] #noticeArea .notice_title::after { display: none !important; }
+        html[data-wt-mobile] #noticeArea .date { color: var(--wt-text-read) !important; }
+        /* Menu links and copyright: the desktop footer's colours. */
+        html[data-wt-mobile] .foot_menu .link { color: var(--wt-text-dim) !important; }
+        html[data-wt-mobile] .foot_menu .link::after { background: rgba(255,255,255,.15) !important; }
+        html[data-wt-mobile] .copyright,
+        html[data-wt-mobile] .copyright .link { color: var(--wt-text-mute) !important; }
+        /* Back-to-top disc: a white disc and arrow in one sprite, turned into
+           a dark disc with a light arrow. */
+        html[data-wt-mobile] .btn_top::after { filter: invert(.87) hue-rotate(180deg) !important; }
+
+        /* "Get the app" pill, floating over every page: the theme's raised
+           surface (opaque: a blur on a fixed element would repaint on every
+           scroll). The app icon keeps its colours; the chevron is inverted. */
+        html[data-wt-mobile] .ly_app_floating .link {
+            background: var(--wt-bg-elev2) !important;
+            border: 1px solid rgba(255,255,255,.14) !important;
+            box-shadow: 0 6px 20px rgba(0,0,0,.55) !important;
+            color: var(--wt-text) !important;
+        }
+        html[data-wt-mobile] .ly_app_floating .link::after { filter: invert(.9) !important; }
+
+        /* ---------- Mobile: /more, home ---------- */
+        html[data-wt-mobile] .bg_g { background-color: var(--wt-bg) !important; }
+        /* The six tiles: the desktop card surface. Their icons are outline
+           drawings with green accents in one sprite: invert + hue-rotate
+           lightens the outline and keeps the green. */
+        html[data-wt-mobile] .more_menu { border-color: rgba(255,255,255,.08) !important; }
+        html[data-wt-mobile] .more_menu li {
+            background: var(--wt-bg-elev) !important;
+            border-color: rgba(255,255,255,.08) !important;
+        }
+        html[data-wt-mobile] .more_menu span { color: var(--wt-text-dim) !important; }
+        html[data-wt-mobile] .more_menu a::before { filter: invert(.9) hue-rotate(180deg) !important; }
+        html[data-wt-mobile] .more_btns span,
+        html[data-wt-mobile] .more_btns span strong { color: var(--wt-accent-soft) !important; }
+        html[data-wt-mobile] .more_btns .logout {
+            background: rgba(255,255,255,.06) !important;
+            border: 1px solid rgba(255,255,255,.16) !important;
+        }
+        /* Home, logged out: "Enter the world of WEBTOON! [Log in]". */
+        html[data-wt-mobile] .main_login .link {
+            background: var(--wt-bg-elev) !important;
+            border: 1px solid rgba(255,255,255,.08) !important;
+            color: var(--wt-text-dim) !important;
+        }
+        html[data-wt-mobile] .main_login .link strong { color: var(--wt-text) !important; }
+        html[data-wt-mobile] .main_login .login_icon {
+            background: rgba(255,255,255,.06) !important;
+            border-color: rgba(255,255,255,.16) !important;
+            color: var(--wt-text) !important;
+        }
+        /* The ad slot between home sections: a #f3f3f3 band when empty. Like
+           the desktop ad areas, it sits on the page colour; an ad draws its
+           own content on top. */
+        html[data-wt-mobile] .main_ad_area { background-color: var(--wt-bg) !important; }
+        /* Section "view all" chevrons: black sprites on our page, redrawn as
+           the theme's chevron. */
+        html[data-wt-mobile] .section_header .button_view_all {
+            background: var(--wt-text-read) !important;
+            -webkit-mask: var(--wt-ico-chevron-right) center / 16px no-repeat !important;
+            mask: var(--wt-ico-chevron-right) center / 16px no-repeat !important;
+        }
+        /* App interstitial on the first home visit: the dismiss button is a
+           plain underlined text button, not a grey box. */
+        html[data-wt-mobile] .pop_download_app .button_web {
+            background: transparent !important;
+            border: 0 !important;
+            color: var(--wt-text) !important;
+        }
+
+        /* ---------- Mobile: search ---------- */
+        /* Trending: the title is the main line, the genre the muted one (the
+           site's title colour #3c3c3c sat on our page at 1.6:1, under a
+           white genre label). */
+        html[data-wt-mobile] .list_trending .link .subject { color: var(--wt-text) !important; }
+        html[data-wt-mobile] .list_trending .link .genre { color: var(--wt-text-read) !important; }
+        /* Category discs (search, CANVAS genre shortcuts): dark glass discs
+           with light glyphs (the user's call; the white discs were the
+           brightest thing on the page). The disc is ::before, the dark glyph
+           an ::after sprite. The selected genre is the theme's green-tinted
+           chip. */
+        html[data-wt-mobile] .lst_shortcut [class^="ico_shortcut"]::before {
+            background: var(--wt-bg-elev2) !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.1) !important;
+        }
+        html[data-wt-mobile] .lst_shortcut [class^="ico_shortcut"]::after { filter: invert(.87) hue-rotate(180deg) !important; }
+        html[data-wt-mobile] .lst_shortcut [class^="ico_shortcut"].on::before {
+            background: rgba(0,213,100,.14) !important;
+            box-shadow: inset 0 0 0 1px rgba(0,213,100,.5) !important;
+        }
+        html[data-wt-mobile] .lst_shortcut [class^="ico_shortcut"].on + .tit_genre { color: var(--wt-accent-soft) !important; }
+        html[data-wt-mobile] .search .ico_srch,
+        html[data-wt-mobile] .search_result .num .link_more { filter: invert(.8) !important; }
+
+        /* ---------- Mobile: CANVAS ---------- */
+        /* "Weekly HOT": a grey band of white cards; now the desktop listing
+           look, cards on the page. Our genre colours were made for dark
+           surfaces. */
+        html[data-wt-mobile] .discover_list { background: transparent !important; }
+        html[data-wt-mobile] .list_discover .link_discover {
+            background: var(--wt-bg-elev) !important;
+            border-color: rgba(255,255,255,.06) !important;
+        }
+        html[data-wt-mobile] .list_discover .grade_num { color: var(--wt-accent-soft) !important; }
+        /* Popular By Category: white text on the site's genre colour; our
+           generic #e6e6e6 dropped it under 4.5:1 on violet. */
+        html[data-wt-mobile] .tit_popular,
+        html[data-wt-mobile] .tit_popular .link_genre { color: #fff !important; }
+        /* Its band is the genre's own bright colour under white text (2:1 on
+           Comedy's #eea800). A 35% black layer over that colour keeps every
+           genre's hue and brings white to 4.5:1 or more on all of them. */
+        html[data-wt-mobile] .discover_genre_wrap { background-image: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)) !important; }
+        /* Cover count bubbles ("15K"): a green figure on the site's white
+           bubble sprite. The generic .num grey left it at 2:1 and the site's
+           #00dc64 is 1.8:1; this deeper green is 5:1 (the text is 7px). */
+        html[data-wt-mobile] .wrap_badge .ico_badge.num { color: #00803a !important; }
+
+        /* ---------- Mobile: sheets ---------- */
+        /* Series info sheet (the (i) button): a full-height white sheet. */
+        html[data-wt-mobile] .ly_detail {
+            background: var(--wt-bg-elev) !important;
+            box-shadow: 0 -12px 40px rgba(0,0,0,.55) !important;
+        }
+        html[data-wt-mobile] .ly_detail .btn_close {
+            background-color: transparent !important;
+            border: 0 !important;
+            filter: invert(.9) !important;
+        }
+        html[data-wt-mobile] .ly_detail .details_area,
+        html[data-wt-mobile] .ly_detail .details_area .label,
+        html[data-wt-mobile] .ly_detail .details_area .value { border-color: rgba(255,255,255,.1) !important; }
+        html[data-wt-mobile] .ly_detail .details_area .label,
+        html[data-wt-mobile] .ly_detail .profile_box .credit { color: var(--wt-text-read) !important; }
+        html[data-wt-mobile] .ly_detail .details_area .desc_rate { color: var(--wt-text-dim) !important; }
+        html[data-wt-mobile] .ly_detail .desc { color: var(--wt-text-body) !important; }
+        html[data-wt-mobile] .ly_detail .sub_title_area .link_report {
+            border-color: var(--wt-border) !important;
+            color: var(--wt-text-dim) !important;
+        }
+        /* Share sheet ("Enjoyed reading? Share this comic now."). */
+        html[data-wt-mobile] .ly_share .inner,
+        html[data-wt-mobile] .ly_share .inner .dsc_encourage,
+        html[data-wt-mobile] .ly_share .share { background: var(--wt-bg-elev) !important; }
+        html[data-wt-mobile] .ly_share .inner .dsc_encourage { color: var(--wt-text-dim) !important; }
+        html[data-wt-mobile] .ly_share .share a,
+        html[data-wt-mobile] .ly_share .share a span { color: var(--wt-text) !important; }
+        /* The bottom app sheets ("Having trouble with slow networks?", "The
+           story doesn't have to end"): one raised surface. */
+        html[data-wt-mobile] .ly_induce_download,
+        html[data-wt-mobile] .ly_download_app {
+            background: var(--wt-bg-elev) !important;
+            border-top: 1px solid var(--wt-border) !important;
+            box-shadow: 0 -8px 28px rgba(0,0,0,.5) !important;
+            color: var(--wt-text) !important;
+        }
+        html[data-wt-mobile] .ly_induce_download .txt_area p { color: var(--wt-text-dim) !important; }
+        html[data-wt-mobile] .ly_induce_download .lk_close .ico_close::before,
+        html[data-wt-mobile] .ly_induce_download .lk_close .ico_close::after { background-color: var(--wt-text-dim) !important; }
+
+        /* ---------- Mobile: reader, after the comic ---------- */
+        /* The 10px separator under the last panel (a light-grey band) and the
+           hairlines around the creator and Top Comments rows (bright white
+           lines on the dark page). */
+        html[data-wt-mobile] .viewer_cont_wrap { border-top-color: var(--wt-bg-elev) !important; }
+        html[data-wt-mobile] .viewer_cont_wrap .creator_note,
+        html[data-wt-mobile] .viewer_best_comment_tit { border-bottom-color: var(--wt-border) !important; }
+        /* The share row and Subscribe: the desktop end card's key. */
+        html[data-wt-mobile] .viewer_sns_area { border-bottom-color: var(--wt-border) !important; }
+        html[data-wt-mobile] .viewer_sns_area .dsc_encourage { color: var(--wt-text-dim) !important; }
+        html[data-wt-mobile] .viewer_sns_area .btn_favorites::before { filter: brightness(0) invert(1) !important; }
+        html[data-wt-mobile] .viewer_sns_area .btn_favorites.on {
+            background: rgba(255,255,255,.06) !important;
+            border: 1px solid rgba(255,255,255,.2) !important;
+            box-shadow: none !important;
+            color: var(--wt-text-dim) !important;
+        }
+        html[data-wt-mobile] .viewer_sns_area .btn_favorites.on::before { filter: invert(.8) !important; }
+        /* "Wanna access your favorite comics offline?": the site's #000. */
+        html[data-wt-mobile] .downapp_area2.viewer span { color: var(--wt-text) !important; }
+        /* TOP strip above the episode thumbnails. */
+        html[data-wt-mobile] .viewer_top {
+            background: var(--wt-bg-elev) !important;
+            color: var(--wt-text-dim) !important;
+        }
+        html[data-wt-mobile] .viewer_top::before { filter: invert(.9) !important; }
+        /* CANVAS Patreon: the desktop reader's coral outline (the site's
+           solid #f35e36 under our #e6e6e6 text was 2.6:1). */
+        html[data-wt-mobile] .viewer_patron .btn_become_patron {
+            background: rgba(243,94,54,.12) !important;
+            border: 1px solid rgba(255,122,89,.5) !important;
+            color: #ffb39e !important;
+        }
+        html[data-wt-mobile] .viewer_patron .bar { background: rgba(255,255,255,.2) !important; }
+
+        /* ---------- Mobile: login ---------- */
+        /* Email / Apple / X rows: black glyph sprites on the dark rows,
+           redrawn as the desktop login popup's light masks. */
+        html[data-wt-mobile] .login_sns .btn_sns._btnToEmailLogin::before,
+        html[data-wt-mobile] .login_sns .btn_sns.apple::before,
+        html[data-wt-mobile] .login_sns .btn_sns.twitter::before {
+            background: var(--wt-text) !important;
+            -webkit-mask: var(--wt-login-ico) center / 20px no-repeat !important;
+            mask: var(--wt-login-ico) center / 20px no-repeat !important;
+        }
+        html[data-wt-mobile] .login_sns .btn_sns._btnToEmailLogin { --wt-login-ico: var(--wt-ico-mail); }
+        html[data-wt-mobile] .login_sns .btn_sns.apple { --wt-login-ico: var(--wt-ico-apple); }
+        html[data-wt-mobile] .login_sns .btn_sns.twitter { --wt-login-ico: var(--wt-ico-x); }
+        /* "See other options": a text button with a chevron, not a box. */
+        html[data-wt-mobile] .login_box .btn_expand {
+            background: transparent !important;
+            border: 0 !important;
+            color: var(--wt-text-dim) !important;
+        }
+        html[data-wt-mobile] .login_box .btn_expand::after { filter: invert(.9) !important; }
+        /* Email login: the "EMAIL ADDRESS" / "PASSWORD" label strips. */
+        html[data-wt-mobile] .account_dsc {
+            background: var(--wt-bg-elev) !important;
+            border-bottom-color: var(--wt-border) !important;
+            color: var(--wt-text-read) !important;
+        }
+        html[data-wt-mobile] .login_email .btn_pw { color: var(--wt-link) !important; }
+        html[data-wt-mobile] .login_btn_wrap .info .ico_login_arr { filter: invert(.9) !important; }
+
+        /* ---------- Mobile: green calls to action ---------- */
+        /* The site's bright #00dc64 buttons (Read Episode 1, Download, Log
+           In, Go to the WEBTOON app, Subscribe at the end of an episode)
+           become the desktop key: white on the deep green (at least 4.5:1;
+           white on #00dc64 is 1.8:1). The hover state is restated because
+           the global a:hover would turn the label blue. */
+        html[data-wt-mobile] .detail_info_wrap .btn_episode,
+        html[data-wt-mobile] .downapp_area2 .link_appdown,
+        html[data-wt-mobile] .downapp_area2.viewer .lk_appdown,
+        html[data-wt-mobile] .more_btns .login,
+        html[data-wt-mobile] .ly_induce_download .lk_download_app,
+        html[data-wt-mobile] .ly_download_app .lk_download_app,
+        html[data-wt-mobile] .pop_download_app .link_app,
+        html[data-wt-mobile] .viewer_sns_area .btn_favorites:not(.on) {
+            background: var(--wt-key) !important;
+            border: 1px solid var(--wt-key-edge) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.35) !important;
+            color: #fff !important;
+        }
+        html[data-wt-mobile] .detail_info_wrap .btn_episode:hover,
+        html[data-wt-mobile] .downapp_area2 .link_appdown:hover,
+        html[data-wt-mobile] .downapp_area2.viewer .lk_appdown:hover,
+        html[data-wt-mobile] .more_btns .login:hover,
+        html[data-wt-mobile] .ly_induce_download .lk_download_app:hover,
+        html[data-wt-mobile] .ly_download_app .lk_download_app:hover,
+        html[data-wt-mobile] .pop_download_app .link_app:hover,
+        html[data-wt-mobile] .viewer_sns_area .btn_favorites:not(.on):hover {
+            background: var(--wt-key-hover) !important;
+            color: #fff !important;
+        }
     `;
 
     /* Optional: dim panels in the viewer for late-night reading. */
@@ -9984,6 +10376,15 @@
     // so changing the attribute would restyle the whole page.
     if (/^\/[a-z]{2}(?:-[a-z]+)?\/creators(?:\/|$)/.test(location.pathname)) {
         document.documentElement.setAttribute('data-wt-dashboard', '');
+    }
+
+    // The mobile site (m.webtoons.com) gates its CSS on this attribute. Its
+    // markup has its own class names (.sub_title, .category_tab, .ly_detail,
+    // footer …), some of which www uses too, so every mobile rule starts
+    // with html[data-wt-mobile] and can never match a desktop page. Set once
+    // from the host and never changed, like the dashboard flag.
+    if (location.hostname === 'm.webtoons.com') {
+        document.documentElement.setAttribute('data-wt-mobile', '');
     }
 
     // Header login flash. The page always ships "Log In" and the site

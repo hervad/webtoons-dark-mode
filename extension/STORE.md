@@ -14,19 +14,24 @@ This writes `dist/toonlight-<version>-chrome.zip` (Chrome and Edge), `dist/toonl
 **Name:** Toonlight: Dark Mode for WEBTOON
 
 **Short description / summary** (Chrome allows 132 characters; it's already in the manifest, and Chrome takes it from there):
-> A dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Not affiliated with NAVER WEBTOON.
+> A hand-made dark theme for WEBTOON that never touches the comic art, from reader to comments. Not affiliated with NAVER WEBTOON.
 
-**Description** (paste only the text, not this guide; AMO accepts Markdown, so `-` bullets work there):
-> Toonlight gives WEBTOON a carefully designed dark theme without touching the art.
+**Description** (paste only the text, not this guide; Chrome and Edge show plain text, so the bullets are `•` characters, which read well in all three stores):
+> Toonlight is a dark theme made for WEBTOON, and only WEBTOON. The comics stay exactly as the artist drew them.
 >
-> Most dark-mode extensions invert the whole page, which also inverts the comics: skin tones go blue, pinks turn green. Toonlight restyles only the site around the comic (header, menus, episode lists, comments, sidebars, popups) and never filters or recolours a comic panel.
+> General-purpose dark-mode tools have to work on every website, so they guess: they invert or recolour whatever they find. On WEBTOON that can catch cover art and stickers, let white pop-ups slip through and leave buttons grey on grey. Toonlight was made by hand for WEBTOON's own pages instead, and it never puts a filter or a colour change on a comic panel.
 >
-> • Works on every part of webtoons.com: home, Originals, CANVAS, series pages, the reader, comments, your account, creator profiles and the mobile site
-> • No white flash while pages load
-> • Reader dim for night reading (Alt+Shift+N), dims only the comic panels
-> • Turn the theme on or off with Alt+Shift+T or the toolbar button
-> • Readable contrast (WCAG AA), visible keyboard focus, respects "reduce motion"
-> • Lightweight: no tracking, no data collection, no requests of its own
+> What you get:
+>
+> • Reading: the panels sit on a dark page as one long card, with no seams or white gaps. An optional night dim (Alt+Shift+N) lowers only the panels' brightness.
+> • Comments: WEBTOON's comment section has a dark colour set that the site never switches on. Toonlight turns it on and finishes the job: one calm panel, coloured letter avatars, amber TOP comments, clear reply threads, and dark emoji and GIF pickers.
+> • Series pages: the title sits on the cover art. Unread episodes have a green dot and read ones are muted, so you can see where you stopped at a glance.
+> • Browsing: dark cards for Home, Originals, Rankings and CANVAS, readable genre colours, and the page you're on lit up in the menu like a neon sign.
+> • Everywhere else: login, account settings, creator profiles, community feeds, search, pop-ups and the cookie banner.
+> • On phones: the mobile site (m.webtoons.com) is dark from top to bottom in Firefox for Android.
+> • No white flash while pages load. Text meets WCAG AA contrast, keyboard focus is visible, and "reduce motion" is respected.
+> • Turn it on or off with Alt+Shift+T or the toolbar button.
+> • Private and light: no tracking, no data collection, no requests of its own.
 >
 > Toonlight is an independent project and is not affiliated with, endorsed by or sponsored by NAVER WEBTOON. WEBTOON is a trademark of NAVER WEBTOON.
 >
@@ -144,7 +149,7 @@ Captions, where a store asks:
      2. Unzip the source and run, from its root: node tools/build-extension.mjs
      3. The add-on is written to dist/firefox/ (and dist/toonlight-<version>-firefox.zip).
 
-     To test: open any page on www.webtoons.com; the theme is on by default. Alt+Shift+T turns it off and on; the toolbar popup lists the same settings.
+     To test: open any page on www.webtoons.com; the theme is on by default. Alt+Shift+T turns it off and on; the toolbar popup lists the same settings. On Firefox for Android the mobile site m.webtoons.com is themed too (on desktop, a phone user agent is needed: without one, m.webtoons.com redirects to www).
      ```
 
 5. **Submit Version.** Publication usually takes up to 24 hours (longer if picked for manual review); AMO emails when it's live.

@@ -8,6 +8,18 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-11
+
+### Changed
+
+- **Mobile site (m.webtoons.com):** fully dark now, in the same look as the desktop theme. The top bar, the page titles and the tab strips (Originals weekdays, CANVAS genres, categories, rankings, MY), the footer, the app banner, the "Get the app" button, the notice, the /more menu, the series information sheet, the share sheet and the app pop-ups were still white or light grey.
+- **Mobile site:** green buttons (Read Episode 1, Download, Log In, Subscribe at the end of an episode, Go to the WEBTOON app) use the theme's deep green with white text, as on desktop. The search page's category buttons are dark discs.
+
+### Fixed
+
+- **Mobile site:** light text on light backgrounds is readable again: the page titles, tab labels, footer links, the notice, the /more menu labels, "Forgot Password?", the Subscribe button under an episode and the TOP strip.
+- **Mobile site:** dark text and icons on the dark page are visible again: titles in the search page's Trending list, "Wanna access your favorite comics offline?", the series page's (i) and ⋮ buttons, the "view all" arrows, and the Email, Apple and X icons on the login page.
+
 ## [1.8.6] - 2026-10-07
 
 ### Changed
@@ -1069,7 +1081,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.6...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.6...v1.9.0
 [1.8.6]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.5...v1.8.6
 [1.8.5]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.4...v1.8.5
 [1.8.4]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.3...v1.8.4

@@ -1,8 +1,10 @@
 # Webtoons Dark Mode
 
-A dark theme for [WEBTOON](https://www.webtoons.com) that keeps the comic's colours exactly as the artist drew them.
+**A dark theme made for WEBTOON, and only WEBTOON. The comics stay exactly as the artist drew them.**
 
-Most dark-mode extensions invert the whole page, which also inverts the artwork: skin tones go blue, pinks turn green. This userscript does the opposite. It restyles the site around the comic (header, menus, episode lists, comments, sidebars, popups) and never filters or recolours the comic panels. The only thing it does to the comic itself is frame it: the strip of panels is shown as one card with rounded corners, so the outer corners of the first and last panel are rounded off.
+Reading at night on webtoons.com means a bright white page around every episode. General-purpose dark-mode tools help, but they have to work on every website, so they guess: they invert or recolour whatever they find. On WEBTOON that can catch cover art and stickers, let white pop-ups slip through, and leave buttons grey on grey.
+
+This theme takes the opposite approach. Every part of WEBTOON's pages was restyled by hand, from the menus and episode lists to the comments, the reader and the phone site. Nothing ever touches the comic panels: no filter, no colour shift.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/hervad/webtoons-dark-mode)](https://github.com/hervad/webtoons-dark-mode/releases/latest)
@@ -18,6 +20,19 @@ Most dark-mode extensions invert the whole page, which also inverts the artwork:
   <img src="docs/screenshots/reader.jpg" width="32%" alt="Under the comic: the end card with Like and Subscribe, the episode strip and the ranking cards">
   <img src="docs/screenshots/comments.jpg" width="32%" alt="The comment panel with letter avatars and amber TOP comments">
 </p>
+
+![Three phone screens of the mobile site m.webtoons.com in dark mode: the CANVAS home with dark cards, the search page with dark category discs, and the More menu with the footer](docs/screenshots/mobile.jpg)
+
+### Why it feels different
+
+| | General dark-mode tools | Webtoons Dark Mode |
+| --- | --- | --- |
+| **Comic panels** | Can be inverted or tinted along with the page | Never touched. An optional night dim lowers only their brightness |
+| **Covers and thumbnails** | Can be recoloured | Shown as published |
+| **Comments** | Recoloured by guesswork | WEBTOON's own dark comment colours, switched on and finished by hand |
+| **Pop-ups, sheets, banners** | White boxes often slip through | Each one is styled by name, and text is checked against WCAG AA contrast |
+| **Opening a page** | Can flash white first | Dark from the first frame |
+| **Buttons and highlights** | Turned into greys | WEBTOON green, readable: white on a deep green |
 
 ## Install
 
@@ -49,6 +64,13 @@ For people who already use a userscript manager, and for Safari. Updates reach y
 
 Updates install automatically. A copy from Greasy Fork updates from Greasy Fork, and a copy from GitHub updates from this repository. Both get the same versions; Greasy Fork usually has a new version within a day.
 
+### On a phone or tablet
+
+The theme covers the mobile site (`m.webtoons.com`) too: every page, the reader, comments, login, menus and pop-ups.
+
+- **Android:** use Firefox for Android. Open [Toonlight on Firefox Add-ons](https://addons.mozilla.org/firefox/addon/toonlight/) in Firefox on the phone and tap **Add to Firefox**. The settings are in Firefox's menu, under the extension. Chrome for Android can't run extensions or userscripts.
+- **iPhone and iPad:** install the free [Userscripts](https://github.com/quoid/userscripts) app for Safari, then the userscript from [GitHub](https://raw.githubusercontent.com/hervad/webtoons-dark-mode/main/webtoons-dark-mode.user.js). There is no menu there; the theme follows your device's dark / light setting.
+
 > **Chrome, Edge and other Chromium browsers:** the browser needs an extra permission before any userscript can run. Open `chrome://extensions`, click **Details** on your userscript manager (Tampermonkey, Violentmonkey, ScriptCat), and turn on **Allow User Scripts**. On Chrome versions before 138, turn on **Developer mode** (top-right of `chrome://extensions`) instead.
 
 ## Using it
@@ -71,17 +93,54 @@ The toggles are also in your userscript manager's menu (click its icon while on 
 
 **Scroll-to-top button:** the round arrow button in the episode reader can be hidden from the menu (**Hide scroll-to-top button in reader**; the entry then reads **Show scroll-to-top button in reader** to bring it back). It's shown by default, it stays hidden whether dark mode is on or off, and the `Home` key still jumps to the top.
 
-## What it covers
+## What's different, page by page
 
-- **Header and menus:** the page you're on lights up in the main menu like a green neon sign. When you're logged in, your name shows straight away instead of a LOG IN button flashing first.
-- **Home, Originals, Categories, Rankings, Canvas:** dark section cards, readable genre colours, clear sort switches and tabs, dark carousels and page numbers.
-- **Series page:** the title sits right on the cover art, readable on light and dark covers. The episode list is dark, and every episode is its own row: unread episodes have a green dot, episodes you've read are muted with a hollow ring, and like counts are shown with a flame. Long synopses fold up behind a small arrow button.
-- **Reader:** the comic strip sits on a dark page as one card with a soft shadow, with no seams between panels. Under the last panel, the like / subscribe / share card, the episode strip, the Patreon card (CANVAS) and the app banner share one card style. The rankings sit in a row of large covers above the comments, and the comments use the full width of the page with large, easy-to-read text.
-- **Comments:** one dark panel of comments, with letter avatars, highlighted top comments, clear reply threads and a dark comment box, emoji picker and GIF picker.
-- **Your account:** login popup and login page, sign-up, account settings, My Comments, followed creators and subscriptions.
-- **Creators:** creator profile pages and community feeds, and the CANVAS Creator Dashboard.
-- **Popups, search and footer:** dark, with visible hover and keyboard-focus states, including the mature-content notice and the age check.
-- **Mobile site (m.webtoons.com):** pages, the reader and its toolbar, share buttons and comments are dark and laid out for a phone screen. The top bar keeps the site's own look.
+### Reading an episode
+
+- The panels sit on a dark page as one long card with a soft shadow, with no seams or white gaps between them.
+- **Night dim** (`Alt + Shift + N`) lowers the brightness of the panels only, for reading in a dark room.
+- Under the last panel, Like and Subscribe are two equal green buttons. Liking an episode turns the button deep orange with a short burst of flames.
+- The episode strip shows two-line titles, and the rankings sit in a row of large, sharp covers above the comments.
+- On wide screens, the empty margins beside the page are gently shaded (edge shading, `Alt + Shift + V`).
+
+### Comments
+
+WEBTOON's comment section comes with a dark colour set that the site never switches on. The theme switches it on, then finishes the job:
+
+- One calm panel of comments instead of boxes inside boxes, in your system's font at a comfortable size.
+- Everyone without a profile picture gets a coloured letter avatar, so you can follow who's talking in a long thread.
+- TOP comments stand out in amber, with a TOP chip between the name and the date.
+- Replies hang off one thin line. Your up and down votes light up green and red. Long comments fold behind **More**.
+- The comment box, the emoji picker and the GIF picker are dark too.
+
+### Series pages
+
+- The title sits right on the cover art, readable on light and dark covers alike.
+- Every episode is its own row. Unread episodes have a green dot and the ones you've read are muted with a hollow ring, so you can see where you stopped at a glance. Like counts get a little flame.
+- Long episode titles unfold when you point at them, without the list jumping. Long synopses fold behind a button.
+
+### Browsing
+
+- The page you're on lights up in the main menu like a green neon sign.
+- Home, Originals, Rankings and CANVAS get dark cards, readable genre colours, clear tabs and sort switches, and page numbers that are easy to spot.
+- If you're logged in, your name shows straight away, without a LOG IN button flashing first.
+
+### Your account, creators and pop-ups
+
+- Login and sign-up, account settings, My Comments, followed creators and subscriptions.
+- Creator profile pages, community feeds and the CANVAS Creator Dashboard.
+- Pop-ups, search, the mature-content notice, the age check and the cookie banner are dark, with clear buttons.
+
+### On your phone
+
+New in 1.9.0: the mobile site, `m.webtoons.com`, is dark from top to bottom. That covers the header and tabs, series pages and their info sheet, the reader and its comments, login, the menus, the footer and the app pop-ups. Green buttons use the same deep green as on desktop. See [On a phone or tablet](#on-a-phone-or-tablet) to install it.
+
+### Small things the site itself doesn't do
+
+- A visible focus ring when you move around with the keyboard.
+- Text that meets WCAG AA contrast on every surface.
+- Respect for your system's reduce-motion setting.
+- Stepping aside under Windows High Contrast.
 
 ## Accessibility
 
@@ -150,7 +209,7 @@ html[data-wt-dark="on"] {
 
 ## Compatibility
 
-- **Browsers:** Chrome, Edge, Brave, Opera, Vivaldi, Firefox and Safari. On Android, Firefox with Tampermonkey or Violentmonkey runs it on the mobile site.
+- **Browsers:** Chrome, Edge, Brave, Opera, Vivaldi, Firefox and Safari. On Android, Firefox runs the Toonlight extension (or the userscript in Tampermonkey or Violentmonkey) on the mobile site; Chrome for Android has no extensions. On iPhone and iPad, Safari runs the userscript in the Userscripts app.
 - **Userscript managers:**
   - **Tampermonkey, Violentmonkey and ScriptCat:** everything works, including the menu.
   - **Violentmonkey on Chrome / Edge:** its newer (Manifest V3) build may start the script a moment after the page begins to draw, so you can see a brief white flash. Turning on **Alternative page mode** in Violentmonkey's settings avoids it.

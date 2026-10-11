@@ -22,7 +22,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const NAME = 'Toonlight: Dark Mode for WEBTOON';
 const SHORT_NAME = 'Toonlight';
 const SLUG = 'toonlight';
-const DESCRIPTION = 'A dark theme for WEBTOON (webtoons.com) that keeps every comic panel in its original colours. Not affiliated with NAVER WEBTOON.';
+const DESCRIPTION = 'A hand-made dark theme for WEBTOON that never touches the comic art, from reader to comments. Not affiliated with NAVER WEBTOON.';
 // Fixed for good once the add-on is on AMO: Firefox identifies it by this ID.
 const GECKO_ID = 'toonlight@hervad';
 

@@ -1,0 +1,302 @@
+page	kind	cause	count	selector	text_or_size	fg	bg	ratio_or_peak	needed	our_color_rule	our_bg_rule
+home	text	ours-P1	2	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+home	text	ours-P1	1	body.en.a > div.pop_download_app.on > div.pop_layer > a.link_app._btnDownload	Read More On The App	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+home	box	gap	2	div#wrap > header	390x98		#ffffff				
+home	box	gap	2	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+home	icon	ours-P3	2	div#ct > div.main_content_wrap > a.section_header._trending_view_all > span.button_view_all	42x42		#15171a	1.13	3		
+home	icon	ours-P3	2	li.item > a.link._titleItem > div.image_wrap > div.icon_area._icon_area > span.ico.badge_up	62x14		#15171a	1.54	3		
+home@1	text	ours-P1	1	div#ct > div.main_content_wrap > div.main_login._main_login > a.link > span	Enter the world of	#e6e6e6	#f8f8f8	1.18	4.5		
+home@1	text	ours-P1	1	div.main_content_wrap > div.main_login._main_login > a.link > span > strong	WEBTOON!	#e6e6e6	#f8f8f8	1.18	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+home@1	text	ours-P1	1	div#ct > div.main_content_wrap > div.main_login._main_login > a.link > em.login_icon	Log in	#e6e6e6	#f8f8f8	1.18	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+home@1	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+home@1	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+home@1	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+home@1	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+home@1	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+home@1	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+home@1	box	gap	1	div#ct > div.main_content_wrap > div.main_login._main_login > a.link	358x58		#f8f8f8				
+home@1	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+home@1	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+home@1	icon	ours-P3	1	div#ct > div.main_content_wrap > a.section_header._ranking_view_all > span.button_view_all	42x42		#15171a	1.16	3		
+home@1	icon	ours-P3	1	div#ct > div.main_content_wrap > a.section_header._new_view_all > span.button_view_all	42x42		#15171a	1.62	3		
+home@1	icon	ours-P3	1	div#ct > div.main_content_wrap > a.section_header._daily_view_all > span.button_view_all	42x42		#15171a	1.62	3		
+home@1	icon	ours-P3	1	a#_canvas_header > span.button_view_all	42x42		#15171a	1.16	3		
+originals	text	ours-P1	16	div#weekdayList > div.flicking-camera > div.item._weekdayTab > a.link._weekdayTabItem	MON / TUE / WED	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+originals	text	ours-P3	2	div#wrap > div.category_tab_sort._sortOrderSelect > div.daily_count > span	series	#666666	#15171a	3.13	4.5		
+originals	text	ours-P1	2	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+originals	box	gap	2	div#wrap > header	390x142		#ffffff				
+originals	box	gap	2	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+originals	icon	site	2	div#wrap > header > div.gnb > h1.logo	48x48		#ffffff	1.84	3		
+canvas	text	ours-P1	5	div#view > ul.flicking-camera > li.item.g_home > a.link > span.genre_txt	HOME / ALL / ROMANCE	#e6e6e6	#ffffff	1.25	4.5		
+canvas	text	ours-other	4	div.eg-flick-camera > li.eg-flick-panel > span.cont_recomm > span.wrap_badge > span.ico_badge.num	15K / 595K / 3K	#b5b9c0	#15171a	1.97	4.5	.desc, .date, .count, .from, .ico_view, .num, .grade_area, .info_area .author, .meta	
+canvas	text	ours-P1	1	div#mflick > div.flicking-camera > div._panel > div.discover_list > h4.tit_list	Weekly HOT	#e6e6e6	#e8e8e8	1.02	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+canvas	text	ours-P1	1	ul.list_discover > li > a.link_discover > span.cont_discover > em.genre.g_comedy	Comedy	#ffc233	#ffffff	1.61	4.5	.genre.g_comedy, .g_comedy, a.g_comedy	
+canvas	text	ours-P1	6	ul.list_discover > li > a.link_discover > span.cont_discover > strong.tit_discover	Nerd and Jock / The Little Trashmaid / Mythed Up	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+canvas	text	ours-P1	6	li > a.link_discover > span.cont_discover > span.info_grade > em.grade_num	8.6M / 19.6M / 2.2M	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+canvas	text	ours-P1	1	ul.list_discover > li > a.link_discover > span.cont_discover > em.genre.g_supernatural	Supernatural	#a983f5	#ffffff	2.9	4.5	.genre.g_supernatural, .g_supernatural, a.g_supernatural	
+canvas	text	ours-other	1	ul.list_discover > li > a.link_discover > span.cont_discover > em.genre.g_romance	Romance	#fd5591	#ffffff	3.05	4.5	.genre.g_romance, .g_romance, a.g_romance	
+canvas	text	ours-P1	1	ul.list_discover > li > a.link_discover > span.cont_discover > em.genre.g_slice_of_life	Slice of life	#b8d62e	#ffffff	1.65	4.5	.genre.g_slice_of_life, .g_slice_of_life, a.g_slice_of_life	
+canvas	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+canvas	text	ours-other	1	div#mflick > div.flicking-camera > div._panel > div._popularByGenreHeader.discover_genre_wrap > h4.tit_popular	Popular By Category	#e6e6e6	#7a41e9	4.47	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+canvas	text	ours-other	1	a#moreGenreLink	Supernatural	#e6e6e6	#7a41e9	4.47	4.5	a, a:visited	
+canvas	text	ours-P1	1	body.en.a > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+canvas	text	ours-P1	1	body.en.a > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+canvas	text	ours-P1	1	body.en.a > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+canvas	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+canvas	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+canvas	text	ours-P1	7	body.en.a > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+canvas	text	ours-P1	1	body.en.a > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+canvas	text	ours-P1	1	body.en.a > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+canvas	box	gap	1	div#wrap > header	390x142		#ffffff				
+canvas	box	gap	1	div#mflick > div.flicking-camera > div._panel > a.banner_discover	390x40		#fff6cf				
+canvas	box	gap	1	div#mflick > div.flicking-camera > div._panel > div.discover_list	390x397		#e8e8e8				
+canvas	box	gap	1	div._panel > div.discover_list > ul.list_discover > li > a.link_discover	123x168		#ffffff				
+canvas	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+canvas	box	gap	1	body.en.a > footer._footer	390x489		#f3f3f8				
+canvas	box	gap	1	body.en.a > footer._footer > p.downapp_area2	390x160		#ffffff				
+canvas	icon	site	1	div#wrap > header > div.gnb > h1.logo	48x48		#ffffff	1.84	3		
+canvas	icon	site	1	li > a.link_discover > span.cont_discover > span.info_grade > span.grade	9x8		#ffffff	1.84	3		
+canvas	icon	site	1	li > a.link_discover > span.cont_discover > span.wrap_badge > span.ico_badge.num	22x22		#ffffff	1.97	3		
+my-recent	text	ours-P1	1	div#mySubTab > div.flicking-camera > div.item.on > a.link._subTabItem	RECENT	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+my-recent	text	ours-P1	3	div#mySubTab > div.flicking-camera > div.item > a.link._subTabItem	SUBSCRIPTIONS / FOLLOWING / COMMENTS	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+my-recent	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+my-recent	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+my-recent	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+my-recent	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+my-recent	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+my-recent	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+my-recent	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+my-recent	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+my-recent	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+my-recent	box	gap	1	div#wrap > header	390x142		#ffffff				
+my-recent	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+my-recent	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+my-recent	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+my-recent	icon	site	1	div#wrap > header > div.gnb > h1.logo	48x48		#ffffff	1.84	3		
+my-recent	icon	ours-other	1	footer._footer > div.footer_bottom > ul.foot_sns > li.item > a.btn_foot_instagram	42x42		#f3f3f8	1.66	3		
+my-recent	icon	ours-other	1	footer._footer > div.footer_bottom > ul.foot_sns > li.item > a.btn_foot_twitter	42x42		#f3f3f8	1.14	3		
+search	text	ours-P3	12	ul.list_trending._searchTrendingTitleList > li.item > a.link._trendingTitle > div.info > span.subject	Osora / Superfish / Tears on a Withered Flower	#3c3c3c	#15171a	1.63	4.5		
+search	text	ours-P1	2	body.en.td > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+search	box	gap	2	body.en.td > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+search	icon	ours-P3	2	div#ct > div.search.row > fieldset > p.col > span.ico_srch._icoSearch	14x14		#15171a	1.63	3		
+search-results	text	ours-P3	6	ul.list_trending._searchTrendingTitleList > li.item > a.link._trendingTitle > div.info > span.subject	Osora / Superfish / Tears on a Withered Flower	#3c3c3c	#15171a	1.63	4.5		
+search-results	text	ours-P1	1	body.en.td > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+search-results	box	gap	1	body.en.td > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+search-results	icon	ours-P3	1	div#ct > div.search.row > fieldset > p.col > span.ico_srch._icoSearch	14x14		#15171a	1.63	3		
+genres	text	ours-P1	1	header#header > h1.sub_title > a.link	Categories	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+genres	text	ours-P1	5	div#genreTabArea > ul.flicking-camera > li.item._genreTab > a.link._genreTabItem	DRAMA / FANTASY / COMEDY	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+genres	text	ours-P3	1	div#wrap > div.category_tab_sort._sortOrderSelect > div.daily_count > span	series	#666666	#15171a	3.13	4.5		
+genres	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+genres	box	gap-new	1	header#header > h1.sub_title	390x49		#ffffff				
+genres	box	gap-new	1	header#header > div.category_tab_wrap	390x44		#ffffff				
+genres	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+genre-drama	text	ours-P1	1	header#header > h1.sub_title > a.link	Categories	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+genre-drama	text	ours-P1	5	div#genreTabArea > ul.flicking-camera > li.item._genreTab > a.link._genreTabItem	DRAMA / FANTASY / COMEDY	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+genre-drama	text	ours-P3	1	div#wrap > div.category_tab_sort._sortOrderSelect > div.daily_count > span	series	#666666	#15171a	3.13	4.5		
+genre-drama	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+genre-drama	box	gap-new	1	header#header > h1.sub_title	390x49		#ffffff				
+genre-drama	box	gap-new	1	header#header > div.category_tab_wrap	390x44		#ffffff				
+genre-drama	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+ranking	text	ours-P1	1	header#header > h1.sub_title > a.link	RANKINGS	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+ranking	text	ours-P1	1	div#view > ul.flicking-camera > li.item.on > a.link	TRENDING	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+ranking	text	ours-P1	4	div#view > ul.flicking-camera > li.item > a.link	POPULAR / DRAMA / FANTASY	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+ranking	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+ranking	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+ranking	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+ranking	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+ranking	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+ranking	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+ranking	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+ranking	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+ranking	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+ranking	box	gap-new	1	header#header > h1.sub_title	390x49		#ffffff				
+ranking	box	gap-new	1	header#header > div.category_tab_wrap	390x44		#ffffff				
+ranking	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+ranking	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+ranking	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+new	text	ours-P1	1	header#header > h1.sub_title > a.link	Newly Released Originals	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+new	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+new	box	gap	1	header#header > h1.sub_title	390x49		#ffffff				
+new	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+more	text	ours-P1	6	div.more_menu_wrap._moreMenuWrap > ul.more_menu > li.menu1 > a._moreMenu > span	CATEGORIES / NEW RELEASES / RANKINGS	#e6e6e6	#ffffff	1.25	4.5		
+more	text	gap	1	div#ct > div.more_menu_wrap._moreMenuWrap > p.more_btns._loginArea > span._msgLogin	Enter the world of	#00dc64	#f5f5f5	1.69	4.5		
+more	text	ours-P1	1	div#ct > div.more_menu_wrap._moreMenuWrap > p.more_btns._loginArea > span._msgLogin > strong	WEBTOON!	#e6e6e6	#f5f5f5	1.14	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+more	text	ours-P1	1	div#ct > div.more_menu_wrap._moreMenuWrap > p.more_btns._loginArea > a.login._btnLogin	Log In	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+more	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+more	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+more	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+more	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+more	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+more	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+more	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+more	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+more	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+more	box	gap	1	div#wrap > header	390x98		#ffffff				
+more	box	gap	1	div#ct	390x337		#f5f5f5				
+more	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+more	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+more	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+more	icon	site	1	div#wrap > header > div.gnb > h1.logo	48x48		#ffffff	1.84	3		
+series	text	ours-P1	4	div#ct > div.detail_info_wrap > a.btn_episode._readEpisodeBtn	Read Episode 1	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+series	text	ours-P1	3	body.en > div.ly_induce_download.data_save > div.induce_txt_area > div.txt_area > strong	Having trouble with slow networks?	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series	text	ours-P1	3	body.en > div.ly_induce_download.data_save > div.induce_txt_area > div.txt_area > p	Download stories on your phone and read offline!	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series	text	ours-P1	3	body.en > div.ly_induce_download.data_save > a.lk_download_app._appDownloadPopupButton	Go to the WEBTOON app	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+series	text	ours-P1	4	body.en > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+series	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+series	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+series	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+series	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+series	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+series	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+series	box	gap	4	div#wrap > header.sub_detail	390x40		#ffffff				
+series	box	gap	2	body.en > div.ly_induce_download.data_save	390x166		#ffffff				
+series	box	gap	2	div#wrap > footer._footer	390x489		#f3f3f8				
+series	box	gap	2	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+series	icon	ours-P3	3	div#wrap > header.sub_detail > div.button_area > button.btn_info._infoBtn	34x34		#2c313a	1.68	3		
+series	icon	ours-P3	3	div#wrap > header.sub_detail > div.button_area > button.btn_more._shareLayerPopBtn	34x34		#2c313a	1.68	3		
+series@1	text	ours-P1	1	div#wrap > header.sub_detail > div.button_area > button.btn_subscribe._subscribeBtn > span.text._subscribeText	Subscribe	#ffffff	#ffffff	1	4.5		
+series@1	text	ours-P1	1	body.en > div.ly_detail._detailDiv > h2.title	The Warrior's Ballad	#e6e6e6	#ffffff	1.25	3	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series@1	text	ours-P1	2	body.en > div.ly_detail._detailDiv > div.details_wrap > div.sub_title_area > h3.sub_title	About / Creators	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series@1	text	ours-P1	3	body.en > div.ly_detail._detailDiv > div.details_wrap > dl.details_area > dt.label	Status / Subscribers / Views	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series@1	text	ours-P1	3	body.en > div.ly_detail._detailDiv > div.details_wrap > dl.details_area > dd.value	New Episode Every Sunday / 105,324 / 1M	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series@1	text	ours-P1	1	body.en > div.ly_detail._detailDiv > div.details_wrap > p.desc	Only the purest of souls may shine as a star, the brightest 	#b5b9c0	#ffffff	1.97	4.5	.desc, .date, .count, .from, .ico_view, .num, .grade_area, .info_area .author, .meta	
+series@1	text	gap	3	div.ly_detail._detailDiv > div.details_wrap > div.creator_area > div.profile_box > div.credit	Art by / Adapted by / Original work by	#8c8c8c	#ffffff	3.36	4.5		
+series@1	text	ours-P1	3	div.ly_detail._detailDiv > div.details_wrap > div.creator_area > div.profile_box > div.author	Street Bard / namwoong / Dodongpa	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+series@1	box	gap	1	body.en > div.ly_detail._detailDiv	390x898		#ffffff				
+series@2	text	ours-P1	1	div#_shareLayer > div.inner > p.dsc_encourage._defaultEncourage	Enjoyed reading?	#e6e6e6	#ffffff	1.25	4.5		
+series@2	box	gap	1	body.en.block_scroll > div.ly_induce_download.data_save	390x166		#ffffff				
+series@2	box	gap	1	div#_shareLayer > div.inner	236x249		#ffffff				
+series@3	box	gap	1	body.en > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+canvas-series	text	ours-P1	1	div#ct > div.detail_info_wrap > a.btn_episode._readEpisodeBtn	Read Episode 1	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+canvas-series	text	ours-P1	1	body.en > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+canvas-series	box	gap	1	div#wrap > header.sub_detail	390x40		#ffffff				
+canvas-series	box	gap	1	body.en > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+canvas-series	icon	ours-P3	1	div#wrap > header.sub_detail > div.button_area > button.btn_info._infoBtn	34x34		#2c313a	1.68	3		
+canvas-series	icon	ours-P3	1	div#wrap > header.sub_detail > div.button_area > button.btn_more._shareLayerPopBtn	34x34		#2c313a	1.68	3		
+viewer	text	ours-P1	5	body.en.a > div.ly_induce_download.data_save > div.induce_txt_area > div.txt_area > strong	Having trouble with slow networks?	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+viewer	text	ours-P1	5	body.en.a > div.ly_induce_download.data_save > div.induce_txt_area > div.txt_area > p	Download stories on your phone and read offline!	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+viewer	text	ours-P1	5	body.en.a > div.ly_induce_download.data_save > a.lk_download_app._appDownloadPopupButton	Go to the WEBTOON app	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+viewer	box	gap	4	div#_viewer > div.flick-ct._imageWrap	390x624		#ffffff				
+viewer@1	text	ours-P1	2	div#ct > div.viewer_cont_wrap._readComplete > div.viewer_sns_area._viewer_sns_area > p.fav_area > a.btn_favorites	Subscribe	#e6e6e6	#efefef	1.09	4.5	a, a:visited	
+viewer@1	text	ours-other	3	div.wcc_CommentItem__inside > div.wcc_CommentBody__root > div.wcc_TextContent__root > p.wcc_TextContent__content > span	woah, too early ig. Well, that was a valid crash out. Seeing / I wonder. If Luck	#eef0f3	#22262b	1.14	4.5		
+viewer@1	text	ours-other	2	ul.wcc_CommentList__list > li.wcc_CommentItem__root.wcc_CommentItem__bestOnly > div.wcc_CommentItem__inside > div.wcc_CommentItem__action > button.wcc_Button__root.wcc_ReplyFolderToggle__root	Replies 59	#ffffff	#2f3338	1	4.5	.wcc_ReplyFolderToggle__root[data-wt-replies]:not([data-wt-replies="0"])	.wcc_ReplyFolderToggle__root[data-wt-replies]:not([data-wt-replies="0"])
+viewer@1	text	ours-other	4	div.wcc_CommentItem__inside > div.wcc_CommentItem__action > div.wcc_CommentReaction__root > button.wcc_Button__root.wcc_CommentReaction__action > span	3377 / 135	#c3c7ce	#22262b	1.7	4.5		
+viewer@1	text	ours-P3	3	div#ct > div.viewer_cont_wrap._readComplete > div.downapp_area2.viewer > span	Wanna access your favorite comics offline?	#000000	#15171a	1.17	4.5		
+viewer@1	text	ours-P1	3	div#ct > div.viewer_cont_wrap._readComplete > div.downapp_area2.viewer > a._episode_footer_app_download.lk_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+viewer@1	text	ours-P1	3	div#ct > div.viewer_cont_wrap._readComplete > a.viewer_top._goTop	TOP	#e6e6e6	#e9e9e9	1.03	4.5		
+viewer@1	box	gap	3	body.en.a > div.ly_induce_download.data_save	390x166		#ffffff				
+viewer@1	box	gap	3	div#ct > div.viewer_cont_wrap._readComplete > a.viewer_top._goTop	390x43		#e9e9e9				
+viewer@3	text	ours-other	1	li.wcc_CommentItem__root.wcc_CommentItem__bestOnly > div.wcc_CommentItem__inside > div.wcc_CommentHeader__root > div.wcc_CommentHeader__identity > span.wcc_CommentHeader__name	Morence	#ffffff	#22262b	1.84	4.5	.wcc_CommentHeader__name	
+viewer@3	text	ours-other	1	ul.wcc_CommentList__list > li.wcc_CommentItem__root.wcc_CommentItem__bestOnly > div.wcc_CommentItem__inside > div.wcc_CommentHeader__root > time.wcc_CommentHeader__createdAt	Sep 19, 2026	#979ea8	#22262b	1.47	4.5	.wcc_CommentHeader__createdAt	
+viewer@4	text	ours-P1	1	div#_shareLayer > div.inner > p.dsc_encourage._defaultEncourage	Enjoyed reading?	#e6e6e6	#ffffff	1.25	4.5		
+canvas-viewer	text	ours-P1	2	body.en.a > div.ly_induce_download.data_save > div.induce_txt_area > div.txt_area > strong	Having trouble with slow networks?	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+canvas-viewer	text	ours-P1	2	body.en.a > div.ly_induce_download.data_save > div.induce_txt_area > div.txt_area > p	Download stories on your phone and read offline!	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+canvas-viewer	text	ours-P1	2	body.en.a > div.ly_induce_download.data_save > a.lk_download_app._appDownloadPopupButton	Go to the WEBTOON app	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+canvas-viewer	text	ours-P1	2	body.en.a > div.ly_download_app._viewerAppDownloadPopup > div.induce_txt_area > div.txt_area > a.lk_download_app._downloadApp	Get the WEBTOON App	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+canvas-viewer	box	gap	2	div#_viewer > div.flick-ct._imageWrap	390x624		#ffffff				
+canvas-viewer@1	text	ours-P1	1	div#ct > div.viewer_cont_wrap._readComplete > div.viewer_sns_area._viewer_sns_area > p.fav_area > a.btn_favorites	Subscribe	#e6e6e6	#efefef	1.09	4.5	a, a:visited	
+canvas-viewer@1	text	ours-other	1	div#ct > div.viewer_cont_wrap._readComplete > div.viewer_patron > a.btn_become_patron	Become a Patron	#e6e6e6	#f35e36	2.6	4.5	a, a:visited	
+canvas-viewer@1	text	ours-other	1	li.wcc_CommentItem__root.wcc_CommentItem__bestOnly > div.wcc_CommentItem__inside > div.wcc_CommentHeader__root > div.wcc_CommentHeader__identity > span.wcc_CommentHeader__name	Isabella Tran	#ffffff	#22262b	1	4.5	.wcc_CommentHeader__name	
+canvas-viewer@1	text	ours-other	1	div.wcc_CommentItem__inside > div.wcc_CommentBody__root > div.wcc_TextContent__root > p.wcc_TextContent__content > span	New readers please read this!! Don't simplify BCB to just an	#eef0f3	#22262b	1.61	4.5		
+canvas-viewer@1	text	ours-P3	1	div#ct > div.viewer_cont_wrap._readComplete > div.downapp_area2.viewer > span	Wanna access your favorite comics offline?	#000000	#15171a	1.17	4.5		
+canvas-viewer@1	text	ours-P1	1	div#ct > div.viewer_cont_wrap._readComplete > div.downapp_area2.viewer > a._episode_footer_app_download.lk_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+canvas-viewer@1	text	ours-P1	1	div#ct > div.viewer_cont_wrap._readComplete > a.viewer_top._goTop	TOP	#e6e6e6	#e9e9e9	1.03	4.5		
+canvas-viewer@1	box	gap	1	body.en.a > div.ly_induce_download.data_save	390x166		#ffffff				
+canvas-viewer@1	box	gap	1	div#ct > div.viewer_cont_wrap._readComplete > a.viewer_top._goTop	390x43		#e9e9e9				
+login	text	ours-P1	1	header#header > h1.sub_title > a.link._pageTitle	Log in	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+login	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+login	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+login	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+login	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+login	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+login	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+login	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+login	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+login	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+login	box	gap	1	header#header > h1.sub_title	390x49		#ffffff				
+login	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+login	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+login	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+email-login	text	ours-P1	1	header#header > h1.sub_title > a.link._pageTitle	Email Login	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+email-login	text	gap	2	form#formLogin > div.login_email > div.account_dsc	EMAIL ADDRESS / PASSWORD	#848484	#f5f5f5	3.43	4.5		
+email-login	text	ours-P1	1	form#formLogin > div.login_email > div.account_dsc > a.btn_pw._goResetPasswordButton	Forgot Password?	#e6e6e6	#f5f5f5	1.14	4.5	a, a:visited	
+email-login	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+email-login	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+email-login	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+email-login	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+email-login	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+email-login	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+email-login	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+email-login	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+email-login	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+email-login	box	gap	1	header#header > h1.sub_title	390x49		#ffffff				
+email-login	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+email-login	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+email-login	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+email-login	icon	ours-P3	1	form#formLogin > div.login_btn_wrap > div.info > a.link._goSignupButton > span.ico_login_arr	8x9		#15171a	1.63	3		
+forgot-password	text	ours-P1	1	header#header > h1.sub_title > a.link	Reset Password	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+forgot-password	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+forgot-password	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+forgot-password	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+forgot-password	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+forgot-password	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+forgot-password	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+forgot-password	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+forgot-password	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+forgot-password	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+forgot-password	box	gap	1	header#header > h1.sub_title	390x49		#ffffff				
+forgot-password	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+forgot-password	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+forgot-password	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+settings	text	ours-P1	1	header#header > h1.sub_title > a.link._pageTitle	Log in	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+settings	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+settings	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+settings	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+settings	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+settings	box	gap	1	header#header > h1.sub_title	390x49		#ffffff				
+settings	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+settings	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+settings	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+promo-code	text	ours-P1	1	header#header > h1.sub_title > a.link._pageTitle	Log in	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+promo-code	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+promo-code	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+promo-code	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+promo-code	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+promo-code	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+promo-code	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+promo-code	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+promo-code	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+promo-code	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+promo-code	box	gap	1	header#header > h1.sub_title	390x49		#ffffff				
+promo-code	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+promo-code	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+promo-code	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+consents	text	ours-P1	1	header#header > h1.sub_title > a.link	Consent	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+consents	text	ours-P1	1	body > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+consents	box	gap	1	header#header > h1.sub_title	390x49		#ffffff				
+consents	box	gap	1	body > div.ly_app_floating.on > a.link._floatingBtnDownload	165x44		#ffffff				
+terms	text	ours-P1	1	header#header > h1.sub_title > a.link	Terms of Use	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+terms	box	gap-new	1	header#header > h1.sub_title	390x49		#ffffff				
+contact	text	ours-P1	1	header#header > h1.sub_title > a.link	Contact	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+contact	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text	Get the latest stories made just for	#e6e6e6	#ffffff	1.25	4.5		
+contact	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > span.downapp_text > strong.downapp_bold	WEBTOON	#e6e6e6	#ffffff	1.25	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+contact	text	ours-P1	1	div#wrap > footer._footer > p.downapp_area2 > a._main_footer_app_download.link_appdown	Download	#e6e6e6	#00dc64	1.47	4.5	a, a:visited	
+contact	text	ours-P1	1	div#noticeArea > a.link > strong.notice_title	Notice	#e6e6e6	#f3f3f8	1.13	4.5	h1, h2, h3, h4, h5, h6, p, dt, dd, label, em, strong, small, .tit, .sub_tit, .subj, .autho	
+contact	text	ours-P1	1	div#noticeArea > a.link > span.ellipsis	WEBTOON is coming to NYCC!	#e6e6e6	#f3f3f8	1.13	4.5		
+contact	text	ours-P1	7	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link	About / Feedback / Help	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+contact	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.foot_menu > a.link.gdprFooter	Personal Data	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+contact	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+contact	text	ours-P1	1	div#wrap > footer._footer > div.footer_bottom > p.copyright > a.link	ⓒ NAVER WEBTOON Ltd.	#e6e6e6	#f3f3f8	1.13	4.5	a, a:visited	
+contact	box	gap	1	header#header > h1.sub_title	390x49		#ffffff				
+contact	box	gap	1	div#wrap > footer._footer	390x489		#f3f3f8				
+contact	box	gap	1	div#wrap > footer._footer > p.downapp_area2	390x160		#ffffff				
+contact	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
+cookie-banner	text	ours-P1	1	header#header > h1.sub_title > a.link	RANKINGS	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+cookie-banner	text	ours-P1	1	div#view > ul.flicking-camera > li.item.on > a.link	TRENDING	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+cookie-banner	text	ours-P1	4	div#view > ul.flicking-camera > li.item > a.link	POPULAR / DRAMA / FANTASY	#e6e6e6	#ffffff	1.25	4.5	a, a:visited	
+cookie-banner	text	ours-P1	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	Get the app	#e6e6e6	#ffffff	1.25	4.5		
+cookie-banner	box	gap-new	1	header#header > h1.sub_title	390x49		#ffffff				
+cookie-banner	box	gap-new	1	header#header > div.category_tab_wrap	390x44		#ffffff				
+cookie-banner	box	gap	1	body.en.a > div.ly_app_floating.on > a.link._floatingBtnDownload	159x44		#ffffff				
