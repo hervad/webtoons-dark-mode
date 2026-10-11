@@ -10,7 +10,7 @@ Screenshots: [github.com/hervad/webtoons-dark-mode](https://github.com/hervad/we
 
 ## What's different
 
-**Reading an episode.** The panels sit on a dark page as one long card with a soft shadow, with no seams or white gaps between them. **Night dim** (`Alt + Shift + N`) lowers the brightness of the panels only, for reading in a dark room. Under the last panel, Like and Subscribe are two equal green buttons, and liking an episode turns the button deep orange with a short burst of flames. The rankings sit in a row of large, sharp covers above the comments.
+**Reading an episode.** The panels sit on a dark page as one long card with a soft shadow, with no seams or white gaps between them. **Night dim** (`Alt + Shift + N`) lowers the brightness of the panels only, for reading in a dark room. Under the last panel, Like and Subscribe are two equal green buttons, and liking an episode turns the button deep orange with a short burst of flames. The episode strip has round buttons over a soft fade, the toolbar's ‹ #18 ▾ › is one tidy capsule, and the rankings sit in a row of large, sharp covers above the comments. If you like, `←` / `→` can take you to the previous and next episode.
 
 **Comments.** WEBTOON's comment section comes with a dark colour set that the site never switches on. The script switches it on, then finishes the job:
 
@@ -57,6 +57,7 @@ The toggles are also in your userscript manager's menu. Each entry says what cli
 
 - **Reader dim** lowers the brightness of the comic panels only. It's off by default, and works whether dark mode is on or off.
 - **Edge shading** darkens the empty margins to the left and right of the page on wide windows. It never covers the page itself. It's on by default.
+- **Arrow keys for episodes:** turn on **← / → for previous / next episode** in the menu, and `←` / `→` open the previous and next episode while you read. It's off by default. The keys are ignored while you type, and with `Alt` or `Shift` held (`Alt + ←` still goes Back).
 - **Scroll-to-top button:** the button in the episode reader can be hidden from the menu (**Hide scroll-to-top button in reader**; the entry then reads **Show…** to bring it back). It's shown by default. When it's hidden, the `Home` key still jumps to the top.
 
 ## How it works
@@ -74,7 +75,7 @@ There are no scroll handlers and no endless animations. Measured in Chrome, the 
 
 **Privacy:**
 
-- **What it stores:** only its own settings: dark mode, reader dim, edge shading, the scroll-to-top choice, and whether you were logged in on the last page (for the LOG IN fix).
+- **What it stores:** only its own settings: dark mode, reader dim, edge shading, the scroll-to-top choice, the arrow-keys choice, and whether you were logged in on the last page (for the LOG IN fix).
 - **Permissions:** `GM_getValue` / `GM_setValue` (and `GM.getValue` / `GM.setValue`) for those settings, and `GM_registerMenuCommand` / `GM_unregisterMenuCommand` for the menu entries.
 - **Network:** it makes no requests of its own and sends no data anywhere. The one change to what the page loads: in the reader, the ranking covers are swapped for a sharper size of the same images, from Webtoons' own image server.
 

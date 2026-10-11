@@ -30,7 +30,7 @@ This writes `dist/toonlight-<version>-chrome.zip` (Chrome and Edge), `dist/toonl
 > • Everywhere else: login, account settings, creator profiles, community feeds, search, pop-ups and the cookie banner.
 > • On phones: the mobile site (m.webtoons.com) is dark from top to bottom in Firefox for Android.
 > • No white flash while pages load. Text meets WCAG AA contrast, keyboard focus is visible, and "reduce motion" is respected.
-> • Turn it on or off with Alt+Shift+T or the toolbar button.
+> • Turn it on or off with Alt+Shift+T or the toolbar button. Optional: the ← / → keys for the previous / next episode (off until you switch it on in the toolbar popup).
 > • Private and light: no tracking, no data collection, no requests of its own.
 >
 > Toonlight is an independent project and is not affiliated with, endorsed by or sponsored by NAVER WEBTOON. WEBTOON is a trademark of NAVER WEBTOON.
@@ -83,7 +83,7 @@ Captions, where a store asks:
    - Item support: off (GitHub issues do that job).
 3. **Privacy:**
    - Single purpose: "Applies a dark theme to the WEBTOON website (www.webtoons.com and m.webtoons.com). It restyles the site's pages (menus, lists, comments, sidebars) and never alters the comic images."
-   - `storage` justification: "Saves the user's own theme settings on their device: dark mode on/off, reader dim on/off, edge shading on/off, and whether the reader's scroll-to-top button is hidden. Nothing is sent anywhere."
+   - `storage` justification: "Saves the user's own theme settings on their device: dark mode on/off, reader dim on/off, edge shading on/off, whether the reader's scroll-to-top button is hidden, and whether the ← / → keys open the previous / next episode. Nothing is sent anywhere."
    - Host permission justification: "The extension's only function is to restyle webtoons.com, so its content script (a stylesheet plus a small script that applies it before the page first paints, avoiding a white flash) must run on www.webtoons.com and m.webtoons.com. It runs on no other site and makes no network requests."
    - Remote code: **No** (check it; the form can come up with Yes selected).
    - Data usage: tick none of the data types; tick all three certifications.

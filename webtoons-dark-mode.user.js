@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.9.0
+// @version      1.10.0
 // @description  A hand-made dark theme for WEBTOON (webtoons.com): the comics stay exactly as drawn, and the reader, comments and phone site go dark. Toggle with Alt+Shift+T; night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -30,7 +30,8 @@
     const KEY_DIM = 'wt_reader_dim';
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
-    const VERSION = '1.9.0';
+    const KEY_ARROWS = 'wt_arrow_keys';
+    const VERSION = '1.10.0';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -1951,56 +1952,70 @@
             color: var(--wt-accent) !important;
             font-weight: 700 !important;
         }
-        /* Dropdown strip arrows: the base sprite is dark glyphs on white,
-           lost on the dark surface. Heavy chevrons at thumbnail height,
-           centred on the 87px thumbnail row. */
+        /* Dropdown strip arrows: the same disc over a faded edge as the
+           strip under the comic (the user's call, October 2026; the ▾ on the
+           toolbar's #N now leads here). They were 40 × 87px dark boxes with
+           ❮ ❯ text glyphs, 18px above the covers. Measured: the covers'
+           centre is 74.5px below .episode_lst's top, and the clipping
+           viewport (.episode_cont) starts 37px in from each side, so the
+           40px discs sit at top 54px, 21px in, over the viewport's edges.
+           A side with nothing to page (.off) loses its disc and its fade.
+           The <em> is the site's translated label: hidden, it stays the
+           link's accessible name through the title attribute. */
         .episode_area .episode_lst .pg_prev, .episode_area .episode_lst .pg_next {
-            background: rgba(15,17,20,.6) !important;
-            background-image: none !important;
-            border: 1px solid var(--wt-border) !important;
-            border-radius: 6px !important;
             width: 40px !important;
-            height: 87px !important;
-            top: 12px !important;
+            height: 40px !important;
+            top: 54px !important;
+            z-index: 3 !important;
             transform: none !important;
+            border-radius: 50% !important;
+            background: rgba(44,49,58,.97) !important;
+            background-image: none !important;
+            border: 1px solid rgba(255,255,255,.16) !important;
+            box-shadow: 0 6px 18px rgba(0,0,0,.55) !important;
             font-size: 0 !important;
-            color: transparent !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,.6) !important;
-            transition: background-color .15s, border-color .15s, box-shadow .15s !important;
+            color: var(--wt-text) !important;
+            transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease !important;
         }
-        .episode_area .episode_lst .pg_prev:hover, .episode_area .episode_lst .pg_next:hover {
-            background: rgba(0,213,100,.18) !important;
-            border-color: rgba(0,213,100,.6) !important;
-            box-shadow: 0 0 16px rgba(0,213,100,.35) !important;
+        .episode_area .episode_lst .pg_prev { left: 21px !important; }
+        .episode_area .episode_lst .pg_next { right: 21px !important; left: auto !important; }
+        .episode_area .episode_lst .pg_prev:hover, .episode_area .episode_lst .pg_next:hover,
+        .episode_area .episode_lst .pg_prev:focus-visible, .episode_area .episode_lst .pg_next:focus-visible {
+            background: var(--wt-bg-hover) !important;
+            border-color: rgba(0,213,100,.55) !important;
+            box-shadow: 0 0 0 3px rgba(0,213,100,.12), 0 6px 18px rgba(0,0,0,.55) !important;
+            color: var(--wt-accent-soft) !important;
+        }
+        .episode_area .episode_lst .pg_prev.off, .episode_area .episode_lst .pg_next.off {
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
         /* Hide the inner <em> label so it doesn't show alongside the chevron. */
         .episode_area .episode_lst .pg_prev > em, .episode_area .episode_lst .pg_next > em {
             display: none !important;
         }
-        /* Heavy chevron drawn via pseudo-element, absolutely positioned + flex
-           centered so the glyph sits dead-center in the button. */
         .episode_area .episode_lst .pg_prev::before, .episode_area .episode_lst .pg_next::after {
-            text-indent: 0 !important;
-            background: none !important;
-            width: auto !important;
-            height: auto !important;
-            margin: 0 !important;
+            content: '' !important;
             position: absolute !important;
             inset: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: var(--wt-text) !important;
-            font-size: 36px !important;
-            line-height: 1 !important;
-            font-weight: normal !important;
+            margin: auto !important;
+            width: 16px !important;
+            height: 16px !important;
+            padding: 0 !important;
+            font-size: 0 !important;
+            text-indent: 0 !important;
             pointer-events: none !important;
+            background: currentColor !important;
+            -webkit-mask: var(--wt-ico-chevron-right) center / contain no-repeat !important;
+            mask: var(--wt-ico-chevron-right) center / contain no-repeat !important;
         }
-        .episode_area .episode_lst .pg_prev::before { content: '\\276E' !important; }
-        .episode_area .episode_lst .pg_next::after  { content: '\\276F' !important; }
-        .episode_area .episode_lst .pg_prev:hover::before,
-        .episode_area .episode_lst .pg_next:hover::after {
-            color: var(--wt-accent) !important;
+        .episode_area .episode_lst .pg_prev::before { transform: rotate(180deg) !important; }
+        #topEpisodeList .episode_lst { --wt-fade-l: 0px; --wt-fade-r: 0px; }
+        #topEpisodeList .episode_lst:has(> .paginate > .pg_prev:not(.off)) { --wt-fade-l: 64px; }
+        #topEpisodeList .episode_lst:has(> .paginate > .pg_next:not(.off)) { --wt-fade-r: 64px; }
+        #topEpisodeList .episode_lst .episode_cont {
+            -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--wt-fade-l), #000 calc(100% - var(--wt-fade-r)), transparent 100%) !important;
+            mask-image: linear-gradient(90deg, transparent 0, #000 var(--wt-fade-l), #000 calc(100% - var(--wt-fade-r)), transparent 100%) !important;
         }
 
         /* Horizontal rules — base CSS leaves them with default browser styling. */
@@ -2884,46 +2899,54 @@
             box-shadow: 0 2px 8px rgba(0,0,0,.5) !important;
         }
         #bottomEpisodeList .episode_lst li .on .subj { color: var(--wt-accent-soft) !important; font-weight: 700 !important; }
-        /* Prev / next: a slim tab in each of the card's 66px side gutters,
-           exactly as tall as the covers (12px in, 87px) and rounded like
-           them, so the arrows read as the ends of the cover row. Round discs
-           beside the square covers looked pasted on (the user's call). The
-           tab is a faint glass column with a chevron; hover lights it
-           green. 30px wide, centred in the gutter: .episode_lst starts 26px
-           in, so -8px. A disabled arrow (.off: first / last page) stays as
-           a faint tab: hiding it left one gutter empty, and the row read as
-           pushed to one side. Both hide only when there is nothing to page
-           (a short series). */
+        /* Prev / next: a 40px disc over a faded edge (the user's call, October
+           2026; it replaced slim glass tabs in the gutters, whose dark fill
+           around a small chevron looked heavy). The row fades into the card
+           on each side that has more episodes, and the disc sits on that
+           fade, centred on the covers (12px in, 87px tall): the fade shows
+           why the button is there, so it doesn't read as pasted on, which
+           plain round discs did. A side with nothing to page (.off) loses
+           both its disc and its fade, so a short series is a plain row. The
+           fade is a mask on .episode_cont (the clipping viewport); the
+           carousel JS measures that box and pages the <ul> inside it, and a
+           mask changes neither. The :has() sits on the strip's own root with
+           a child-only argument. */
         .episode_area#bottomEpisodeList .episode_lst .pg_prev,
         .episode_area#bottomEpisodeList .episode_lst .pg_next {
-            width: 30px !important;
-            height: 87px !important;
-            top: 12px !important;
-            border-radius: 14px !important;
-            background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)) !important;
-            border: 1px solid rgba(255,255,255,.1) !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
-            color: var(--wt-text-dim) !important;
-            transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease, opacity .18s ease !important;
+            width: 40px !important;
+            height: 40px !important;
+            top: 35px !important;
+            z-index: 3 !important;
+            border-radius: 50% !important;
+            background: rgba(44,49,58,.97) !important;
+            border: 1px solid rgba(255,255,255,.16) !important;
+            box-shadow: 0 6px 18px rgba(0,0,0,.55) !important;
+            color: var(--wt-text) !important;
+            transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease !important;
         }
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev { left: -8px !important; }
-        .episode_area#bottomEpisodeList .episode_lst .pg_next { right: -8px !important; left: auto !important; }
+        .episode_area#bottomEpisodeList .episode_lst .pg_prev { left: 4px !important; }
+        .episode_area#bottomEpisodeList .episode_lst .pg_next { right: 4px !important; left: auto !important; }
         .episode_area#bottomEpisodeList .episode_lst .pg_prev:hover,
         .episode_area#bottomEpisodeList .episode_lst .pg_next:hover,
         .episode_area#bottomEpisodeList .episode_lst .pg_prev:focus-visible,
         .episode_area#bottomEpisodeList .episode_lst .pg_next:focus-visible {
-            background: linear-gradient(180deg, rgba(0,213,100,.18), rgba(0,213,100,.08)) !important;
-            border-color: rgba(0,213,100,.5) !important;
-            box-shadow: 0 0 0 3px rgba(0,213,100,.1), 0 6px 16px rgba(0,0,0,.35) !important;
+            background: var(--wt-bg-hover) !important;
+            border-color: rgba(0,213,100,.55) !important;
+            box-shadow: 0 0 0 3px rgba(0,213,100,.12), 0 6px 18px rgba(0,0,0,.55) !important;
             color: var(--wt-accent-soft) !important;
         }
         .episode_area#bottomEpisodeList .episode_lst .pg_prev.off,
         .episode_area#bottomEpisodeList .episode_lst .pg_next.off {
-            opacity: .35 !important;
-            box-shadow: none !important;
+            opacity: 0 !important;
             pointer-events: none !important;
         }
-        .episode_area#bottomEpisodeList .episode_lst:has(.pg_prev.off):has(.pg_next.off) :is(.pg_prev, .pg_next) { opacity: 0 !important; }
+        .episode_area#bottomEpisodeList .episode_lst { --wt-fade-l: 0px; --wt-fade-r: 0px; }
+        .episode_area#bottomEpisodeList .episode_lst:has(> .paginate > .pg_prev:not(.off)) { --wt-fade-l: 64px; }
+        .episode_area#bottomEpisodeList .episode_lst:has(> .paginate > .pg_next:not(.off)) { --wt-fade-r: 64px; }
+        .episode_area#bottomEpisodeList .episode_lst .episode_cont {
+            -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--wt-fade-l), #000 calc(100% - var(--wt-fade-r)), transparent 100%) !important;
+            mask-image: linear-gradient(90deg, transparent 0, #000 var(--wt-fade-l), #000 calc(100% - var(--wt-fade-r)), transparent 100%) !important;
+        }
         /* text-indent:0 — the pseudo inherits the site's text-indent:100%
            hidden-label trick, which shoved the chevron to the button's right edge. */
         .episode_area#bottomEpisodeList .episode_lst .pg_prev::before,
@@ -8665,86 +8688,111 @@
             box-shadow: inset 0 0 0 1.5px var(--wt-accent), 0 0 16px rgba(0,213,100,.28) !important;
         }
 
-        /* Viewer toolbar prev/next-episode buttons (.paginate.v2 around #N).
-           Same class family as the bottom-of-list pager but rendered at
-           toolbar scale. Three things needed:
-           1. Size the buttons explicitly (the disabled .pg_next.dim is a
-              <span>, not <a>, so it picks up no pill rule from the generic
-              .paginate a rule — zero dimensions, chevron invisible).
-           2. Match parent line-height to button height so the text "#N"
-              and the buttons share the same line metrics — without this,
-              vertical-align:middle still leaves the buttons below text.
-           3. Draw the heavy chevron ornaments ❮ ❯ (same as the snb
-              scroll arrows) on the pseudo-elements and absolutely-position
-              them inside the button: centering becomes bulletproof
-              regardless of font metrics. */
+        /* Reader toolbar episode navigator (.paginate.v2: previous, "#N",
+           next; "#N" opens the site's episode list). One segmented capsule,
+           "‹ | #N ▾ | ›", the user's call (October 2026) after a look at
+           pager and menu-button guidance: the three parts are one control
+           (grouping by proximity), the ▾ is the usual sign that #N opens a
+           list, a disabled arrow stays in place dimmed (no layout shift),
+           and hover is a neutral tint (green means "selected" here).
+           - The container spans the whole 1400px toolbar, so the capsule
+             needs width: max-content; 7px down centres it in the 51px bar.
+           - The site gives #N its own top margin, which left it 6px below
+             the arrows (the old fix was a translateY(-5px) nudge); with the
+             margin reset everything shares one centre line.
+           - Chevrons are masks: the ❮ ❯ text glyphs drawn here before never
+             centred. .pg_prev::before also carries the site's dark arrow
+             sprite, which background: currentColor replaces.
+           - Segments are 40 × 34px (WCAG 2.5.8 asks for 24px); the focus
+             ring is inset (-3px) so the capsule's clipping can't hide it.
+           - A disabled arrow is a <span class="pg_prev dim">, not an <a>. */
         .paginate.v2 {
             display: flex !important;
             align-items: center !important;
-            justify-content: center !important;
-            gap: 12px !important;
+            gap: 0 !important;
+            box-sizing: border-box !important;
+            width: max-content !important;
+            height: 36px !important;
+            margin: 7px auto 0 !important;
+            padding: 0 !important;
+            border-radius: 999px !important;
+            background: var(--wt-bg-elev2) !important;
+            border: 1px solid rgba(255,255,255,.14) !important;
+            overflow: hidden !important;
         }
         .paginate.v2 .pg_prev,
         .paginate.v2 .pg_next {
-            display: inline-block !important;
+            display: block !important;
             position: relative !important;
-            width: 36px !important;
-            min-width: 36px !important;
-            height: 36px !important;
-            padding: 0 !important;
+            flex: 0 0 auto !important;
+            width: 40px !important;
+            min-width: 40px !important;
+            height: 34px !important;
             margin: 0 !important;
-            border-radius: 6px !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
             background: none !important;
-            background-image: none !important;
+            box-shadow: none !important;
             text-indent: 0 !important;
             color: var(--wt-text) !important;
-            flex: 0 0 auto !important;
+            transition: background-color .15s ease, color .15s ease !important;
         }
+        .paginate.v2 .pg_prev::before,
+        .paginate.v2 .pg_next::after {
+            content: '' !important;
+            position: absolute !important;
+            inset: 0 !important;
+            margin: auto !important;
+            width: 14px !important;
+            height: 14px !important;
+            font-size: 0 !important;
+            text-indent: 0 !important;
+            background: currentColor !important;
+            -webkit-mask: var(--wt-ico-chevron-right) center / contain no-repeat !important;
+            mask: var(--wt-ico-chevron-right) center / contain no-repeat !important;
+        }
+        .paginate.v2 .pg_prev::before { transform: rotate(180deg) !important; }
         .paginate.v2 ._btnOpenEpisodeList,
         .paginate.v2 .tx {
             display: inline-flex !important;
             align-items: center !important;
+            align-self: center !important;
             justify-content: center !important;
-            height: 36px !important;
-            line-height: 1 !important;
-            flex: 0 0 auto !important;
-            /* Nudge text up to optically align with the chevron centers.
-               Empirical offset — flex-centering the line-box doesn't match
-               the digits' visual center because "#289" has no descenders. */
-            transform: translateY(-5px) !important;
-        }
-        .paginate.v2 .pg_prev::before { content: '\\276E' !important; }
-        .paginate.v2 .pg_next::after  { content: '\\276F' !important; }
-        /* Base CSS draws the dark arrow sprite on .pg_prev::before (a 20×20
-           box with background-position) — the same pseudo we reuse for ❮.
-           Without clearing the sprite and the fixed box, the dark sprite
-           showed behind a squashed glyph ("<‹"). ::after (next) has no sprite. */
-        .paginate.v2 .pg_prev::before,
-        .paginate.v2 .pg_next::after {
-            text-indent: 0 !important;
-            background: none !important;
-            width: auto !important;
-            height: auto !important;
+            gap: 6px !important;
+            box-sizing: border-box !important;
+            min-width: 56px !important;
+            height: 34px !important;
             margin: 0 !important;
-            position: absolute !important;
-            inset: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-size: 28px !important;
-            font-weight: normal !important;
+            padding: 0 12px !important;
+            border-left: 1px solid rgba(255,255,255,.12) !important;
+            border-right: 1px solid rgba(255,255,255,.12) !important;
+            color: var(--wt-text) !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            font-variant-numeric: tabular-nums !important;
             line-height: 1 !important;
-            color: inherit !important;
+            cursor: pointer !important;
+            transition: background-color .15s ease, color .15s ease !important;
+        }
+        .paginate.v2 .tx::after {
+            content: '' !important;
+            width: 10px !important;
+            height: 10px !important;
+            background: var(--wt-text-read) !important;
+            -webkit-mask: var(--wt-ico-chevron-down) center / contain no-repeat !important;
+            mask: var(--wt-ico-chevron-down) center / contain no-repeat !important;
         }
         .paginate.v2 a.pg_prev:hover,
-        .paginate.v2 a.pg_next:hover {
-            background-color: var(--wt-bg-hover) !important;
-            color: var(--wt-accent) !important;
-            box-shadow: inset 0 0 0 1px var(--wt-accent-soft) !important;
+        .paginate.v2 a.pg_next:hover,
+        .paginate.v2 .tx:hover {
+            background: rgba(255,255,255,.1) !important;
+            color: #fff !important;
         }
+        .paginate.v2 a.pg_prev:focus-visible,
+        .paginate.v2 a.pg_next:focus-visible { outline-offset: -3px !important; }
         .paginate.v2 .pg_prev.dim,
         .paginate.v2 .pg_next.dim {
-            opacity: 0.35 !important;
+            opacity: .4 !important;
             cursor: default !important;
             pointer-events: none !important;
         }
@@ -9308,6 +9356,41 @@
             width: 30px !important;
             height: 30px !important;
             box-shadow: 0 3px 10px rgba(0,0,0,.35) !important;
+        }
+        /* Patreon: creators with a Patreon get a third action,
+           a.HomeProfile_patreonButton (the site's white Patreon glyph). With
+           the actions row dissolved it auto-placed into a stray grid cell
+           under Follow, a bare white glyph with no button around it. It sits
+           after the social button instead, as the same 30px disc in the
+           theme's Patreon coral (white glyph 3.3:1); without a social link it
+           takes that button's column, so no gap opens after the name. */
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] > a[class*="HomeProfile_patreonButton"] {
+            grid-row: 2 !important;
+            grid-column: 4 !important;
+            justify-self: start !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-sizing: border-box !important;
+            width: 30px !important;
+            height: 30px !important;
+            margin: 19px 0 0 8px !important;
+            border-radius: 50% !important;
+            background: #f35e36 !important;
+            border: 1px solid rgba(255,255,255,.28) !important;
+            box-shadow: 0 3px 10px rgba(0,0,0,.35) !important;
+            line-height: 0 !important;
+            transition: filter .15s ease, box-shadow .15s ease, border-color .15s ease !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"]:not(:has(> [class*="SocialLinkTrigger_root"])) > a[class*="HomeProfile_patreonButton"] {
+            grid-column: 3 !important;
+            margin-left: 10px !important;
+        }
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] > a[class*="HomeProfile_patreonButton"]:hover,
+        #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] > a[class*="HomeProfile_patreonButton"]:focus-visible {
+            border-color: rgba(255,255,255,.5) !important;
+            filter: brightness(1.1) !important;
+            box-shadow: 0 0 0 4px rgba(243,94,54,.2), 0 8px 20px rgba(0,0,0,.4) !important;
         }
         #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] [class*="SocialLinkIcon_root"] { width: auto !important; height: auto !important; }
         #app[class*="BaseLayout_container"] [class*="HomeProfile_actions"] [class*="SocialLinkIcon_root"] img { width: 16px !important; height: 16px !important; }
@@ -10339,6 +10422,9 @@
     let dimOn = loadPref(KEY_DIM, false);
     let vignetteOn = loadPref(KEY_VIGNETTE, true);
     let topBtnOn = loadPref(KEY_TOP_BTN, true);
+    // ← / → for the previous / next episode in the reader: off until the
+    // reader turns it on (it changes what keys do while reading).
+    let arrowsOn = loadPref(KEY_ARROWS, false);
 
     // Windows contrast themes (forced colours): the OS already paints a
     // high-contrast palette, and under it the theme's mask icons and
@@ -10424,15 +10510,16 @@
     if (asyncGM) {
         // Greasemonkey 4 / Userscripts: the stored settings arrive after the
         // first paint; adopt them if the localStorage mirror was stale.
-        const keys = [KEY_THEME, KEY_DIM, KEY_VIGNETTE, KEY_TOP_BTN, KEY_LOGGED_IN];
+        const keys = [KEY_THEME, KEY_DIM, KEY_VIGNETTE, KEY_TOP_BTN, KEY_LOGGED_IN, KEY_ARROWS];
         Promise.all(keys.map(k => GM.getValue(k))).then((vals) => {
             // Refresh the mirror, so the next page paints with these.
             vals.forEach((v, i) => { if (typeof v === 'boolean') { try { localStorage.setItem(MIRROR + keys[i], JSON.stringify(v)); } catch { /* storage blocked */ } } });
-            const [t, d, v, b] = vals;
+            const [t, d, v, b, , a] = vals;
             if (typeof t === 'boolean' && t !== darkOn) { darkOn = t; applyTheme(); }
             if (typeof d === 'boolean' && d !== dimOn) { dimOn = d; applyDim(); }
             if (typeof v === 'boolean' && v !== vignetteOn) { vignetteOn = v; applyVignette(); }
             if (typeof b === 'boolean' && b !== topBtnOn) { topBtnOn = b; applyTopButton(); }
+            if (typeof a === 'boolean') arrowsOn = a;
             registerMenu();
         }).catch(() => {});
     }
@@ -10481,6 +10568,12 @@
         console.info('[webtoons-dark-mode] reader scroll-to-top button →', topBtnOn ? 'shown' : 'hidden');
         registerMenu();
     }
+    function toggleArrows() {
+        arrowsOn = !arrowsOn;
+        savePref(KEY_ARROWS, arrowsOn);
+        console.info('[webtoons-dark-mode] ← / → episode keys →', arrowsOn ? 'on' : 'off');
+        registerMenu();
+    }
 
     // Menu entries say what a click will do ("Turn off dark mode" / "Turn on
     // dark mode"), so someone who changed a setting long ago can still see
@@ -10504,6 +10597,8 @@
             [vignetteOn, 'Hide edge shading', 'Show edge shading', 'Toggle edge shading (vignette)', toggleVignette],
             [topBtnOn, 'Hide scroll-to-top button in reader', 'Show scroll-to-top button in reader',
                 'Toggle scroll-to-top button in reader', toggleTopButton],
+            [arrowsOn, 'Turn off ← / → for previous / next episode', 'Turn on ← / → for previous / next episode',
+                'Toggle ← / → for previous / next episode', toggleArrows],
         ];
         menuIds = entries.map(([on, whenOn, whenOff, neutral, action]) =>
             GM_registerMenuCommand(canRelabel ? (on ? whenOn : whenOff) : neutral, action));
@@ -10534,8 +10629,30 @@
             (/\p{Script=Latin}/u.test(key) || !/\p{L}/u.test(key))))) return false;
         return e.code === want.code || key.toUpperCase() === want.letter;
     }
+    // ← / → open the previous / next episode in the reader (the arrow-keys
+    // setting, off by default). Only on reader pages (www and m.), never
+    // while typing (comment box, search, any text field), never with a
+    // modifier (Alt+← is the browser's Back), and once per press. It clicks
+    // the site's own link (a._prevEpisode / a._nextEpisode, on both sites),
+    // so the site's navigation runs; on the first / last episode that link
+    // is a disabled <span> and the key does nothing. It works with the
+    // theme on or off, like the reader dim.
+    function episodeKey(e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return false;
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return false;
+        if (!/\/viewer\/?$/.test(location.pathname)) return false;
+        const t = e.target;
+        if (t && t.nodeType === 1 && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return false;
+        const link = document.querySelector(e.key === 'ArrowRight' ? 'a._nextEpisode' : 'a._prevEpisode');
+        if (!link) return false;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (!e.repeat) link.click();
+        return true;
+    }
     function handleKey(e) {
         if (e.isComposing) return;
+        if (arrowsOn && episodeKey(e)) return;
         const themeAltShiftT = matchCombo(e, { alt: true, shift: true, ctrl: false, code: 'KeyT', letter: 'T' });
         const themeCtrlAltD = matchCombo(e, { alt: true, shift: false, ctrl: true, code: 'KeyD', letter: 'D' });
         const dimAltShiftN = matchCombo(e, { alt: true, shift: true, ctrl: false, code: 'KeyN', letter: 'N' });

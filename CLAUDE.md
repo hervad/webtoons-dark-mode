@@ -30,7 +30,7 @@
 | Part | Contents |
 |---|---|
 | Metadata | `@version` (line 4), `@match` www + m, `@run-at document-start`, `@noframes`. Grants: `GM_getValue`, `GM_setValue`, `GM_registerMenuCommand`, `GM_unregisterMenuCommand`, `GM.getValue`, `GM.setValue`. |
-| Constants | `KEY_THEME` `wt_dark_enabled`, `KEY_DIM` `wt_reader_dim`, `KEY_VIGNETTE` `wt_vignette`, `KEY_TOP_BTN` `wt_top_button`, `VERSION` (line 33). The first statement logs `vX starting`. |
+| Constants | `KEY_THEME` `wt_dark_enabled`, `KEY_DIM` `wt_reader_dim`, `KEY_VIGNETTE` `wt_vignette`, `KEY_TOP_BTN` `wt_top_button`, `KEY_ARROWS` `wt_arrow_keys`, `VERSION` (line 34). The first statement logs `vX starting`. |
 | `palette` | `:root` tokens: colours, key gradients, all data-URI icons (`--wt-ico-*` masks, coloured images such as `--wt-flower` and `--wt-play-badge`). |
 | `theme` | Every rule, grouped by page under `/* ===` / `/* ----------` banners. The reduced-motion block is near the top. |
 | `dimCss` | `.viewer_lst img, .viewer_img img { filter: brightness(.78) }` in `<style id="wt-dim-style">`. |
@@ -42,7 +42,7 @@
 - **One copy per page:** right after the startup log, the script returns if `html[data-wt-running]` is already set, and otherwise sets it to its version. The userscript and the Toonlight extension run the same code; with both installed, each toggled on every shortcut press. Whichever starts first runs the page; the extension's popup then says the userscript is running it (`gm-shim.js` answers `{ otherCopy: true }`).
 - **`ensureStyle(id, css, on)`:** inserts or removes a `<style>` by id. It is idempotent; the text is set only on creation.
 - **`loadPref` / `savePref`:** sync `GM_*` when present; otherwise localStorage (`wt-dark-mode:<key>`) plus `GM.setValue`, and a later `GM.getValue` pass corrects the cached values.
-- **State:** `darkOn`, `dimOn`, `vignetteOn` and `topBtnOn` are read once and cached (the theme's first-run default follows `prefers-color-scheme`). Never read storage in an observer or rAF callback.
+- **State:** `darkOn`, `dimOn`, `vignetteOn`, `topBtnOn` and `arrowsOn` are read once and cached (the theme's first-run default follows `prefers-color-scheme`). Never read storage in an observer or rAF callback.
 - **`themeActive()`:** `darkOn` and not `(forced-colors: active)`. The theme turns itself off under Windows contrast themes (B6), and a `change` listener follows the setting.
 - **`applyTheme` / `applyDim` / `applyVignette` / `applyTopButton`:** `applyTheme` inserts `<style id="wt-dark-style">` and sets `html[data-wt-dark="on|off"]` (a hook for users' own CSS); `applyVignette` sets `html[data-wt-vignette]`.
 - **Dashboard flag:** `html[data-wt-dashboard]` is set once at document-start on `/<lang>/creators/…` and never changed. Its rules include `::before` / `::after`, so flipping it would restyle every element.
@@ -52,6 +52,7 @@
 - **`toggleTheme` / `toggleDim` / `toggleVignette` / `toggleTopButton`:** each saves, applies, logs and calls `registerMenu()`. `toggleTheme` also runs `domPass()` (on) or `undoDomTweaks()` (off).
 - **`registerMenu()`:** entries say what a click does. Every toggle re-adds **all** entries, so the order stays fixed. A new setting goes into `entries` with on, off and neutral "Toggle …" labels (the neutral one is used without `GM_unregisterMenuCommand`).
 - **`matchCombo` / `handleKey`:** **one** capture-phase `keydown` listener on `window`; do not add more. Theme: Alt+Shift+T / Ctrl+Alt+D. Dim: Alt+Shift+N / Ctrl+Alt+Shift+D. Vignette: Alt+Shift+V / Ctrl+Alt+Shift+V. Scroll-to-top: menu only. It ignores IME composition, `e.repeat` and AltGr text (Windows sends AltGr as Ctrl+Alt, so Đ / ð must not toggle; a non-Latin letter such as в still works).
+- **`episodeKey`** (the **← / → episode keys** setting, `KEY_ARROWS`, **off by default**, menu only): the first branch of `handleKey`. On `/viewer` pages of both sites, a bare ← / → clicks the site's own `a._prevEpisode` / `a._nextEpisode` (both sites use these classes; a disabled end is a `<span>`, so nothing happens). Never with a modifier (Alt+← is Back), never while typing (`isContentEditable`, `input`, `textarea`, `select`), once per press. It works with the theme on or off, like the dim. Checked by `key-checks.mjs`.
 - **`routeBodyClass()` / `syncBodyClasses()`:** set `body.wt-viewer` (`…/viewer`), `wt-detail` (`…/list?title_no=`) or `wt-home` (`/<lang>/`, originals, genres, ranking, search) from the URL before first paint, on www only; a DOM check at DOMContentLoaded corrects them.
 - **`tuneContestBanners()`:** marks light `.contest_banner` creatives with `data-wt-light`.
 - **/canvas sort listener:** a capture-phase `click` listener, active only while the theme is on. A click on `.sort_area._sorting .sort_box a[data-sort]` loads the URL with `sortOrder=<data-sort>` and drops `page`. The site ignores option clicks while its own menu is closed.
@@ -303,7 +304,8 @@ Each rule's comment holds its full spec. These are the constraints a session mus
   - `width: fit-content; margin: 0 auto` puts the shadow at the image edge.
   - `font-size: 0; line-height: 0` on the container plus `display: block` on `img._images` remove the gaps between panels.
   - Only `.viewer_lst` needs `overflow: visible`.
-- **Toolbar:** `.tool_area` is 10000 (needs the `#container` fix); its icons are 36 px mask discs; `.paginate.v2` (prev / #N / next) is excluded from the page pager. The CANVAS `.age_text` band is amber: change only its colours, the viewer's top padding is sized for it.
+- **Toolbar:** `.tool_area` is 10000 (needs the `#container` fix); its icons are 36 px mask discs; `.paginate.v2` (prev / #N / next) is excluded from the page pager.
+- **Episode navigator (`.paginate.v2`):** one segmented capsule "‹ | #N ▾ | ›" (the user's call, October 2026, after pager / menu-button research). The container spans the 1400 px toolbar, so the capsule is `width: max-content` (7 px down to centre it in the 51 px bar). The site's own margin on `#N` is reset (it put #N 6 px low; no `translateY` nudge). Chevrons are masks. Hover is a neutral tint, never green. The focus ring is inset (−3 px). A disabled end is `span.pg_prev.dim`, dimmed in place. Mobile's pager is plain `.paginate`, untouched. The CANVAS `.age_text` band is amber: change only its colours, the viewer's top padding is sized for it.
 - **After the comic:** one block, declared after the generic WCC rules so it wins by source order. The end card (`.viewer_info_area`) is 800 px; the episode strip and `.induce_app_area` are 1200 px, on the comments grid.
 - **End card:** Like and Subscribe are equal 60 px keys. Liked is `.lnk_like.bx:is([aria-pressed="true"], :has(> .ico_like2.on))` (the site marks it with `.on` on the flame): solid `#c2410c → #9a3412`, white text, a flame burst.
 - **Share icons** (`.spi_area a[class^="ico_"]`): masks, with the per-network `--wt-share` / `--wt-brand` variables set unscoped. The end card, the series header and the toolbar all use them.
@@ -314,7 +316,7 @@ Each rule's comment holds its full spec. These are the constraints a session mus
     - Change heights only (150 px for 2-line titles).
     - Fewer than 9 episodes are centred; `ul:has(> li:nth-child(9))` restores start alignment, so paging stays pixel-identical.
   - **Tiles:** change only by `transform`. `a.on` is reset to `margin: 0; width: 92px` (same effective width), and its ring is an **inset** shadow on `.mask` (an outer ring is clipped on the first tile).
-  - **Arrows:** slim 30 × 87 px glass tabs in the side gutters (`top: 12px`, `left / right: -8px`), as tall and as rounded as the covers; round discs looked pasted on (the user's call). A disabled (`.off`) arrow stays faint; both hide only when both are `.off`. Strip rules are prefixed `.episode_area#bottomEpisodeList`; `#topEpisodeList` is the toolbar dropdown's strip.
+  - **Arrows:** a 40 px disc over a faded edge (the user's call, October 2026; it replaced slim tabs whose dark fill looked heavy, and plain discs that looked pasted on). The fade is a mask on `.episode_cont` (the carousel measures that box and pages the `<ul>` inside, so a mask is safe), switched per side by `.episode_lst:has(> .paginate > .pg_prev:not(.off))`. A `.off` side loses its disc and its fade. Under the comic the discs sit at `top: 35px`, `left / right: 4px`; in the toolbar dropdown (`#topEpisodeList`) at `top: 54px`, `left / right: 21px` (measured: covers' centre 74.5 px down, viewport 37 px in). Strip rules are prefixed `.episode_area#bottomEpisodeList`; the unscoped `.episode_area .episode_lst` rules style the dropdown.
 - **App banner (`.induce_app_area`):** don't clip `.img_area`, because the `.preview` badge hangs off its edge. The QR code keeps a white tile so it stays scannable.
 - **Creator card (`.creator_note`):** a grid with `.author_area { display: contents }`; `--wt-avatar-none` without a `.profile`; one linked creator stretches the link's `::before` over the card (its `::after` is the verified sprite).
 
@@ -369,6 +371,7 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 
 - **Scoping:** `#app[class*="BaseLayout_container"]` (popovers, toasts and tooltips are portalled outside it). The button reset is `button:where(:not(#wcc_root *))`: unscoped it beat WCC's vote colours, and a bare `:not(#wcc_root *)` adds ID weight and beat the Follow rules. Small muted text uses `--wt-text-read`.
 - **Profile card layout** (the user's call): `HomeProfile_root` is a grid (`1fr auto auto 1fr`); `HomeProfile_actions` is `display: contents`, so the social button (`SocialLinkTrigger_root`, a 30 px disc) sits in row 2 after the name (`HomeProfile_nickname`, row 2 col 2) and Follow / Following spans the full width. The avatar, bio, link and metric span all columns and auto-place. An unknown direct child would auto-place into the empty cell beside the name: give it `grid-column: 1 / -1`.
+  - **Patreon** (`a.HomeProfile_patreonButton`, creators with a Patreon): row 2, column 4, after the social button, a 30 px coral disc (`#f35e36`); without a social button it takes column 3. Unplaced, it auto-placed under Follow as a bare white glyph (the "|●" report).
 - **Series / Followers tiles** (`CreatorBriefMetric_*`, full width, `flex: 1 1 0`): violet (wash, hairline, `#ddd6fe` label) with amber `#ffc233` figures, the user's call: grey read as filler, all-amber tiles blended into the Follow / Following key.
 - **Social link button** (`SocialLinkTrigger_icon`): the network's brand fill (`--wt-sns`, picked by `:has(img[src*="instagram"])` etc.; other networks a brighter glass disc), so it stands out beside the key. It needs `background-origin: border-box`: from the padding box the gradient repeated under the 1 px border (coloured rims at the top and bottom).
 - **Post ⋮** (`MoreActionMenu_button`): its dots are filled `var(--gw-icon-05)` in the SVG, so `svg path { fill: currentColor }`; a 36 px glass disc with bright dots.
@@ -409,7 +412,7 @@ The tools are in `.claude/tools/`, which is gitignored, so they exist on this ma
 | `firefox-mobile.mjs <addonDir\|-> <outDir> <pages.json\|name=url…>` | The built add-on (`dist/firefox`, temporary install) on m.webtoons.com in headless Firefox over WebDriver BiDi (no geckodriver): Android user agent, meta viewport on, 390×844. Same in-page text / light-box checks as `mobile-audit.mjs`, plus screenshots. Gecko, not a phone: Android's fonts and native pickers aren't covered. |
 
 - For an "old" copy: `git show HEAD:webtoons-dark-mode.user.js > <scratch>/old.user.js`.
-- **Machines differ.** On the Fedora machine the browser is `chromium-browser`, and only the mobile tools above plus a smaller `style-diff.mjs` (old vs new, then swapped back to old to drop animation noise; `KEEP=` lists containers that must not change) exist; `shot.mjs`, `perf.mjs`, `js-checks.mjs`, `coverage.mjs` and `ext-test.mjs` are on the other machine.
+- **Machines differ.** On the Fedora machine the browser is `chromium-browser`. It has the mobile tools above, a smaller `style-diff.mjs` (old vs new, then swapped back to old to drop animation noise; `KEEP=` lists containers that must not change), a compatible `shot.mjs` (plus `CLIP=`, `CSS=` to prototype, `HOVER="a >> b"`, `POSTJS` / `POSTDUMP`), `perf-swap.mjs` and `key-checks.mjs` (← / → episode keys and the theme shortcut, real key events). `perf.mjs`, `js-checks.mjs`, `coverage.mjs` and `ext-test.mjs` are on the other machine.
 - **BiDi navigation:** wait for `interactive`, not `complete` (ad frames can keep a page from ever completing); every command needs a deadline.
 - **CDP injection runs before `<html>` exists:** the injected wrapper must wait for `document.documentElement` (managers guarantee it, CDP doesn't). `m.webtoons.com` redirects to www without a mobile user agent.
 - `.claude/tools/perf/` holds lower-level probes (`probe.mjs`, `summ.mjs`, `layers.mjs`, …).
@@ -432,7 +435,7 @@ The same theme also ships as a browser extension, **Toonlight: Dark Mode for WEB
 Release only when the user asks.
 
 ```bash
-# 1. Bump BOTH (they must match): `// @version` (line 4) and `const VERSION` (line 33)
+# 1. Bump BOTH (they must match): `// @version` (line 4) and `const VERSION` (line 34)
 # 2. Add the CHANGELOG.md entry (Keep a Changelog; [Unreleased] → the new version)
 # 3. Commit and tag (plain message, no Claude attribution)
 git add webtoons-dark-mode.user.js CHANGELOG.md
@@ -510,7 +513,9 @@ There is no automated suite. Check the pages a change touches, logged out unless
 
 - [ ] Strip: one card with rounded outer corners and one soft shadow, no seams, colours unchanged. Edge shading only in the empty margins.
 - [ ] Toolbar icons at full brightness, matching discs. End card: equal 60 px keys; Liked is deep orange with a flame burst; Report is fully clickable in the corner.
+- [ ] Toolbar navigator: one centred capsule ‹ | #N ▾ | ›, chevrons centred, a grey hover; on episode 1 the ‹ is dimmed in place. #N opens the dropdown strip, which has the same discs on faded edges.
 - [ ] Episode strip:
+  - discs on faded edges where more episodes continue; no disc and no fade on a side with nothing to page;
   - 2-line titles;
   - the current tile is not clipped, even as the first tile;
   - a short series is centred with no arrows;
@@ -518,6 +523,7 @@ There is no automated suite. Check the pages a change touches, logged out unless
   - thumbnails load.
 - [ ] Rankings: two cards of 5 sharp covers above the comments; the genre filter re-renders sharp covers. Mature notice (Slack Wyrm): one even dim.
 - [ ] With the Chapter Preloader installed, its bubble is unchanged and nothing flickers.
+- [ ] ← / → episode keys (menu, off by default): when on, ← / → open the previous / next episode; nothing while typing a comment or with Alt / Shift held.
 
 ### Comments checks
 
@@ -533,7 +539,7 @@ There is no automated suite. Check the pages a change touches, logged out unless
 - [ ] Account: Delete turns red on hover and Redeem stays amber; one of Check / Save at a time.
 - [ ] My Comments: tiles two to a row, the vote chips and trash at each tile's foot; your own chips static, a cast vote ringed. /mycreator, /favorite: Edit hides in edit mode.
 - [ ] Dashboard: dark sidebar and fields, light icons, an open dropdown joins its field.
-- [ ] Creator profile: the social button sits after the name and opens its menu under it; Series / Followers and Follow span the card. Amber Follow, Following as an outline with a tick, a dark toast, three equal series tiles, a folded bio ending on a whole word with a green "... more", a long genre (SUPERHERO) on its own line; ⋮ opens a narrow menu that hugs Share / Report / Block. Feeds: separate post cards. Post page: comments the card's width, votes grey.
+- [ ] Creator profile: the social button (and a coral Patreon disc, for creators with one, e.g. Merryweather) sits after the name and opens its menu under it; Series / Followers and Follow span the card. Amber Follow, Following as an outline with a tick, a dark toast, three equal series tiles, a folded bio ending on a whole word with a green "... more", a long genre (SUPERHERO) on its own line; ⋮ opens a narrow menu that hugs Share / Report / Block. Feeds: separate post cards. Post page: comments the card's width, votes grey.
 
 ### Mobile (`m.webtoons.com`)
 

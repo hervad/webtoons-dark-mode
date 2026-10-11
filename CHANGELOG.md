@@ -8,6 +8,21 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-10-11
+
+### Added
+
+- **Arrow keys for episodes (optional, off by default):** turn on **← / → for previous / next episode** in the menu (or the Toonlight toolbar button), and `←` / `→` open the previous / next episode in the reader. They do nothing while you type a comment or search, or with `Alt` / `Shift` held, so `Alt + ←` still goes Back. Works on the mobile site too, and with dark mode off.
+
+### Changed
+
+- **Reader:** the episode navigator in the top toolbar is one compact, centred control, ‹ #18 ▾ ›. The arrows and the number now line up, and the ▾ shows that the number opens the episode list.
+- **Reader:** the arrows of the episode strip under the comic, and of the strip in the toolbar's episode list, are round buttons over a soft fade where more episodes continue. The fade and the button disappear on a side with nothing more to show.
+
+### Fixed
+
+- **Creator profiles:** for creators with a Patreon, a stray white Patreon logo sat under the Follow button. It is now a coral Patreon button next to the creator's other social link.
+
 ## [1.9.0] - 2026-10-11
 
 ### Changed
@@ -1081,7 +1096,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.6...v1.9.0
 [1.8.6]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.5...v1.8.6
 [1.8.5]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.4...v1.8.5

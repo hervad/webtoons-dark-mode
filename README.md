@@ -91,6 +91,8 @@ The toggles are also in your userscript manager's menu (click its icon while on 
 
 **Edge shading** darkens the empty margins to the left and right of the page on wide windows, which frames the page. It never covers the page itself, so on narrower windows there is nothing to shade. It's on by default and is part of dark mode.
 
+**Arrow keys for episodes:** turn on **Turn on ← / → for previous / next episode** in the menu (or the Toonlight toolbar button), and the `←` and `→` keys open the previous and next episode while you read. It's off by default. The keys are ignored while you type a comment or search, and with `Alt` or `Shift` held, so `Alt + ←` still goes Back. It works on the mobile site too, and whether dark mode is on or off.
+
 **Scroll-to-top button:** the round arrow button in the episode reader can be hidden from the menu (**Hide scroll-to-top button in reader**; the entry then reads **Show scroll-to-top button in reader** to bring it back). It's shown by default, it stays hidden whether dark mode is on or off, and the `Home` key still jumps to the top.
 
 ## What's different, page by page
@@ -100,7 +102,9 @@ The toggles are also in your userscript manager's menu (click its icon while on 
 - The panels sit on a dark page as one long card with a soft shadow, with no seams or white gaps between them.
 - **Night dim** (`Alt + Shift + N`) lowers the brightness of the panels only, for reading in a dark room.
 - Under the last panel, Like and Subscribe are two equal green buttons. Liking an episode turns the button deep orange with a short burst of flames.
-- The episode strip shows two-line titles, and the rankings sit in a row of large, sharp covers above the comments.
+- The episode strip shows two-line titles, with round buttons over a soft fade where more episodes continue. The rankings sit in a row of large, sharp covers above the comments.
+- In the top toolbar, the previous / episode number / next control is one tidy capsule, and the number opens the episode list.
+- Optional: turn on the `←` / `→` keys for the previous and next episode (see [Using it](#using-it)).
 - On wide screens, the empty margins beside the page are gently shaded (edge shading, `Alt + Shift + V`).
 
 ### Comments
@@ -172,7 +176,7 @@ Measured in Chrome with the theme on, the browser's styling work while a page lo
 ### Privacy
 
 - **Permissions:** `GM_getValue` and `GM_setValue` (with `GM.getValue` and `GM.setValue`, the same storage for managers that only offer the newer form) to remember your settings, and `GM_registerMenuCommand` and `GM_unregisterMenuCommand` for the menu entries.
-- **What it stores:** only its own settings: dark mode on or off, reader dim, edge shading, the scroll-to-top choice, and whether you were logged in on the last page (a yes / no, used for the LOG IN fix). In Greasemonkey and the Safari Userscripts app, a copy of these settings is also kept in webtoons.com's local storage so the first frame of each page already has them.
+- **What it stores:** only its own settings: dark mode on or off, reader dim, edge shading, the scroll-to-top choice, the arrow-keys choice, and whether you were logged in on the last page (a yes / no, used for the LOG IN fix). In Greasemonkey and the Safari Userscripts app, a copy of these settings is also kept in webtoons.com's local storage so the first frame of each page already has them.
 - **Network:** the script makes no requests of its own and sends no data anywhere. The one exception is a change to what the page loads: in the reader, the ranking covers are swapped from Webtoons' 92 px images to the 210 px size of the same images, on Webtoons' own image server. Those few covers are therefore downloaded a second time, in the larger size.
 
 ## Customising the colours

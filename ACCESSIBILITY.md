@@ -5,7 +5,7 @@ The theme aims to make WEBTOON comfortable to read for as many people as possibl
 ## What it does
 
 - **Contrast:** main and secondary text, the labels on green buttons and the keyboard focus ring meet WCAG 2.2 AA (4.5:1 for text, 3:1 for focus indicators and controls). The colours are checked against every surface the theme uses.
-- **Keyboard:** a visible focus ring on links, buttons and form fields, which the site itself doesn't provide. Menus and popups the theme restyles keep the site's keyboard behaviour.
+- **Keyboard:** a visible focus ring on links, buttons and form fields, which the site itself doesn't provide. Menus and popups the theme restyles keep the site's keyboard behaviour. Optionally, `←` / `→` open the previous / next episode in the reader (off by default; ignored while typing).
 - **Reduced motion:** with "reduce motion" on in your system, the theme's own hover lifts, zooms and animations are switched off. The site's own timing is never changed, so nothing breaks.
 - **High contrast / forced colours:** under Windows High Contrast the theme switches itself off, so your system colours apply.
 - **Screen readers:** the theme changes only how the page looks. Text the site hides for screen readers stays available, the synopsis fold-out button has a label in the page's language and reports whether it's open, and the comic panels and their alt text are untouched.
