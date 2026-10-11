@@ -108,6 +108,8 @@ Captions, where a store asks:
 3. **Properties:** category Accessibility; website and support URLs as above; mature content unticked.
 4. **Privacy:** the same single-purpose and `storage` texts as Chrome (Edge asks no host-permission question); remote code No; no data types; privacy policy URL; all three certifications.
 5. **Store listings → English (United States) → Edit details:** description, `store-logo-300.png`, both promo tiles, the five screenshots with captions, and search terms.
+   - **Description:** the text above **without the "On phones … Firefox for Android" bullet**. Edge refuses to save a description that names another browser ("Avoid referencing other browsers … such as Firefox"), and on desktop Edge m.webtoons.com redirects to www anyway.
+   - **Screenshots** can't be reordered: a replaced one (trash, then Add Image) goes to the end.
    - **Search terms:** at most 7, at most 30 characters each, 21 words in total, added **one per Add Term**. Seven terms pasted as one comma list gave "Something went wrong"; an eighth term greys out Save draft. Current set: `dark mode`, `webtoons`, `dark theme`, `night mode`, `comics`, `manhwa`, `comic reader`. No other products' names (store policy).
    - **Save draft**, then **Close**, then reload: the row must say Complete before Publish works.
 6. **Publish → Submit your extension:** answer **Yes** to "Does a tester need … other info": with No, the notes box is disabled, and Microsoft warns that submissions without notes may be flagged. Notes for certification:

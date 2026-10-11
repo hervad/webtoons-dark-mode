@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.11.2
+// @version      1.11.3
 // @description  A hand-made dark theme for WEBTOON (webtoons.com): the comics stay exactly as drawn, and the reader, comments and phone site go dark. Toggle with Alt+Shift+T; night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -31,7 +31,7 @@
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
     const KEY_ARROWS = 'wt_arrow_keys';
-    const VERSION = '1.11.2';
+    const VERSION = '1.11.3';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -2753,9 +2753,9 @@
            so it lines up with the first cover in the 1200px card and in the
            full-width dropdown alike (the viewport is 1158px, centred; the
            first cover starts 8px in).
-           Under the comic: the series title (20px 700, with no green bar:
-           green marks only the episode being read, the user's call), with
-           the reading progress right of it. In the
+           Under the comic: the /canvas section title (20px 700 behind a
+           4 × 20px green bar, the user's call: the section headings keep
+           their bar), with the reading progress right of it. In the
            dropdown only the progress: the toolbar right above already shows
            the series title (the user's call). The title's right edge keeps
            a long one clear of the progress, and it ends in "…". */
@@ -2766,6 +2766,7 @@
             left: calc(50% - 571px) !important;
             right: calc(50% - 130px) !important;
             height: 30px !important;
+            padding-left: 14px !important;
             overflow: hidden !important;
             white-space: nowrap !important;
             text-overflow: ellipsis !important;
@@ -2775,6 +2776,7 @@
             font-weight: 700 !important;
             line-height: 30px !important;
             letter-spacing: .01em !important;
+            background: linear-gradient(var(--wt-accent), var(--wt-accent)) 0 50% / 4px 20px no-repeat !important;
         }
         /* Reading progress: a 120px bar, then "100 / 408" (the episode's
            place in the list / episodes in the list; tagEpisodeStrip()).
@@ -5137,10 +5139,10 @@
             letter-spacing: .01em !important;
             text-transform: none !important;
         }
-        /* Weekly HOT / Popular By Category headings sit behind a green
-           bar. "Recommended series" has none: its carousel matches the
-           reader's episode strips, where green marks only the episode
-           being read (the user's call). */
+        /* Section headings sit behind a green bar (the user's call: it
+           stays, also on "Recommended series", though its hover and page
+           dot have no green). */
+        .discover_spot_inner h3.tit::before,
         .discover_cont_area h2.tit::before {
             content: '' !important;
             flex: none !important;

@@ -8,6 +8,12 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.11.3] - 2026-10-11
+
+### Changed
+
+- **Reader and CANVAS:** the series title on the episode strip under the comic, and CANVAS's "Recommended series" heading, have their green bar back, like every other section heading. 1.11.0 removed it along with the green lines inside the carousels.
+
 ## [1.11.2] - 2026-10-11
 
 ### Fixed
@@ -1122,7 +1128,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.2...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.3...HEAD
+[1.11.3]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.2...v1.11.3
 [1.11.2]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.1...v1.11.2
 [1.11.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.10.0...v1.11.0
