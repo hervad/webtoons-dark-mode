@@ -55,7 +55,7 @@
 - **`episodeKey`** (the **← / → episode keys** setting, `KEY_ARROWS`, **off by default**, menu only): the first branch of `handleKey`. On `/viewer` pages of both sites, a bare ← / → clicks the site's own `a._prevEpisode` / `a._nextEpisode` (both sites use these classes; a disabled end is a `<span>`, so nothing happens). Never with a modifier (Alt+← is Back), never while typing (`isContentEditable`, `input`, `textarea`, `select`), once per press. It works with the theme on or off, like the dim. Checked by `key-checks.mjs`.
 - **`routeBodyClass()` / `syncBodyClasses()`:** set `body.wt-viewer` (`…/viewer`), `wt-detail` (`…/list?title_no=`) or `wt-home` (`/<lang>/`, originals, genres, ranking, search) from the URL before first paint, on www only; a DOM check at DOMContentLoaded corrects them.
 - **`tuneContestBanners()`:** marks light `.contest_banner` creatives with `data-wt-light`.
-- **/canvas sort listener:** a capture-phase `click` listener, active only while the theme is on. A click on `.sort_area._sorting .sort_box a[data-sort]` loads the URL with `sortOrder=<data-sort>` and drops `page`. The site ignores option clicks while its own menu is closed.
+- **Click fixes listener:** one capture-phase `click` listener, active only while the theme is on. Reader toolbar: a click on `#toolbar ._btnOpenEpisodeList` while `#topEpisodeList.unfd` (open) clicks the site's own `._btnCloseEpisodeList` instead (the site binds `#N` to open only; the theme's ▾ promises a toggle). /canvas sort: a click on `.sort_area._sorting .sort_box a[data-sort]` loads the URL with `sortOrder=<data-sort>` and drops `page`. The site ignores option clicks while its own menu is closed.
 - **`clampSynopsis()`:** clamps a synopsis longer than 8 lines and adds a `hidden` `button.wt-summary-toggle` whose `aria-label` is in the page's language (`SYNOPSIS_LABEL`).
 - **DOM-pass helpers:**
 
@@ -69,6 +69,7 @@
   | `tagPatronAmount()` | Sets `data-wt-zero` on a "$0" amount. |
   | `trimBioCut()` | Community app only: drops the half word a folded creator bio was cut on (react-lines-ellipsis cuts letter by letter), keeping the original in `bioCuts`. |
   | `darkenEmojiPickers()` | Puts `EMOJI_NAV_CSS` into each emoji picker's shadow root. |
+  | `tagEpisodeStrip()` | Once parsing is done (the list is still growing before): stamps the reading progress on `#bottomEpisodeList` and `#topEpisodeList`, `data-wt-pos` ("97 / 408": the `a.on` item's place in the list / the `<li>` count; the same number as the site's `#N`) and `data-wt-progress` (0–20, the bar in 5 % steps). On `#bottomEpisodeList` only, it also copies the series title from `#toolbar .subj_info .subj` into `data-wt-series` (the site's own text, in the page's language). |
   | `darkenConsentBanner()` | Puts `CONSENT_CSS` into the consentmanager.net cookie banner's open shadow root (`#cmpwrapper`); both screens (welcome, Cookie Settings). Colours only: Reject stays the quiet button and Accept / Save the strong one, as on the light banner. |
 
 - **`domPass()`:** runs the helpers above plus `tuneContestBanners()`, and `clampSynopsis()` once parsing is done, only while `themeActive()`. One MutationObserver on `<html>` from document-start drives it at most once per frame (rAF), skipping records about the preloader bubble; it runs again at DOMContentLoaded.
@@ -253,7 +254,7 @@ Each rule's comment holds its full spec. These are the constraints a session mus
 - **Sort:** `.sort_area._sorting` is a segmented switch (option `<ul>` always shown, `width: auto`, trigger hidden) and the JS listener navigates. Scope it with `._sorting` so the `._filterArea` dropdown keeps its rules.
 - **Genre labels** on lists and the rail get their `g_*` class from `tagGenreLabels()`.
 - **Home:** `.discover_lst` is a 6-column grid; Popular By Category hides the other genres inline, so it needs the `[style*="none"]` guard. The cards grow outward (−24 px side margins) so the site's tiles keep their place, 24 px apart.
-- **"Recommended series":** never change the 1130 px `.discover_spot_rolling` width (the flicking JS pages by it). Prev / dots / next (`.paging`) are one capsule on the header row (the user's request).
+- **"Recommended series":** never change the 1130 px `.discover_spot_rolling` width (the flicking JS pages by it). Prev / dots / next (`.paging`) are one capsule on the header row (the user's request). Hover: the cover darkens and `li.rolling-item::after` (a no-click layer over the tile link) draws the episode strip's white ring. No green bar on its heading, and the current page dot is white: green in these carousels marks only the episode being read (the user's call; Weekly HOT / Popular By Category keep their bars).
 - **Cover chips:** `.badge_discover` is a solid `#14171b` chip. The status sprites beside it (`.discover_badge_area > [class^="txt_ico"]`: END, hiatus) are white discs, inverted to dark (`invert(.9) hue-rotate(180deg)`, then `brightness(1.7) saturate(1.6) contrast(1.15)` so END reads bright green: the user's call; the profile's END badges use the same chain). `.badge_new*` gets the gold filter chain (`brightness(.62)` → sepia → saturate, no hue step) with a trailing `drop-shadow()`, since a box-shadow would be filtered. `.badge_up*` must **not** be filtered.
 - **Weekly round-up** (`#_challengeRoundUp`, in the reader): never change the 1032 px `.challenge_spot_rolling`, 188 px tiles or 23 px gaps (the carousel relies on them). The card is `.challenge_spot_inner` (1200 px, 84 px side padding); the viewport clips, so hover rings are inset.
 
@@ -305,18 +306,23 @@ Each rule's comment holds its full spec. These are the constraints a session mus
   - `font-size: 0; line-height: 0` on the container plus `display: block` on `img._images` remove the gaps between panels.
   - Only `.viewer_lst` needs `overflow: visible`.
 - **Toolbar:** `.tool_area` is 10000 (needs the `#container` fix); its icons are 36 px mask discs; `.paginate.v2` (prev / #N / next) is excluded from the page pager.
-- **Episode navigator (`.paginate.v2`):** one segmented capsule "‹ | #N ▾ | ›" (the user's call, October 2026, after pager / menu-button research). The container spans the 1400 px toolbar, so the capsule is `width: max-content` (7 px down to centre it in the 51 px bar). The site's own margin on `#N` is reset (it put #N 6 px low; no `translateY` nudge). Chevrons are masks. Hover is a neutral tint, never green. The focus ring is inset (−3 px). A disabled end is `span.pg_prev.dim`, dimmed in place. Mobile's pager is plain `.paginate`, untouched. The CANVAS `.age_text` band is amber: change only its colours, the viewer's top padding is sized for it.
+- **Episode navigator (`.paginate.v2`):** one segmented capsule "‹ | #N ▾ | ›" (the user's call, October 2026, after pager / menu-button research). The container spans the 1400 px toolbar, so the capsule is `width: max-content`, 40 px tall (5 px down to centre it in the 51 px bar). Segments are wide so nobody has to aim (the user's call): arrows 88 × 38 px, `#N` at least 96 px, 20 px bold, `user-select: none` (each click selected the number). A second click on `#N` closes the list (the click fixes listener), and the ▾ turns up while it's open (`.paginate.v2:has(~ #topEpisodeList.unfd)`). The site's own margin on `#N` is reset (it put #N 6 px low; no `translateY` nudge). Chevrons are masks. Hover is a neutral tint, never green. The focus ring is inset (−3 px). A disabled end is `span.pg_prev.dim`, dimmed in place. Mobile's pager is plain `.paginate`, untouched. The CANVAS `.age_text` band is amber: change only its colours, the viewer's top padding is sized for it.
 - **After the comic:** one block, declared after the generic WCC rules so it wins by source order. The end card (`.viewer_info_area`) is 800 px; the episode strip and `.induce_app_area` are 1200 px, on the comments grid.
 - **End card:** Like and Subscribe are equal 60 px keys. Liked is `.lnk_like.bx:is([aria-pressed="true"], :has(> .ico_like2.on))` (the site marks it with `.on` on the flame): solid `#c2410c → #9a3412`, white text, a flame burst.
 - **Share icons** (`.spi_area a[class^="ico_"]`): masks, with the per-network `--wt-share` / `--wt-brand` variables set unscoped. The end card, the series header and the toolbar all use them.
 - **Report** (`.report_area .lk_report`, CANVAS only): pinned into the end card's corner (`right: calc(50% - 400px + 20px)`), `width: auto; white-space: nowrap` (the site fixes 78 px), `z-index: 60` (the share row is 50).
 - **Patreon card** (`#_viewerBox > .viewer_patron_area`): coral. `data-wt-zero` hides "$0".
 - **Episode strip (`#bottomEpisodeList`):**
-  - **Size:** style the wrapper, never the carousel. The JS measures `.episode_lst` / `.episode_cont` and pages the `<ul>` by inline `left` / `width`.
-    - Change heights only (150 px for 2-line titles).
-    - Fewer than 9 episodes are centred; `ul:has(> li:nth-child(9))` restores start alignment, so paging stays pixel-identical.
-  - **Tiles:** change only by `transform`. `a.on` is reset to `margin: 0; width: 92px` (same effective width), and its ring is an **inset** shadow on `.mask` (an outer ring is clipped on the first tile).
-  - **Arrows:** a 40 px disc over a faded edge (the user's call, October 2026; it replaced slim tabs whose dark fill looked heavy, and plain discs that looked pasted on). The fade is a mask on `.episode_cont` (the carousel measures that box and pages the `<ul>` inside, so a mask is safe), switched per side by `.episode_lst:has(> .paginate > .pg_prev:not(.off))`. A `.off` side loses its disc and its fade. Under the comic the discs sit at `top: 35px`, `left / right: 4px`; in the toolbar dropdown (`#topEpisodeList`) at `top: 54px`, `left / right: 21px` (measured: covers' centre 74.5 px down, viewport 37 px in). Strip rules are prefixed `.episode_area#bottomEpisodeList`; the unscoped `.episode_area .episode_lst` rules style the dropdown.
+  - **Look:** the /canvas "Recommended series" card (the user's pick, October 2026): a header row with the series title, no green bar (`::before` with `attr(data-wt-series)`, from `tagEpisodeStrip()`), the reading progress (`::after`: a 120 px light-grey bar in its left padding, then `attr(data-wt-pos)`; 20 px left of the capsule), a pager capsule opposite, then 9 covers (118 × 111 px; the thumbnails are 160 × 151) with the title over a dark foot. Hover darkens the cover and rings it white; the current episode has a green ring with a glow and a ▶ badge in the top corner. **Green marks only the current episode** (the user's call): no green title bar, progress fill or hover ring.
+  - **The carousel's rules** (`viewer-*.js`): it measures the first `<li>`'s `outerWidth` once, at start, and pages by exactly 9 (`_nItemPerPage`), setting the `<ul>`'s inline `left` / `width`.
+    - The tile width is free, but `.episode_cont` must be 9 tiles + the `<ul>`'s 2 × 3 px padding wide: 9 × 128 + 6 = 1158 px.
+    - `outerWidth` leaves out margins, so the gap between covers is `<li>` padding (5 px a side).
+    - The site pulls the `<ul>` 15 px left (its old tile padding): `margin: 0`.
+    - Thumbnails load from `data-url` when the site's visibility check sees them (after each page move); never touch `src` or the paging.
+    - Fewer than 9 episodes are centred; `ul:has(> li:nth-child(9))` restores start alignment, so paging stays exact.
+  - **Titles** are clamped to 2 lines by an offset (`bottom: 8px`), not padding: `overflow` clips at the padding edge, so a third line showed through bottom padding.
+  - **Arrows:** the toolbar navigator's capsule on the header row (88 × 38 px segments); a `.off` side is dimmed in place; with both `.off` the capsule is hidden.
+- **Toolbar dropdown strip (`#topEpisodeList`):** the same strip as under the comic (the user's call): every tile, header and pager rule is `:is(#bottomEpisodeList, #topEpisodeList)`; only the container differs (the card under the comic; a full-width panel on the toolbar's surface here). Both use the same carousel code and the same 1148 / 1074 px geometry, so the header is placed from the centre (`left: calc(50% - 571px)`). Its header has no series title (the toolbar right above shows it; the user's call), only the progress, at the title's place. The bar's fill comes from 21 `[data-wt-progress="N"] { --wt-p }` rules: an exact fill would need an inline style. The ︿ tab (`#toolbar ._btnCloseEpisodeList`) is hidden: `#N` toggles the list, and the click fixes listener still clicks the hidden tab to close it.
 - **App banner (`.induce_app_area`):** don't clip `.img_area`, because the `.preview` badge hangs off its edge. The QR code keeps a white tile so it stays scannable.
 - **Creator card (`.creator_note`):** a grid with `.author_area { display: contents }`; `--wt-avatar-none` without a `.profile`; one linked creator stretches the link's `::before` over the card (its `::after` is the verified sprite).
 
@@ -490,7 +496,7 @@ There is no automated suite. Check the pages a change touches, logged out unless
 
 ### /canvas checks
 
-- [ ] Home: three matching cards 24 px apart. Recommended series has its ‹ • › capsule on the title row. 6-column tiles; END / hiatus badges on covers are dark discs (also on the lists). A category click shows one row; "more" is a pill with a chevron, green on hover.
+- [ ] Home: three matching cards 24 px apart. Recommended series has its ‹ • › capsule on the title row; a hovered cover darkens with a white ring; no green bar or green page dot. 6-column tiles; END / hiatus badges on covers are dark discs (also on the lists). A category click shows one row; "more" is a pill with a chevron, green on hover.
 - [ ] List: the sort switch re-sorts from page 1; 4 columns with no clipped border. The rail (296 px) has identical cards 16 px apart, the filter panel covers the rank numbers, and the headers have a green bar, no pointer and no chevron. Rows are faint tiles with the rank on the cover's corner and 2-line titles; a long genre (SUPERNATURAL) leaves "Top CANVAS" whole.
 
 ### Series page checks
@@ -513,12 +519,11 @@ There is no automated suite. Check the pages a change touches, logged out unless
 
 - [ ] Strip: one card with rounded outer corners and one soft shadow, no seams, colours unchanged. Edge shading only in the empty margins.
 - [ ] Toolbar icons at full brightness, matching discs. End card: equal 60 px keys; Liked is deep orange with a flame burst; Report is fully clickable in the corner.
-- [ ] Toolbar navigator: one centred capsule ‹ | #N ▾ | ›, chevrons centred, a grey hover; on episode 1 the ‹ is dimmed in place. #N opens the dropdown strip, which has the same discs on faded edges.
+- [ ] Toolbar navigator: one centred capsule ‹ | #N ▾ | › with wide segments and a big #N, chevrons centred, a grey hover; on episode 1 the ‹ is dimmed in place. #N opens the dropdown strip (the same card look: titles on covers, a capsule pager, no ︿ tab) and the ▾ turns up; a second click on #N closes it; clicking never selects the number.
 - [ ] Episode strip:
-  - discs on faded edges where more episodes continue; no disc and no fade on a side with nothing to page;
-  - 2-line titles;
-  - the current tile is not clipped, even as the first tile;
-  - a short series is centred with no arrows;
+  - a card with the series title (no green bar), a grey progress bar with "N / total" (N matches the toolbar's #N), and a wide ‹ › capsule opposite; the dropdown shows the progress without the title; 9 covers with titles on them (2 lines at most);
+  - the current episode has a green ring and a ▶ badge, even as the first tile; hover darkens a cover and rings it white; nothing else in either strip is green;
+  - on episode 1 the ‹ is dimmed; a short series is a centred row with no capsule;
   - paging matches the site;
   - thumbnails load.
 - [ ] Rankings: two cards of 5 sharp covers above the comments; the genre filter re-renders sharp covers. Mature notice (Slack Wyrm): one even dim.

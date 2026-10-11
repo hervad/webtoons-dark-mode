@@ -8,6 +8,20 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-10-11
+
+### Changed
+
+- **Reader:** the episodes under the comic are a card like CANVAS's "Recommended series": the series title on a header row with a reading-progress bar ("97 / 408": where this episode sits in the list), a wide ‹ › pager opposite it, and nine larger covers with each episode's title on the cover. The arrows no longer sit on top of the covers. Hovering a cover darkens it and rings it white; only the episode you're reading is marked in green, with a green ring and a ▶ badge.
+- **Reader:** the episode list that opens from the toolbar's episode number looks the same: titles on the covers, the progress bar and the same wide ‹ › pager. It leaves out the series title, which the toolbar right above already shows. The small ︿ tab under it is gone; click the number again to close the list.
+- **Reader:** the toolbar's ‹ #18 ▾ › control has much wider buttons, so changing episode needs no careful aiming, and the episode number is much bigger.
+- **CANVAS:** hovering a "Recommended series" cover now also rings it, like the episode covers. Its heading lost the green bar and the current page dot is white, so green there no longer competes with anything.
+
+### Fixed
+
+- **Reader:** clicking the episode number (#18 ▾) a second time now closes the episode list it opened; before, only the small ︿ tab under the list closed it. The ▾ turns up while the list is open.
+- **Reader:** clicking the episode number no longer selects it as text.
+
 ## [1.10.0] - 2026-10-11
 
 ### Added
@@ -1096,7 +1110,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.0...HEAD
+[1.11.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.6...v1.9.0
 [1.8.6]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.5...v1.8.6

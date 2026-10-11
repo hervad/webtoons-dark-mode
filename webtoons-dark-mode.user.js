@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.10.0
+// @version      1.11.0
 // @description  A hand-made dark theme for WEBTOON (webtoons.com): the comics stay exactly as drawn, and the reader, comments and phone site go dark. Toggle with Alt+Shift+T; night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -31,7 +31,7 @@
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
     const KEY_ARROWS = 'wt_arrow_keys';
-    const VERSION = '1.10.0';
+    const VERSION = '1.11.0';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -225,12 +225,7 @@
             html .discover_cont_area .popular_genre_area .lk_more:hover .ico_arr::after { transform: rotate(45deg) !important; }
             html #header .lnb a[aria-current="true"],
             html #header .lnb a[aria-current="true"]::before, html #header .lnb a[aria-current="true"]::after { animation: none !important; }
-            html #bottomEpisodeList .episode_lst li a:hover .thmb,
-            html #bottomEpisodeList .episode_lst li a:focus-visible .thmb,
-            html #bottomEpisodeList .episode_lst li a:hover .thmb img,
-            html .challenge_cont_area a.challenge_item:hover .img_area img,
-            html .episode_area#bottomEpisodeList .episode_lst .pg_next:hover::after { transform: none !important; }
-            html .episode_area#bottomEpisodeList .episode_lst .pg_prev:hover::before { transform: rotate(180deg) !important; }
+            html .challenge_cont_area a.challenge_item:hover .img_area img { transform: none !important; }
             html .tool_area .spi_area > li > a[class^="ico_"]:hover,
             html .tool_area .spi_area > li > a[class^="ico_"]:focus-visible,
             html .aside.viewer .ranking_lst.viewer .lst_type1 > li > a:is(:hover, :focus-visible) .pic_area img,
@@ -683,6 +678,22 @@
         .discover_spot li:hover img {
             filter: brightness(.7) !important;
         }
+        /* "Recommended series" (/canvas home) tiles: a light ring over the
+           darkened cover on hover, like the reader's episode strip (the
+           user's call). Not green: in these carousels green marks only the
+           episode being read (the user's call). The tile is a positioned
+           <li> under a full-size link; the ring is a layer above it that
+           takes no clicks. */
+        .discover_spot li.rolling-item::after {
+            content: '' !important;
+            position: absolute !important;
+            inset: 0 !important;
+            z-index: 3 !important;
+            pointer-events: none !important;
+            box-shadow: inset 0 0 0 2px transparent !important;
+            transition: box-shadow .2s ease !important;
+        }
+        .discover_spot li.rolling-item:hover::after { box-shadow: inset 0 0 0 2px rgba(255,255,255,.6) !important; }
         /* Hover darken extended to: viewer bottom episode strip + viewer sidebar
            "Trending & Popular" / "Top Originals" rankings. */
         .episode_lst li .thmb img, .episode_lst li img,
@@ -1933,90 +1944,23 @@
         }
         .tool_area .age_text [class*="ico_mature"] { display: none !important; }
 
-        /* Episode strip in the toolbar's episode-list dropdown
-           (#topEpisodeList). These rules are unscoped, but the strip under
-           the comic (#bottomEpisodeList, "Episode strip" below) restyles
-           everything they set, so they only show in the dropdown: the page
-           background, a green ring and glow on the current episode, and
-           large chevron arrows. */
-        .episode_area {
-            background: var(--wt-bg) !important;
-            border-color: var(--wt-border) !important;
+        /* The toolbar's episode list (#topEpisodeList, opened by #N): the
+           same strip as under the comic (the user's call, October 2026; it
+           had discs over faded covers and titles under them). The tiles,
+           the header (reading progress + pager capsule) and the carousel limits
+           are in the "Episode strip" block below, shared by both lists; the
+           site's carousel code and markup are the same for both. Here: the
+           panel, the toolbar's surface continued under it, and no ︿ tab: a
+           second click on #N closes the list (the click fixes listener
+           clicks this hidden tab, which still works). */
+        #topEpisodeList.episode_area {
+            height: auto !important;
+            padding: 72px 0 24px !important;
+            background: var(--wt-bg-elev) !important;
+            border-bottom: 1px solid var(--wt-border) !important;
+            box-shadow: 0 14px 30px rgba(0,0,0,.45) !important;
         }
-        /* Current episode: the base gives only a 3px green border. */
-        .episode_lst li .on .thmb {
-            border: 3px solid var(--wt-accent) !important;
-            box-shadow: 0 0 0 1px rgba(0, 213, 100, .25), 0 0 14px rgba(0, 213, 100, .55) !important;
-        }
-        .episode_lst li .on .subj {
-            color: var(--wt-accent) !important;
-            font-weight: 700 !important;
-        }
-        /* Dropdown strip arrows: the same disc over a faded edge as the
-           strip under the comic (the user's call, October 2026; the ▾ on the
-           toolbar's #N now leads here). They were 40 × 87px dark boxes with
-           ❮ ❯ text glyphs, 18px above the covers. Measured: the covers'
-           centre is 74.5px below .episode_lst's top, and the clipping
-           viewport (.episode_cont) starts 37px in from each side, so the
-           40px discs sit at top 54px, 21px in, over the viewport's edges.
-           A side with nothing to page (.off) loses its disc and its fade.
-           The <em> is the site's translated label: hidden, it stays the
-           link's accessible name through the title attribute. */
-        .episode_area .episode_lst .pg_prev, .episode_area .episode_lst .pg_next {
-            width: 40px !important;
-            height: 40px !important;
-            top: 54px !important;
-            z-index: 3 !important;
-            transform: none !important;
-            border-radius: 50% !important;
-            background: rgba(44,49,58,.97) !important;
-            background-image: none !important;
-            border: 1px solid rgba(255,255,255,.16) !important;
-            box-shadow: 0 6px 18px rgba(0,0,0,.55) !important;
-            font-size: 0 !important;
-            color: var(--wt-text) !important;
-            transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease !important;
-        }
-        .episode_area .episode_lst .pg_prev { left: 21px !important; }
-        .episode_area .episode_lst .pg_next { right: 21px !important; left: auto !important; }
-        .episode_area .episode_lst .pg_prev:hover, .episode_area .episode_lst .pg_next:hover,
-        .episode_area .episode_lst .pg_prev:focus-visible, .episode_area .episode_lst .pg_next:focus-visible {
-            background: var(--wt-bg-hover) !important;
-            border-color: rgba(0,213,100,.55) !important;
-            box-shadow: 0 0 0 3px rgba(0,213,100,.12), 0 6px 18px rgba(0,0,0,.55) !important;
-            color: var(--wt-accent-soft) !important;
-        }
-        .episode_area .episode_lst .pg_prev.off, .episode_area .episode_lst .pg_next.off {
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-        /* Hide the inner <em> label so it doesn't show alongside the chevron. */
-        .episode_area .episode_lst .pg_prev > em, .episode_area .episode_lst .pg_next > em {
-            display: none !important;
-        }
-        .episode_area .episode_lst .pg_prev::before, .episode_area .episode_lst .pg_next::after {
-            content: '' !important;
-            position: absolute !important;
-            inset: 0 !important;
-            margin: auto !important;
-            width: 16px !important;
-            height: 16px !important;
-            padding: 0 !important;
-            font-size: 0 !important;
-            text-indent: 0 !important;
-            pointer-events: none !important;
-            background: currentColor !important;
-            -webkit-mask: var(--wt-ico-chevron-right) center / contain no-repeat !important;
-            mask: var(--wt-ico-chevron-right) center / contain no-repeat !important;
-        }
-        .episode_area .episode_lst .pg_prev::before { transform: rotate(180deg) !important; }
-        #topEpisodeList .episode_lst { --wt-fade-l: 0px; --wt-fade-r: 0px; }
-        #topEpisodeList .episode_lst:has(> .paginate > .pg_prev:not(.off)) { --wt-fade-l: 64px; }
-        #topEpisodeList .episode_lst:has(> .paginate > .pg_next:not(.off)) { --wt-fade-r: 64px; }
-        #topEpisodeList .episode_lst .episode_cont {
-            -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--wt-fade-l), #000 calc(100% - var(--wt-fade-r)), transparent 100%) !important;
-            mask-image: linear-gradient(90deg, transparent 0, #000 var(--wt-fade-l), #000 calc(100% - var(--wt-fade-r)), transparent 100%) !important;
-        }
+        #toolbar ._btnCloseEpisodeList { display: none !important; }
 
         /* Horizontal rules — base CSS leaves them with default browser styling. */
         hr { border-color: var(--wt-border) !important; background: var(--wt-border) !important; }
@@ -2783,17 +2727,37 @@
             box-shadow: 0 0 0 4px rgba(243,94,54,.18), 0 8px 22px rgba(243,94,54,.28) !important;
         }
 
-        /* Episode strip — the card is the outer #bottomEpisodeList box on the
-           1200px grid. The carousel JS measures .episode_lst and its <ul>, so
-           those keep their size; only the wrapper around them changes. */
+        /* Episode strip, under the comic (#bottomEpisodeList, a card) and in
+           the toolbar's episode list (#topEpisodeList, a panel; see the
+           toolbar block): the "Recommended series" card of /canvas home,
+           which the user picked as the model (October 2026;
+           the boxed row of small tiles with discs over the covers looked
+           bad). A header row (under the comic the green bar + the series
+           title, copied by tagEpisodeStrip() from the toolbar: the strip has
+           no heading of its own and the theme adds no words; then the
+           reading progress) with a wide pager capsule opposite, then nine
+           covers with their titles laid over a dark foot, as on the
+           Recommended tiles.
+           The site's carousel (#_bottomEpisodeList) sets the limits:
+           - It measures the first <li>'s outerWidth once, when it starts,
+             and pages by exactly 9 of them (_nItemPerPage), setting the
+             <ul>'s inline left / width. So the tile width is free, but the
+             viewport (.episode_cont) must be 9 tiles + the <ul>'s 2 × 3px
+             padding wide, or pages stop lining up: 9 × 128 + 6 = 1158px.
+           - outerWidth leaves out margins, so the gap between covers is the
+             <li>'s padding (5px a side).
+           - The site pulls the <ul> 15px left (its old 15px <li> padding);
+             with 5px padding that cut the first cover, so margin: 0.
+           - Thumbnails load from data-url when the site's visibility check
+             sees them (after every page move), so nothing here touches
+             src or the paging.
+           The thumbnails are 160 × 151, so a 118 × 111 cover stays sharp. */
         #bottomEpisodeList.episode_area {
+            position: relative !important;
             max-width: 1200px !important;
             height: auto !important;  /* base: fixed, shorter than the strip */
             margin: 32px auto 0 !important;
-            /* The strip keeps room for a second title line (and 12px
-               under it); most titles take one, which left 45px under them
-               against 31px above the covers. */
-            padding: 18px 0 8px !important;
+            padding: 72px 0 24px !important;
             box-sizing: border-box !important;
             background: var(--wt-bg-elev) !important;
             border: 1px solid rgba(255,255,255,.08) !important;
@@ -2801,96 +2765,186 @@
             border-radius: 16px !important;
             box-shadow: 0 12px 32px rgba(0,0,0,.35) !important;
         }
-        /* The <ul> (fixed 132px) and .episode_cont both clip, which cut the
-           second title line; heights only — the carousel pages by width. */
-        #bottomEpisodeList .episode_lst,
-        #bottomEpisodeList .episode_lst .episode_cont { height: 150px !important; }
-        #bottomEpisodeList .episode_lst .episode_cont > ul { height: 150px !important; }
-        /* A short series (fewer episodes than one carousel page — 9 at this
-           width) used to hug the left edge with a void on the right; centre
-           that row. From 9 episodes up the row fills the strip and keeps
-           the site's start alignment, so paging positions stay pixel-identical. */
-        #bottomEpisodeList .episode_lst .episode_cont > ul {
+        /* The header row, level with the capsule, is placed from the centre,
+           so it lines up with the first cover in the 1200px card and in the
+           full-width dropdown alike (the viewport is 1158px, centred; the
+           first cover starts 8px in).
+           Under the comic: the series title (20px 700, with no green bar:
+           green marks only the episode being read, the user's call), with
+           the reading progress right of it. In the
+           dropdown only the progress: the toolbar right above already shows
+           the series title (the user's call). The title's right edge keeps
+           a long one clear of the progress, and it ends in "…". */
+        .episode_area#bottomEpisodeList[data-wt-series]::before {
+            content: attr(data-wt-series) !important;
+            position: absolute !important;
+            top: 24px !important;
+            left: calc(50% - 571px) !important;
+            right: calc(50% - 130px) !important;
+            height: 30px !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            text-align: left !important;
+            color: var(--wt-text) !important;
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            line-height: 30px !important;
+            letter-spacing: .01em !important;
+        }
+        /* Reading progress: a 120px bar, then "100 / 408" (the episode's
+           place in the list / episodes in the list; tagEpisodeStrip()).
+           Numbers only, so nothing to translate. It is the position in the
+           list, not the episode's number: side stories count too. The bar
+           is the pseudo-element's own background, in its left padding, a
+           light fill (not green: green marks only the episode being read,
+           the user's call). Its fill comes in 5% steps (data-wt-progress 0-20, below): an exact
+           fill would need an inline style. Under the comic it sits left of
+           the capsule (whose left edge is 392px right of the centre); in
+           the dropdown it takes the title's place. */
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList)[data-wt-pos]::after {
+            content: attr(data-wt-pos) !important;
+            position: absolute !important;
+            top: 24px !important;
+            height: 30px !important;
+            padding-left: 132px !important;
+            white-space: nowrap !important;
+            color: var(--wt-text-dim) !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            line-height: 30px !important;
+            font-variant-numeric: tabular-nums !important;
+            background:
+                linear-gradient(var(--wt-text-body), var(--wt-text-body)) 0 50% / calc(120px * var(--wt-p, 0)) 6px no-repeat,
+                linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.14)) 0 50% / 120px 6px no-repeat !important;
+        }
+        .episode_area#bottomEpisodeList[data-wt-pos]::after { right: calc(50% - 372px) !important; }
+        .episode_area#topEpisodeList[data-wt-pos]::after { left: calc(50% - 571px) !important; }
+        .episode_area[data-wt-progress="1"] { --wt-p: .05; }
+        .episode_area[data-wt-progress="2"] { --wt-p: .1; }
+        .episode_area[data-wt-progress="3"] { --wt-p: .15; }
+        .episode_area[data-wt-progress="4"] { --wt-p: .2; }
+        .episode_area[data-wt-progress="5"] { --wt-p: .25; }
+        .episode_area[data-wt-progress="6"] { --wt-p: .3; }
+        .episode_area[data-wt-progress="7"] { --wt-p: .35; }
+        .episode_area[data-wt-progress="8"] { --wt-p: .4; }
+        .episode_area[data-wt-progress="9"] { --wt-p: .45; }
+        .episode_area[data-wt-progress="10"] { --wt-p: .5; }
+        .episode_area[data-wt-progress="11"] { --wt-p: .55; }
+        .episode_area[data-wt-progress="12"] { --wt-p: .6; }
+        .episode_area[data-wt-progress="13"] { --wt-p: .65; }
+        .episode_area[data-wt-progress="14"] { --wt-p: .7; }
+        .episode_area[data-wt-progress="15"] { --wt-p: .75; }
+        .episode_area[data-wt-progress="16"] { --wt-p: .8; }
+        .episode_area[data-wt-progress="17"] { --wt-p: .85; }
+        .episode_area[data-wt-progress="18"] { --wt-p: .9; }
+        .episode_area[data-wt-progress="19"] { --wt-p: .95; }
+        .episode_area[data-wt-progress="20"] { --wt-p: 1; }
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst,
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .episode_cont,
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .episode_cont > ul { height: 111px !important; }
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .episode_cont { width: 1158px !important; margin-left: -579px !important; }
+        /* A short series (fewer episodes than one page) is a centred row;
+           from 9 up the row keeps the site's start alignment, so paging
+           positions stay exact. */
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .episode_cont > ul {
             display: flex !important;
             justify-content: safe center !important;
+            margin: 0 !important;
         }
-        #bottomEpisodeList .episode_lst .episode_cont > ul:has(> li:nth-child(9)) { justify-content: flex-start !important; }
-        #bottomEpisodeList .episode_lst .episode_cont > ul > li { float: none !important; flex: none !important; }
-        /* Tiles: rounded covers with a soft drop shadow and a hairline,
-           titles on up to two lines (one line cut most of them to "Ep. 3 -
-           The Tri…"). Hover lifts the cover, zooms the art a touch and rings
-           it green. The episode being read keeps a green ring with a glow
-           and a ▶ badge in its corner. Only the cover moves (transform), so
-           the tile widths the carousel JS pages by never change. */
-        #bottomEpisodeList .episode_lst .thmb {
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .episode_cont > ul:has(> li:nth-child(9)) { justify-content: flex-start !important; }
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .episode_cont > ul > li {
+            float: none !important;
+            flex: none !important;
+            width: 118px !important;
+            padding: 0 5px !important;
+        }
+        /* The site gives the current tile its own width and a -3px offset
+           (for its old 3px border); reset so every tile is the same box. */
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a,
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a.on {
             position: relative !important;
-            border: 0 !important;
-            border-radius: 14px !important;
-            overflow: hidden !important;
-            box-shadow: 0 6px 16px rgba(0,0,0,.45) !important;
-            transition: transform .2s ease, box-shadow .2s ease !important;
+            width: 118px !important;
+            margin: 0 !important;
         }
-        #bottomEpisodeList .episode_lst .thmb img {
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .thmb,
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li .on .thmb {
+            position: relative !important;
+            width: 118px !important;
+            height: 111px !important;
+            margin: 0 !important;
+            border: 0 !important;
+            border-radius: 10px !important;
+            box-shadow: none !important;  /* the dropdown's unscoped glow on .on */
+            overflow: hidden !important;
+        }
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .thmb img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
             border-radius: 0 !important;
             filter: none !important;
-            transition: transform .3s ease !important;
+            transition: filter .2s ease !important;
         }
-        #bottomEpisodeList .episode_lst ul .mask {
-            background: transparent !important;
+        /* .mask (over the image) carries the foot gradient the title sits on,
+           the hairline and, for the current episode, the green ring. */
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst ul .mask,
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst ul .on .mask {
+            position: absolute !important;
+            inset: 0 !important;
+            z-index: 1 !important;
+            opacity: 1 !important;
             border: 0 !important;
             border-radius: inherit !important;
+            background: linear-gradient(180deg, transparent 38%, rgba(8,10,12,.88)) !important;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,.1) !important;
-            transition: box-shadow .2s ease !important;
         }
-        #bottomEpisodeList .episode_lst li a:hover .thmb,
-        #bottomEpisodeList .episode_lst li a:focus-visible .thmb {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 10px 22px rgba(0,0,0,.5) !important;
-        }
-        #bottomEpisodeList .episode_lst li a:hover .thmb img { transform: scale(1.06) !important; filter: none !important; }
-        #bottomEpisodeList .episode_lst li a:hover .mask,
-        #bottomEpisodeList .episode_lst li a:focus-visible .mask { box-shadow: inset 0 0 0 2px var(--wt-accent-soft) !important; }
-        #bottomEpisodeList .episode_lst .subj {
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst .subj {
             display: -webkit-box !important;
             -webkit-box-orient: vertical !important;
             -webkit-line-clamp: 2 !important;
+            position: absolute !important;
+            left: 0 !important;
+            right: 0 !important;
+            /* An offset, not padding: overflow clips at the padding edge,
+               so a third line showed through bottom padding. */
+            bottom: 8px !important;
+            z-index: 2 !important;
             box-sizing: border-box !important;
-            width: 100% !important;
-            margin-top: 9px !important;
-            padding: 0 4px !important;
+            width: auto !important;
+            max-height: 2.5em !important;
+            margin: 0 !important;
+            padding: 0 9px !important;
             overflow: hidden !important;
             white-space: normal !important;
-            text-overflow: clip !important;
-            text-align: center !important;
-            color: var(--wt-text-dim) !important;
-            font-size: 12.5px !important;
-            font-weight: 500 !important;
-            line-height: 1.3 !important;
-            letter-spacing: .01em !important;
-            transition: color .15s ease !important;
+            text-align: left !important;
+            color: #fff !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            line-height: 1.25 !important;
+            letter-spacing: 0 !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,.8) !important;
         }
-        #bottomEpisodeList .episode_lst li a:hover .subj { color: #fff !important; }
-        /* The site offsets the current cover by -3px for its old 3px border;
-           with the border gone that pushed it up into the strip's clip. */
-        #bottomEpisodeList .episode_lst li a.on { margin: 0 !important; width: 92px !important; }
-        #bottomEpisodeList .episode_lst li .on .thmb,
-        #bottomEpisodeList .episode_lst li .on:hover .thmb {
-            margin: 0 0 7px !important;
-            border: 0 !important;
-            border-radius: 14px !important;
+        /* Hover is the listing pages' cue (darken the cover, no lift), with
+           a light ring (a green title over the art was hard to read). Not
+           green: green marks only the episode being read (the user's call). */
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a:hover .thmb img,
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a:focus-visible .thmb img { filter: brightness(.7) !important; }
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a:hover .mask,
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a:focus-visible .mask {
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,.6) !important;
         }
-        #bottomEpisodeList .episode_lst ul .on .mask,
-        #bottomEpisodeList .episode_lst ul .on:hover .mask {
-            z-index: 1 !important;
-            opacity: 1 !important;
-            background: transparent !important;
+        /* The episode being read: a green ring with a glow, a ▶ badge in
+           the top corner (the title owns the foot) and a bolder title. */
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst ul .on .mask,
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst ul .on:hover .mask {
             box-shadow: inset 0 0 0 3px var(--wt-accent), inset 0 0 14px rgba(0,213,100,.45) !important;
         }
-        #bottomEpisodeList .episode_lst li .on .thmb::after {
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li .on .thmb::after {
             content: '' !important;
             position: absolute !important;
-            right: 6px !important;
-            bottom: 6px !important;
+            top: 7px !important;
+            right: 7px !important;
             z-index: 2 !important;
             width: 22px !important;
             height: 22px !important;
@@ -2898,60 +2952,67 @@
             background: var(--wt-play-badge) center / contain no-repeat !important;
             box-shadow: 0 2px 8px rgba(0,0,0,.5) !important;
         }
-        #bottomEpisodeList .episode_lst li .on .subj { color: var(--wt-accent-soft) !important; font-weight: 700 !important; }
-        /* Prev / next: a 40px disc over a faded edge (the user's call, October
-           2026; it replaced slim glass tabs in the gutters, whose dark fill
-           around a small chevron looked heavy). The row fades into the card
-           on each side that has more episodes, and the disc sits on that
-           fade, centred on the covers (12px in, 87px tall): the fade shows
-           why the button is there, so it doesn't read as pasted on, which
-           plain round discs did. A side with nothing to page (.off) loses
-           both its disc and its fade, so a short series is a plain row. The
-           fade is a mask on .episode_cont (the clipping viewport); the
-           carousel JS measures that box and pages the <ul> inside it, and a
-           mask changes neither. The :has() sits on the strip's own root with
-           a child-only argument. */
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev,
-        .episode_area#bottomEpisodeList .episode_lst .pg_next {
-            width: 40px !important;
-            height: 40px !important;
-            top: 35px !important;
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li .on .subj { color: #fff !important; font-weight: 700 !important; }
+        /* Prev / next: the toolbar navigator's capsule on the header row,
+           with the same wide 88 × 38px segments (no aiming; the user's
+           call). A disabled side (.off) stays in place dimmed; with both off
+           (a short series) the capsule goes. The :has() sits on the small
+           .paginate with child-only arguments. */
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst > .paginate {
+            position: absolute !important;
+            top: -53px !important;  /* centred on the 30px title row at 24px */
+            right: 3px !important;
+            left: auto !important;
             z-index: 3 !important;
-            border-radius: 50% !important;
-            background: rgba(44,49,58,.97) !important;
-            border: 1px solid rgba(255,255,255,.16) !important;
-            box-shadow: 0 6px 18px rgba(0,0,0,.55) !important;
+            display: flex !important;
+            box-sizing: border-box !important;
+            width: auto !important;
+            height: 40px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            border-radius: 999px !important;
+            background: var(--wt-bg-elev2) !important;
+            border: 1px solid rgba(255,255,255,.14) !important;
+        }
+        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst > .paginate:has(> .pg_prev.off):has(> .pg_next.off) { display: none !important; }
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_prev,
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_next {
+            position: relative !important;
+            inset: auto !important;
+            display: block !important;
+            flex: none !important;
+            width: 88px !important;
+            height: 38px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: none !important;
+            box-shadow: none !important;
             color: var(--wt-text) !important;
-            transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease !important;
+            transition: background-color .15s ease, color .15s ease !important;
         }
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev { left: 4px !important; }
-        .episode_area#bottomEpisodeList .episode_lst .pg_next { right: 4px !important; left: auto !important; }
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev:hover,
-        .episode_area#bottomEpisodeList .episode_lst .pg_next:hover,
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev:focus-visible,
-        .episode_area#bottomEpisodeList .episode_lst .pg_next:focus-visible {
-            background: var(--wt-bg-hover) !important;
-            border-color: rgba(0,213,100,.55) !important;
-            box-shadow: 0 0 0 3px rgba(0,213,100,.12), 0 6px 18px rgba(0,0,0,.55) !important;
-            color: var(--wt-accent-soft) !important;
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_prev { border-right: 1px solid rgba(255,255,255,.12) !important; }
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_prev:hover,
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_next:hover {
+            background: rgba(255,255,255,.1) !important;
+            color: #fff !important;
         }
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev.off,
-        .episode_area#bottomEpisodeList .episode_lst .pg_next.off {
-            opacity: 0 !important;
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_prev:focus-visible,
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_next:focus-visible { outline-offset: -3px !important; }
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_prev.off,
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_next.off {
+            opacity: .4 !important;
+            cursor: default !important;
             pointer-events: none !important;
-        }
-        .episode_area#bottomEpisodeList .episode_lst { --wt-fade-l: 0px; --wt-fade-r: 0px; }
-        .episode_area#bottomEpisodeList .episode_lst:has(> .paginate > .pg_prev:not(.off)) { --wt-fade-l: 64px; }
-        .episode_area#bottomEpisodeList .episode_lst:has(> .paginate > .pg_next:not(.off)) { --wt-fade-r: 64px; }
-        .episode_area#bottomEpisodeList .episode_lst .episode_cont {
-            -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--wt-fade-l), #000 calc(100% - var(--wt-fade-r)), transparent 100%) !important;
-            mask-image: linear-gradient(90deg, transparent 0, #000 var(--wt-fade-l), #000 calc(100% - var(--wt-fade-r)), transparent 100%) !important;
         }
         /* text-indent:0 — the pseudo inherits the site's text-indent:100%
            hidden-label trick, which shoved the chevron to the button's right edge. */
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev::before,
-        .episode_area#bottomEpisodeList .episode_lst .pg_next::after {
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_prev::before,
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_next::after {
             content: '' !important;
+            position: absolute !important;
             inset: 0 !important;
             margin: auto !important;
             width: 16px !important;
@@ -2964,11 +3025,7 @@
             -webkit-mask: var(--wt-ico-chevron-right) center / contain no-repeat !important;
             mask: var(--wt-ico-chevron-right) center / contain no-repeat !important;
         }
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev::before,
-        .episode_area#bottomEpisodeList .episode_lst .pg_next::after { transition: transform .18s ease !important; }
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev::before { transform: rotate(180deg) !important; }
-        .episode_area#bottomEpisodeList .episode_lst .pg_prev:hover::before { transform: translateX(-2px) rotate(180deg) !important; }
-        .episode_area#bottomEpisodeList .episode_lst .pg_next:hover::after { transform: translateX(2px) !important; }
+        .episode_area:is(#bottomEpisodeList, #topEpisodeList) .episode_lst .pg_prev::before { transform: rotate(180deg) !important; }
 
         /* "Want more? Read more episodes … on the WEBTOON App" — shown under
            the newest free episode. Base: a full-bleed #2f2f2f band that
@@ -5095,7 +5152,10 @@
             letter-spacing: .01em !important;
             text-transform: none !important;
         }
-        .discover_spot_inner h3.tit::before,
+        /* Weekly HOT / Popular By Category headings sit behind a green
+           bar. "Recommended series" has none: its carousel matches the
+           reader's episode strips, where green marks only the episode
+           being read (the user's call). */
         .discover_cont_area h2.tit::before {
             content: '' !important;
             flex: none !important;
@@ -5225,7 +5285,7 @@
             transition: width .25s ease, background-color .2s ease !important;
         }
         .discover_spot .paging .ico_discover_pg.on,
-        .discover_spot .paging .ico_discover_pg[aria-current="true"] { width: 24px !important; background: var(--wt-accent) !important; }
+        .discover_spot .paging .ico_discover_pg[aria-current="true"] { width: 24px !important; background: var(--wt-text) !important; }
 
         /* Weekly HOT / Popular By Category: each block is a section card.
            Negative side margins grow the card outwards, so the 6-column grid
@@ -8696,15 +8756,19 @@
            list, a disabled arrow stays in place dimmed (no layout shift),
            and hover is a neutral tint (green means "selected" here).
            - The container spans the whole 1400px toolbar, so the capsule
-             needs width: max-content; 7px down centres it in the 51px bar.
+             needs width: max-content; 5px down centres it in the 51px bar.
            - The site gives #N its own top margin, which left it 6px below
              the arrows (the old fix was a translateY(-5px) nudge); with the
              margin reset everything shares one centre line.
            - Chevrons are masks: the ❮ ❯ text glyphs drawn here before never
              centred. .pg_prev::before also carries the site's dark arrow
              sprite, which background: currentColor replaces.
-           - Segments are 40 × 34px (WCAG 2.5.8 asks for 24px); the focus
-             ring is inset (-3px) so the capsule's clipping can't hide it.
+           - Wide segments, so changing episode needs no aiming (the user's
+             call): arrows 88 × 38px, #N at least 96px (WCAG 2.5.8 asks for
+             24px). #N is 20px bold (the user asked for it much bigger) and
+             can't be selected (each click selected the number). The whole segment is the target, not just the chevron.
+             The focus ring is inset (-3px) so the capsule's clipping can't
+             hide it.
            - A disabled arrow is a <span class="pg_prev dim">, not an <a>. */
         .paginate.v2 {
             display: flex !important;
@@ -8712,8 +8776,8 @@
             gap: 0 !important;
             box-sizing: border-box !important;
             width: max-content !important;
-            height: 36px !important;
-            margin: 7px auto 0 !important;
+            height: 40px !important;
+            margin: 5px auto 0 !important;
             padding: 0 !important;
             border-radius: 999px !important;
             background: var(--wt-bg-elev2) !important;
@@ -8725,9 +8789,9 @@
             display: block !important;
             position: relative !important;
             flex: 0 0 auto !important;
-            width: 40px !important;
-            min-width: 40px !important;
-            height: 34px !important;
+            width: 88px !important;
+            min-width: 88px !important;
+            height: 38px !important;
             margin: 0 !important;
             padding: 0 !important;
             border-radius: 0 !important;
@@ -8743,8 +8807,8 @@
             position: absolute !important;
             inset: 0 !important;
             margin: auto !important;
-            width: 14px !important;
-            height: 14px !important;
+            width: 16px !important;
+            height: 16px !important;
             font-size: 0 !important;
             text-indent: 0 !important;
             background: currentColor !important;
@@ -8760,28 +8824,36 @@
             justify-content: center !important;
             gap: 6px !important;
             box-sizing: border-box !important;
-            min-width: 56px !important;
-            height: 34px !important;
+            min-width: 96px !important;
+            height: 38px !important;
             margin: 0 !important;
-            padding: 0 12px !important;
+            padding: 0 18px !important;
             border-left: 1px solid rgba(255,255,255,.12) !important;
             border-right: 1px solid rgba(255,255,255,.12) !important;
             color: var(--wt-text) !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
+            font-size: 20px !important;
+            font-weight: 700 !important;
             font-variant-numeric: tabular-nums !important;
             line-height: 1 !important;
             cursor: pointer !important;
+            /* It is a button, not text: clicking it selected the number. */
+            -webkit-user-select: none !important;
+            user-select: none !important;
             transition: background-color .15s ease, color .15s ease !important;
         }
         .paginate.v2 .tx::after {
             content: '' !important;
-            width: 10px !important;
-            height: 10px !important;
+            width: 12px !important;
+            height: 12px !important;
             background: var(--wt-text-read) !important;
             -webkit-mask: var(--wt-ico-chevron-down) center / contain no-repeat !important;
             mask: var(--wt-ico-chevron-down) center / contain no-repeat !important;
         }
+        /* Open list: the caret points up. The site marks the open dropdown
+           strip with .unfd on #topEpisodeList, a later sibling of the
+           navigator, and the click listener makes a second click on #N close
+           it. No transition, so reduced motion needs no entry. */
+        .paginate.v2:has(~ #topEpisodeList.unfd) .tx::after { transform: rotate(180deg) !important; }
         .paginate.v2 a.pg_prev:hover,
         .paginate.v2 a.pg_next:hover,
         .paginate.v2 .tx:hover {
@@ -10722,14 +10794,31 @@
         });
     }
 
-    // /canvas sort: the theme shows the dropdown's options as an always-open
-    // switch and hides its trigger, but the site ignores option clicks
-    // unless its own menu state says "open" (opening it programmatically
-    // first was not enough). The site's click ends in a load of the same
-    // list with ?sortOrder=<data-sort> from page 1, so do exactly that.
+    // Click fixes for controls the theme redraws (one capture listener, only
+    // while the theme is on):
+    // - Reader toolbar "#N": the site binds it to open() only; the list
+    //   closes from the ︿ tab (._btnCloseEpisodeList). The theme draws #N as
+    //   a menu button with a caret, which promises that a second click
+    //   closes, so a click on #N while the list is open (.unfd) clicks the
+    //   site's own close button instead.
+    // - /canvas sort: the theme shows the dropdown's options as an always-open
+    //   switch and hides its trigger, but the site ignores option clicks
+    //   unless its own menu state says "open" (opening it programmatically
+    //   first was not enough). The site's click ends in a load of the same
+    //   list with ?sortOrder=<data-sort> from page 1, so do exactly that.
     document.addEventListener('click', (e) => {
-        if (!themeActive()) return;
-        const opt = e.target.closest && e.target.closest('.sort_area._sorting .sort_box a[data-sort]');
+        if (!themeActive() || !e.target.closest) return;
+        if (e.target.closest('#toolbar ._btnOpenEpisodeList')) {
+            const list = document.getElementById('topEpisodeList');
+            const close = document.querySelector('#toolbar ._btnCloseEpisodeList');
+            if (list && close && list.classList.contains('unfd')) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                close.click();
+            }
+            return;
+        }
+        const opt = e.target.closest('.sort_area._sorting .sort_box a[data-sort]');
         if (!opt) return;
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -10853,6 +10942,29 @@
             if (box) box.toggleAttribute('data-wt-zero', ZERO_AMOUNT.test(a.textContent.trim()));
         });
     }
+    // Episode strips (under the comic, and the toolbar's list): their header
+    // shows the reading progress, and under the comic also the series title
+    // (CSS attr()); the strips carry neither. The title is the site's own,
+    // from the toolbar, so it is in the page's language; the progress is
+    // numbers only. Counted once the page is parsed: while it loads, the
+    // list is still growing.
+    function tagEpisodeStrip() {
+        if (document.readyState === 'loading') return;
+        for (const id of ['bottomEpisodeList', 'topEpisodeList']) {
+            const strip = document.getElementById(id);
+            if (!strip || strip.dataset.wtPos) continue;
+            if (id === 'bottomEpisodeList') {
+                const title = document.querySelector('#toolbar .subj_info .subj');
+                const text = title && (title.getAttribute('title') || title.textContent).trim();
+                if (text) strip.dataset.wtSeries = text;
+            }
+            const items = [...strip.querySelectorAll('.episode_cont li')];
+            const pos = items.findIndex(li => li.querySelector(':scope > a.on')) + 1;
+            if (!pos) continue;
+            strip.dataset.wtPos = `${pos} / ${items.length}`;
+            strip.dataset.wtProgress = String(Math.round(pos / items.length * 20));
+        }
+    }
     // Creator bio (community app): its two-line clamp cuts letter by
     // letter, so a folded bio ended mid-word ("…for publishers such as
     // Webtoon, Scholas... more"). Drop the partial word, and the comma or
@@ -10947,6 +11059,7 @@
         upgradeRankingThumbs();
         tagGenreLabels();
         tagPatronAmount();
+        tagEpisodeStrip();
         trimBioCut();
         darkenEmojiPickers();
         darkenConsentBanner();

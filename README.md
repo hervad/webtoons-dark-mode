@@ -17,7 +17,7 @@ This theme takes the opposite approach. Every part of WEBTOON's pages was restyl
 
 <p align="center">
   <img src="docs/screenshots/series.jpg" width="32%" alt="A series page: the title over the cover art, episode tiles with green unread dots and flame like counts, and the sidebar card">
-  <img src="docs/screenshots/reader.jpg" width="32%" alt="Under the comic: the end card with Like and Subscribe, the episode strip and the ranking cards">
+  <img src="docs/screenshots/reader.jpg" width="32%" alt="Under the comic: the end card with Like and Subscribe, the episode card with large covers, a reading-progress bar and a wide pager, and the ranking cards">
   <img src="docs/screenshots/comments.jpg" width="32%" alt="The comment panel with letter avatars and amber TOP comments">
 </p>
 
@@ -102,8 +102,8 @@ The toggles are also in your userscript manager's menu (click its icon while on 
 - The panels sit on a dark page as one long card with a soft shadow, with no seams or white gaps between them.
 - **Night dim** (`Alt + Shift + N`) lowers the brightness of the panels only, for reading in a dark room.
 - Under the last panel, Like and Subscribe are two equal green buttons. Liking an episode turns the button deep orange with a short burst of flames.
-- The episode strip shows two-line titles, with round buttons over a soft fade where more episodes continue. The rankings sit in a row of large, sharp covers above the comments.
-- In the top toolbar, the previous / episode number / next control is one tidy capsule, and the number opens the episode list.
+- Under the comic, the series' other episodes sit in one card: large covers with each episode's title on them, the series name on top and a wide ‹ › pager. The rankings sit in a row of large, sharp covers above the comments.
+- In the top toolbar, previous / episode number / next is one tidy capsule with big buttons; the number opens and closes the episode list.
 - Optional: turn on the `←` / `→` keys for the previous and next episode (see [Using it](#using-it)).
 - On wide screens, the empty margins beside the page are gently shaded (edge shading, `Alt + Shift + V`).
 
@@ -137,7 +137,7 @@ WEBTOON's comment section comes with a dark colour set that the site never switc
 
 ### On your phone
 
-New in 1.9.0: the mobile site, `m.webtoons.com`, is dark from top to bottom. That covers the header and tabs, series pages and their info sheet, the reader and its comments, login, the menus, the footer and the app pop-ups. Green buttons use the same deep green as on desktop. See [On a phone or tablet](#on-a-phone-or-tablet) to install it.
+The mobile site, `m.webtoons.com`, is dark too, from top to bottom. That covers the header and tabs, series pages and their info sheet, the reader and its comments, login, the menus, the footer and the app pop-ups. Green buttons use the same deep green as on desktop. See [On a phone or tablet](#on-a-phone-or-tablet) to install it.
 
 ### Small things the site itself doesn't do
 

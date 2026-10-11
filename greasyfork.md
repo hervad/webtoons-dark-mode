@@ -10,7 +10,7 @@ Screenshots: [github.com/hervad/webtoons-dark-mode](https://github.com/hervad/we
 
 ## What's different
 
-**Reading an episode.** The panels sit on a dark page as one long card with a soft shadow, with no seams or white gaps between them. **Night dim** (`Alt + Shift + N`) lowers the brightness of the panels only, for reading in a dark room. Under the last panel, Like and Subscribe are two equal green buttons, and liking an episode turns the button deep orange with a short burst of flames. The episode strip has round buttons over a soft fade, the toolbar's ‹ #18 ▾ › is one tidy capsule, and the rankings sit in a row of large, sharp covers above the comments. If you like, `←` / `→` can take you to the previous and next episode.
+**Reading an episode.** The panels sit on a dark page as one long card with a soft shadow, with no seams or white gaps between them. **Night dim** (`Alt + Shift + N`) lowers the brightness of the panels only, for reading in a dark room. Under the last panel, Like and Subscribe are two equal green buttons, and liking an episode turns the button deep orange with a short burst of flames. The other episodes sit in a card of large covers with their titles on them and a bar showing how far into the series you are, the toolbar's ‹ #18 ▾ › is one tidy capsule with big buttons, and the rankings sit in a row of large, sharp covers above the comments. If you like, `←` / `→` can take you to the previous and next episode.
 
 **Comments.** WEBTOON's comment section comes with a dark colour set that the site never switches on. The script switches it on, then finishes the job:
 
@@ -26,7 +26,7 @@ Screenshots: [github.com/hervad/webtoons-dark-mode](https://github.com/hervad/we
 
 **Everything else.** Login and sign-up, account settings, My Comments, subscriptions, creator profiles, community feeds, the CANVAS Creator Dashboard, search, pop-ups, the mature-content notice, the age check and the cookie banner.
 
-**On your phone.** New in 1.9.0: the mobile site, m.webtoons.com, is dark from top to bottom. That covers the header and tabs, series pages, the reader and its comments, login, the menus, the footer and the app pop-ups.
+**On your phone.** The mobile site, m.webtoons.com, is dark too, from top to bottom. That covers the header and tabs, series pages, the reader and its comments, login, the menus, the footer and the app pop-ups.
 
 **Things the site itself doesn't do.** Text meets WCAG AA contrast, there's a visible focus ring for keyboard users, the theme respects your reduce-motion setting, and it steps aside under Windows High Contrast. Pages are dark from the first frame, with no white flash while they load.
 
