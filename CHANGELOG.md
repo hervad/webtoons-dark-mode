@@ -8,6 +8,12 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.11.1] - 2026-10-11
+
+### Changed
+
+- **Reader and CANVAS:** hovering a cover in the episode strips or in CANVAS's "Recommended series" only darkens it again; the white ring 1.11.0 added around it is gone. The only outline left in those rows is the green one on the episode you're reading.
+
 ## [1.11.0] - 2026-10-11
 
 ### Changed
@@ -1110,7 +1116,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.1...HEAD
+[1.11.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.8.6...v1.9.0

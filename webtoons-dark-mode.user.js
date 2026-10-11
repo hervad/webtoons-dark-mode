@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.11.0
+// @version      1.11.1
 // @description  A hand-made dark theme for WEBTOON (webtoons.com): the comics stay exactly as drawn, and the reader, comments and phone site go dark. Toggle with Alt+Shift+T; night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -31,7 +31,7 @@
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
     const KEY_ARROWS = 'wt_arrow_keys';
-    const VERSION = '1.11.0';
+    const VERSION = '1.11.1';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which
@@ -678,22 +678,6 @@
         .discover_spot li:hover img {
             filter: brightness(.7) !important;
         }
-        /* "Recommended series" (/canvas home) tiles: a light ring over the
-           darkened cover on hover, like the reader's episode strip (the
-           user's call). Not green: in these carousels green marks only the
-           episode being read (the user's call). The tile is a positioned
-           <li> under a full-size link; the ring is a layer above it that
-           takes no clicks. */
-        .discover_spot li.rolling-item::after {
-            content: '' !important;
-            position: absolute !important;
-            inset: 0 !important;
-            z-index: 3 !important;
-            pointer-events: none !important;
-            box-shadow: inset 0 0 0 2px transparent !important;
-            transition: box-shadow .2s ease !important;
-        }
-        .discover_spot li.rolling-item:hover::after { box-shadow: inset 0 0 0 2px rgba(255,255,255,.6) !important; }
         /* Hover darken extended to: viewer bottom episode strip + viewer sidebar
            "Trending & Popular" / "Top Originals" rankings. */
         .episode_lst li .thmb img, .episode_lst li img,
@@ -2925,12 +2909,13 @@
             letter-spacing: 0 !important;
             text-shadow: 0 1px 3px rgba(0,0,0,.8) !important;
         }
-        /* Hover is the listing pages' cue (darken the cover, no lift), with
-           a light ring (a green title over the art was hard to read). Not
-           green: green marks only the episode being read (the user's call). */
+        /* Hover is the listing pages' cue: the cover darkens, nothing else
+           (no lift, no ring; a ring of any colour read as one more line, and
+           green marks only the episode being read: the user's call). Keyboard
+           focus keeps a light ring on the cover: the viewport clips the
+           tile, so the generic outline around it would be cut off. */
         :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a:hover .thmb img,
         :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a:focus-visible .thmb img { filter: brightness(.7) !important; }
-        :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a:hover .mask,
         :is(#bottomEpisodeList, #topEpisodeList) .episode_lst li a:focus-visible .mask {
             box-shadow: inset 0 0 0 2px rgba(255,255,255,.6) !important;
         }
