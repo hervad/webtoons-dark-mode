@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Webtoons Dark Mode
 // @namespace    https://github.com/hervad/webtoons-dark-mode
-// @version      1.11.1
+// @version      1.11.2
 // @description  A hand-made dark theme for WEBTOON (webtoons.com): the comics stay exactly as drawn, and the reader, comments and phone site go dark. Toggle with Alt+Shift+T; night-reading dim with Alt+Shift+N.
 // @author       hervad
 // @match        https://www.webtoons.com/*
@@ -31,7 +31,7 @@
     const KEY_VIGNETTE = 'wt_vignette';
     const KEY_TOP_BTN = 'wt_top_button';
     const KEY_ARROWS = 'wt_arrow_keys';
-    const VERSION = '1.11.1';
+    const VERSION = '1.11.2';
 
     // Log the startup banner as the FIRST runtime statement so that if anything
     // below throws, the console still proves the script loaded and which

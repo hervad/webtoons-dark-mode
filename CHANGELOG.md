@@ -8,6 +8,12 @@ Builds 1.0.17–1.0.34 and 1.0.52–1.0.57 were published without an entry here;
 
 ## [Unreleased]
 
+## [1.11.2] - 2026-10-11
+
+### Fixed
+
+- **Toonlight extension:** in the toolbar popup, the long "Turn on ← / → for previous / next episode" setting wraps onto two lines, and its text touched the button's top and bottom edges. The buttons now have room inside. Nothing changes in the userscript.
+
 ## [1.11.1] - 2026-10-11
 
 ### Changed
@@ -1116,7 +1122,8 @@ Not done (intentional):
 - `@noframes` so the script doesn't re-run inside ad iframes.
 - Style injection at `@run-at document-start` to avoid flash of light theme.
 
-[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.1...HEAD
+[Unreleased]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.2...HEAD
+[1.11.2]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.1...v1.11.2
 [1.11.1]: https://github.com/hervad/webtoons-dark-mode/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/hervad/webtoons-dark-mode/compare/v1.9.0...v1.10.0
