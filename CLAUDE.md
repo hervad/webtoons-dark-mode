@@ -416,6 +416,7 @@ The tools are in `.claude/tools/`, which is gitignored, so they exist on this ma
 | `perf-swap.mjs <old> <new> <name=url[@mobile]>…` | Style cost of two versions on the same DOM: parse + match, and a whole-page restyle, ABAB blocks. Run old vs old first for the noise floor. |
 | `compare-sheet.mjs <beforeDir> <afterDir> <outDir>` | Before / after JPEG per page from two `mobile-audit.mjs` runs. |
 | `firefox-mobile.mjs <addonDir\|-> <outDir> <pages.json\|name=url…>` | The built add-on (`dist/firefox`, temporary install) on m.webtoons.com in headless Firefox over WebDriver BiDi (no geckodriver): Android user agent, meta viewport on, 390×844. Same in-page text / light-box checks as `mobile-audit.mjs`, plus screenshots. Gecko, not a phone: Android's fonts and native pickers aren't covered. |
+| `store-popup.sh <out.png> [panelIndex]` | Store screenshot 5: the built `dist/chrome` popup (menu labels from a stub; add new settings to `LABELS`) over an Office Romance Contract reader panel, 1280 × 800 RGB. Fedora machine. |
 
 - For an "old" copy: `git show HEAD:webtoons-dark-mode.user.js > <scratch>/old.user.js`.
 - **Machines differ.** On the Fedora machine the browser is `chromium-browser`. It has the mobile tools above, a smaller `style-diff.mjs` (old vs new, then swapped back to old to drop animation noise; `KEEP=` lists containers that must not change), a compatible `shot.mjs` (plus `CLIP=`, `CSS=` to prototype, `HOVER="a >> b"`, `POSTJS` / `POSTDUMP`), `perf-swap.mjs` and `key-checks.mjs` (← / → episode keys and the theme shortcut, real key events). `perf.mjs`, `js-checks.mjs`, `coverage.mjs` and `ext-test.mjs` are on the other machine.
@@ -450,7 +451,11 @@ git push origin main
 git tag vX.Y.Z && git push origin vX.Y.Z
 # 4. GitHub release
 gh release create vX.Y.Z --title "vX.Y.Z — <short title>" --notes-from-tag
+# 5. Extension: node tools/build-extension.mjs, THEN the source zip (the build deletes every zip in dist/)
+git archive --format=zip -o dist/toonlight-X.Y.Z-source.zip HEAD
 ```
+
+The store uploads (Chrome, Edge, AMO) follow "Each new version" in `extension/STORE.md`: the user does them in the browser, step by step, with Claude preparing the texts (`dist/*-notes*.txt`) and screenshots.
 
 There are two install channels:
 

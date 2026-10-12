@@ -6,6 +6,8 @@ Reading at night on webtoons.com means a bright white page around every episode.
 
 This theme takes the opposite approach. Every part of WEBTOON's pages was restyled by hand, from the menus and episode lists to the comments, the reader and the phone site. Nothing ever touches the comic panels: no filter, no colour shift.
 
+It comes in two forms that run the same code: the **Toonlight** browser extension (Chrome, Edge, Firefox) and the **Webtoons Dark Mode** userscript ([Install](#install)).
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/hervad/webtoons-dark-mode)](https://github.com/hervad/webtoons-dark-mode/releases/latest)
 [![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-install-670000)](https://greasyfork.org/scripts/577859)
@@ -179,6 +181,8 @@ Measured in Chrome with the theme on, the browser's styling work while a page lo
 - **What it stores:** only its own settings: dark mode on or off, reader dim, edge shading, the scroll-to-top choice, the arrow-keys choice, and whether you were logged in on the last page (a yes / no, used for the LOG IN fix). In Greasemonkey and the Safari Userscripts app, a copy of these settings is also kept in webtoons.com's local storage so the first frame of each page already has them.
 - **Network:** the script makes no requests of its own and sends no data anywhere. The one exception is a change to what the page loads: in the reader, the ranking covers are swapped from Webtoons' 92 px images to the 210 px size of the same images, on Webtoons' own image server. Those few covers are therefore downloaded a second time, in the larger size.
 
+The full privacy policy, which also covers the Toonlight extension, is in [PRIVACY.md](PRIVACY.md).
+
 ## Customising the colours
 
 The palette is the first block in the script. These are the main values:
@@ -228,7 +232,7 @@ Webtoons occasionally renames parts of its pages, which can make an area light a
 - a screenshot
 - if you can, the element's class name (right-click it → **Inspect**)
 
-These are usually quick fixes.
+These are usually quick fixes. To report a security problem privately instead, see [SECURITY.md](SECURITY.md).
 
 ## Also by the author
 
@@ -236,7 +240,14 @@ These are usually quick fixes.
 
 ## Development
 
-Everything lives in one file, [`webtoons-dark-mode.user.js`](webtoons-dark-mode.user.js), with no build step. To test changes, paste the file into a new Tampermonkey script, or point Tampermonkey at your local copy. [`CLAUDE.md`](CLAUDE.md) documents the architecture, Webtoons' page structure, known pitfalls, and the release checklist. [`CHANGELOG.md`](CHANGELOG.md) describes the changes in each release.
+The theme lives in one file, [`webtoons-dark-mode.user.js`](webtoons-dark-mode.user.js), with no build step. To test changes, paste the file into a new Tampermonkey script, or point Tampermonkey at your local copy.
+
+The Toonlight extension is built from that file, unchanged: `node tools/build-extension.mjs` (Node 22+, no dependencies) writes `dist/chrome/` (Chrome and Edge), `dist/firefox/` and a zip of each. [`extension/STORE.md`](extension/STORE.md) has the store listings and the publishing steps.
+
+- [`CONTRIBUTING.md`](CONTRIBUTING.md): how to report problems and send changes.
+- [`CLAUDE.md`](CLAUDE.md): the architecture, Webtoons' page structure, known pitfalls and the release checklist.
+- [`CHANGELOG.md`](CHANGELOG.md): the changes in each release.
+- [`ACCESSIBILITY.md`](ACCESSIBILITY.md): the accessibility details behind the summary above.
 
 ## License
 

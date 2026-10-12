@@ -44,7 +44,7 @@ This writes `dist/toonlight-<version>-chrome.zip` (Chrome and Edge), `dist/toonl
 - `promo-large-1400x560.png`: Edge's large promo tile, used only if Microsoft features the item in a banner. It is all original: the moon icon, text in Inter (SIL OFL, which allows logo use), an abstract page sketch of plain shapes, WEBTOON only as plain grey text, and a "Not affiliated" line.
 - Store icon: `extension/icons/icon-128.png` (Chrome, AMO); Edge wants `store-logo-300.png` (300 × 300).
 
-They are build output and stay out of git (`dist/` is ignored); the README's smaller copies are in `docs/screenshots/`. `python -I tools/make-icons.py` redraws the 300 px logo; the screenshots and tiles come from local tools in `.claude/tools/` (`store-images.py`, `promo-large.py`).
+They are build output and stay out of git (`dist/` is ignored); the README's smaller copies are in `docs/screenshots/`. `python -I tools/make-icons.py` redraws the 300 px logo; the screenshots and tiles come from local tools in `.claude/tools/` (`store-images.py`, `promo-large.py`, on the other machine). On the Fedora machine, `.claude/tools/store-popup.sh <out.png>` remakes `5-reader-popup.png` from the built `dist/chrome` popup (a stub supplies the menu labels; add a new setting's label to its `LABELS`), and `shot.mjs` with `W=1600 H=1000`, scaled to 1280 × 800, makes the reader shots (`2-reader-end.png`: the end card and the episode strip of Office Romance Contract episode 1).
 
 Captions, where a store asks:
 
@@ -115,11 +115,13 @@ Captions, where a store asks:
 6. **Publish → Submit your extension:** answer **Yes** to "Does a tester need … other info": with No, the notes box is disabled, and Microsoft warns that submissions without notes may be flagged. Notes for certification:
 
    ```text
-   No account or setup needed. Open any page on https://www.webtoons.com (for example https://www.webtoons.com/en/originals or any series page and episode): the dark theme applies automatically on first run.
+   No account or setup needed. Open any page on https://www.webtoons.com (for example https://www.webtoons.com/en/originals or any series page and episode): the dark theme applies automatically on first run. The mobile site m.webtoons.com is themed too (it needs a phone user agent; on desktop it redirects to www).
 
    How to test:
    - Alt+Shift+T turns the theme off and on; the choice is remembered across reloads.
    - Alt+Shift+N dims only the comic panels in the episode reader.
+   - In the episode reader (for example https://www.webtoons.com/en/super-hero/unordinary/episode-100/viewer?title_no=679&episode_no=100), the episode list under the comic and the one opened from the episode number in the toolbar show the episodes as covers with a ‹ › pager.
+   - Optional, off by default: in the toolbar popup, turn on "← / → for previous / next episode"; then the ← and → keys open the previous and next episode in the reader. They do nothing while typing in a field.
    - The toolbar button opens a popup with the same settings.
 
    The extension only runs on www.webtoons.com and m.webtoons.com. It uses the "storage" permission to save these settings locally, collects no data, loads no remote code and makes no network requests of its own. Source code: https://github.com/hervad/webtoons-dark-mode
@@ -157,11 +159,52 @@ Captions, where a store asks:
 5. **Submit Version.** Publication usually takes up to 24 hours (longer if picked for manual review); AMO emails when it's live.
 6. **Manage Listing → Edit Product Page → Images:** the icon and the five screenshots with their captions. They aren't part of the submission form.
 
+## AlternativeTo
+
+Listed since 2026-10-12: https://alternativeto.net/software/toonlight/about/ (approved the same day, in the free queue). It's a directory, not a store: nothing is uploaded, and people find it through the apps it's listed as an alternative to. Anyone can suggest edits (**Contribute to this app** → edit); the site's team reviews them before they show.
+
+- **Name:** `Toonlight` only (the form forbids taglines).
+- **Short description:** A browser extension that gives the WEBTOON website a hand-made dark theme without touching the comic panels.
+- **Full description** (no links allowed in it):
+  > WEBTOON's website has no dark mode. This makes webtoons.com dark: the menus, series pages and episode lists, the reader, comments and the mobile site.
+  >
+  > Unlike general dark-mode tools, it doesn't guess or invert colors. WEBTOON's pages were styled by hand, so the comics stay exactly as they were drawn. An optional night dim lowers only the panels' brightness when you read in the dark, and keyboard shortcuts turn the theme and the dim on and off.
+  >
+  > It's free, with no ads, no paid version and no account. It collects no data and runs only on webtoons.com. The code is open source (MIT).
+  >
+  > Downsides: it only works on WEBTOON, and when WEBTOON changes its site, some parts can show up light until the theme is updated.
+  >
+  > Also available as a userscript for Tampermonkey and Violentmonkey, on Greasy Fork. An independent project, not affiliated with NAVER WEBTOON.
+- **Tags:** `dark-mode-extension`, `browser-extension`, `webcomics`, `webtoon`, `userscript`, `dark-mode-enforcer`. The last one matters: it's the application type (Dark Mode Enforcer) that Dark Reader and the other alternatives share; without it Toonlight had nothing in common with them. Tags that are really features (`ad-free`, `lightweight`) are converted to features by the site.
+- **Features:** Dark Mode, Ad-free, Browser extension. Lightweight is left unticked: it claims "less than similar apps", which hasn't been measured.
+- **Platforms:** Chrome, Firefox, Edge, with the three store links. Firefox note: "Needs Firefox 142 or later. Also works in Firefox for Android." The reviewer dropped Brave and Vivaldi.
+- **Alternatives:** Dark Reader, Midnight Lizard, Night Eye, Turn Off the Lights (each suggestion is reviewed separately from the listing).
+- **Icon:** 512 px PNG from `python -I tools/make-icons.py` (`dist/store/icon-512.png`); the site wants 280 px or more.
+- **Screenshots** (1280 × 800, under 3 MB each), in this order, with captions:
+  1. `docs/screenshots/series.jpg`: Series page: episode list, sidebar and synopsis
+  2. `docs/screenshots/before-after.jpg`: Series page without and with the dark theme (its label still says "Webtoons Dark Mode", so it isn't first)
+  3. `docs/screenshots/reader.jpg`: End of an episode: like, subscribe, episode strip and rankings
+  4. `docs/screenshots/comments.jpg`: Comments in one clean panel
+  5. `docs/screenshots/mobile.jpg`: The mobile site (m.webtoons.com)
+  6. `dist/store/5-reader-popup.png`: The toolbar popup with the reader settings
+- **Author:** hervad (github.com/hervad). The listing shows "Coen", the GitHub profile's display name.
+
+Update it only when the description, the platforms or the look of a screenshot changes; a new version alone needs nothing there.
+
 ## Each new version
 
-1. Bump `@version` in the userscript as usual (the extension takes it from there), and commit.
-2. `node tools/build-extension.mjs`, then the `git archive` line above for the source zip.
-3. Upload the new zips:
-   - Chrome Web Store: the item → **Package** → Upload new package → Submit for review.
-   - Edge: the extension → **Update** → Packages → Replace; certification notes are required again on every submission.
-   - AMO: the add-on → **Upload New Version**; answer Yes to source code, upload the new source zip, and reuse the reviewer notes with the new version number.
+1. Bump `@version` in the userscript as usual (the extension takes it from there), and commit. Any change to `extension/` also needs a bump: a store rejects a package whose version isn't higher, even when the userscript itself didn't change.
+2. `node tools/build-extension.mjs`, **then** the `git archive` line above (the build deletes every zip in `dist/`, the source zip too). Check `unzip -p dist/toonlight-<version>-chrome.zip manifest.json | grep version`.
+3. Upload one version at a time: if a store still has an earlier version in review, wait for it (or cancel that review first). A store several versions behind gets release notes covering everything since its version.
+4. **Chrome Web Store:** the item → **Package** → **Upload new package** (the Draft column must show the new version) → **Save draft** after every page you change → **Submit for review**, "publish automatically" ticked. An update takes about 1–3 days. Chrome has no release-notes field.
+5. **Edge:** the extension → **Packages** → **Replace** (the row must show the new version and Complete) → **Save & Continue** → **Publish** → **Yes** to "tester needs other info" → certification notes (above, required on every submission). Don't touch **Cancel submission** or **Unpublish** on the overview; the live version stays until the review passes (up to 7 business days).
+6. **AMO:** the add-on → **Upload New Version** → validation → **Yes** to source code + the new source zip → **Release notes** (what's new, shown to users) and **Notes to reviewer** (the build steps above, with the new version number and a "new since the last approved version" line). Updates usually go public within minutes after the automatic checks (1.11.2: 3 minutes) and can still be picked for manual review later. Check with `curl -s https://addons.mozilla.org/api/v5/addons/addon/toonlight/ | jq .current_version.version`.
+
+**When a setting, a shortcut or the look of a screenshot changes,** update the listings too:
+
+- the `storage` justification (Chrome **Privacy**, Edge **Privacy**) names every saved setting;
+- the test steps in the Edge certification notes and the AMO reviewer notes;
+- the description (here first, then Chrome **Store listing**, Edge **Store listings → Edit details**, AMO **Edit Product Page → Describe Add-on**; Edge without the Firefox bullet);
+- the screenshots (`store-popup.sh` for the popup). Captions: Chrome has none; on AMO and Edge reuse the captions above. AMO listing text and images aren't reviewed and change at once; Chrome and Edge send them through review with the next submission.
+
+AMO's tags come from a fixed list; only `dark mode` fits.

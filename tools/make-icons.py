@@ -1,5 +1,6 @@
-"""Draws the extension icons (extension/icons/icon-{16,32,48,128}.png) and
-Edge's 300 px store logo (dist/store/store-logo-300.png):
+"""Draws the extension icons (extension/icons/icon-{16,32,48,128}.png),
+Edge's 300 px store logo (dist/store/store-logo-300.png) and the 512 px icon
+for AlternativeTo (dist/store/icon-512.png):
 a green crescent moon on the theme's dark card colour. Drawn at 512px and
 scaled down, so the small sizes stay crisp.
 
@@ -37,3 +38,6 @@ store = out.parent.parent / 'dist' / 'store'
 store.mkdir(parents=True, exist_ok=True)
 img.resize((300, 300), Image.LANCZOS).save(store / 'store-logo-300.png')
 print('store logo written to', store / 'store-logo-300.png')
+# AlternativeTo wants an icon of 280 px or more: the full 512 px drawing.
+img.save(store / 'icon-512.png')
+print('512 px icon written to', store / 'icon-512.png')
