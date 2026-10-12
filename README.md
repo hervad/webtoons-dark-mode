@@ -232,7 +232,7 @@ These are usually quick fixes.
 
 ## Also by the author
 
-[Webtoons Chapter Preloader](https://github.com/hervad/webtoons-chapter-preloader) ([Greasy Fork](https://greasyfork.org/scripts/575967)) loads every panel of the episode you open right away, instead of a few at a time as you scroll. It works alongside this theme. It's also available as the **Toonlight Preloader** browser extension for [Chrome](https://chromewebstore.google.com/detail/toonlight-preloader-for-w/kanadpglihpekgidpopkpblcheoinekh) and [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-preloader-for-w/mpgabnfjnfleojaokcojabpcpfnnpgfd).
+[Webtoons Chapter Preloader](https://github.com/hervad/webtoons-chapter-preloader) ([Greasy Fork](https://greasyfork.org/scripts/575967)) is made for WEBTOON too: open an episode and every panel is on its way, panel 1 first, so you don't wait for panels as you scroll. It works alongside this theme. It's also available as the **Toonlight Preloader** browser extension for [Chrome](https://chromewebstore.google.com/detail/toonlight-preloader-for-w/kanadpglihpekgidpopkpblcheoinekh), [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-preloader-for-w/mpgabnfjnfleojaokcojabpcpfnnpgfd) and [Firefox](https://addons.mozilla.org/firefox/addon/toonlight-preloader/).
 
 ## Development
 

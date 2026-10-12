@@ -83,7 +83,7 @@ There are no scroll handlers and no endless animations. Measured in Chrome, the 
 
 Webtoons occasionally renames parts of its pages, which can make an area light again. Please [open an issue on GitHub](https://github.com/hervad/webtoons-dark-mode/issues) (or use the Feedback tab) with the page URL and a screenshot. These are usually quick fixes.
 
-Also by the author: [Webtoons Chapter Preloader](https://greasyfork.org/scripts/575967) loads every panel of the episode you open right away. It works alongside this theme. It's also available as the **Toonlight Preloader** browser extension for [Chrome](https://chromewebstore.google.com/detail/toonlight-preloader-for-w/kanadpglihpekgidpopkpblcheoinekh) and [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-preloader-for-w/mpgabnfjnfleojaokcojabpcpfnnpgfd).
+Also by the author: [Webtoons Chapter Preloader](https://greasyfork.org/scripts/575967) is made for WEBTOON too: open an episode and every panel is on its way, panel 1 first, so you don't wait for panels as you scroll. It works alongside this theme. It's also available as the **Toonlight Preloader** browser extension for [Chrome](https://chromewebstore.google.com/detail/toonlight-preloader-for-w/kanadpglihpekgidpopkpblcheoinekh), [Edge](https://microsoftedge.microsoft.com/addons/detail/toonlight-preloader-for-w/mpgabnfjnfleojaokcojabpcpfnnpgfd) and [Firefox](https://addons.mozilla.org/firefox/addon/toonlight-preloader/).
 
 Source code, full changelog and colour-customisation guide: [github.com/hervad/webtoons-dark-mode](https://github.com/hervad/webtoons-dark-mode)
 
