@@ -252,3 +252,5 @@ The Toonlight extension is built from that file, unchanged: `node tools/build-ex
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+Webtoons Dark Mode (Toonlight) is an independent project and is not affiliated with, endorsed by or sponsored by NAVER WEBTOON. WEBTOON is a trademark of NAVER WEBTOON. The comics in the screenshots belong to their creators.
